@@ -127,8 +127,11 @@ with st.expander("Scoring Breakdown (top 20)"):
     top = filtered.head(20)
     for _, row in top.iterrows():
         reasons = row.get("reasons", "")
+        title = row.get("title", "Untitled")
+        url = row.get("url", "")
+        title_display = f"[{title}]({url})" if url else f"**{title}**"
         st.markdown(
-            f"**{row.get('title', 'Untitled')}** — Score: {row.get('score', 0)} | "
+            f"**{title_display}** — Score: {row.get('score', 0)} | "
             f"Absentee: {row.get('absentee', 'No')}\n\n"
             f"_{reasons}_"
         )
