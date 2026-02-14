@@ -87,7 +87,7 @@ st.divider()
 
 # --- Main table ---
 display_cols = [
-    "score", "bucket", "title", "asking_price_text",
+    "score", "bucket", "title", "asking_price",
     "annual_cash_flow", "cf_after_debt_20pct", "coc_return_20pct",
     "dscr_20pct", "absentee", "location", "url",
 ]
@@ -96,24 +96,9 @@ available = [c for c in display_cols if c in filtered.columns]
 if len(filtered) > 0:
     display_df = filtered[available].copy()
 
-    # Format CoC as percentage
+    # Convert CoC from decimal to percentage for display (0.97 -> 97)
     if "coc_return_20pct" in display_df.columns:
-        display_df["coc_return_20pct"] = display_df["coc_return_20pct"].apply(
-            lambda x: f"{x:.0%}" if pd.notna(x) else ""
-        )
-
-    # Format currency columns
-    for col in ["annual_cash_flow", "cf_after_debt_20pct"]:
-        if col in display_df.columns:
-            display_df[col] = display_df[col].apply(
-                lambda x: f"${x:,.0f}" if pd.notna(x) else ""
-            )
-
-    # Format DSCR
-    if "dscr_20pct" in display_df.columns:
-        display_df["dscr_20pct"] = display_df["dscr_20pct"].apply(
-            lambda x: f"{x:.2f}x" if pd.notna(x) else ""
-        )
+        display_df["coc_return_20pct"] = display_df["coc_return_20pct"] * 100
 
     st.dataframe(
         display_df,
@@ -121,11 +106,11 @@ if len(filtered) > 0:
             "score": st.column_config.NumberColumn("Score", width="small"),
             "bucket": st.column_config.TextColumn("Bucket", width="small"),
             "title": st.column_config.TextColumn("Business", width="large"),
-            "asking_price_text": st.column_config.TextColumn("Price", width="small"),
-            "annual_cash_flow": st.column_config.TextColumn("Cash Flow", width="small"),
-            "cf_after_debt_20pct": st.column_config.TextColumn("CF After Debt", width="small"),
-            "coc_return_20pct": st.column_config.TextColumn("CoC %", width="small"),
-            "dscr_20pct": st.column_config.TextColumn("DSCR", width="small"),
+            "asking_price": st.column_config.NumberColumn("Price", format="$%,.0f", width="small"),
+            "annual_cash_flow": st.column_config.NumberColumn("Cash Flow", format="$%,.0f", width="small"),
+            "cf_after_debt_20pct": st.column_config.NumberColumn("CF After Debt", format="$%,.0f", width="small"),
+            "coc_return_20pct": st.column_config.NumberColumn("CoC %", format="%.0f%%", width="small"),
+            "dscr_20pct": st.column_config.NumberColumn("DSCR", format="%.2fx", width="small"),
             "absentee": st.column_config.TextColumn("Absentee", width="small"),
             "location": st.column_config.TextColumn("Location", width="small"),
             "url": st.column_config.LinkColumn("Link", width="small"),
@@ -152,23 +137,32 @@ with st.expander("Scoring Breakdown (top 20)"):
 # --- SBA Comparison ---
 with st.expander("SBA Financing Comparison (10% vs 20% Down)"):
     sba_cols = [
-        "title", "asking_price_text",
-        "down_10", "sba_monthly_10pct", "cf_after_debt_10pct", "coc_return_10pct",
+        "title",
+        "asking_price", "down_10", "sba_monthly_10pct", "cf_after_debt_10pct", "coc_return_10pct",
         "down_20", "sba_monthly_20pct", "cf_after_debt_20pct", "coc_return_20pct",
     ]
     sba_available = [c for c in sba_cols if c in filtered.columns]
     sba_df = filtered[filtered["bucket"] != "AUTO-REJECT"][sba_available].head(20).copy()
 
-    for col in ["down_10", "down_20", "sba_monthly_10pct", "sba_monthly_20pct",
-                "cf_after_debt_10pct", "cf_after_debt_20pct"]:
-        if col in sba_df.columns:
-            sba_df[col] = sba_df[col].apply(
-                lambda x: f"${x:,.0f}" if pd.notna(x) else ""
-            )
+    # Convert CoC from decimal to percentage for display
     for col in ["coc_return_10pct", "coc_return_20pct"]:
         if col in sba_df.columns:
-            sba_df[col] = sba_df[col].apply(
-                lambda x: f"{x:.0%}" if pd.notna(x) else ""
-            )
+            sba_df[col] = sba_df[col] * 100
 
-    st.dataframe(sba_df, hide_index=True, use_container_width=True)
+    st.dataframe(
+        sba_df,
+        column_config={
+            "title": st.column_config.TextColumn("Business", width="large"),
+            "asking_price": st.column_config.NumberColumn("Price", format="$%,.0f"),
+            "down_10": st.column_config.NumberColumn("Down 10%", format="$%,.0f"),
+            "sba_monthly_10pct": st.column_config.NumberColumn("Monthly (10%)", format="$%,.0f"),
+            "cf_after_debt_10pct": st.column_config.NumberColumn("CF After Debt (10%)", format="$%,.0f"),
+            "coc_return_10pct": st.column_config.NumberColumn("CoC (10%)", format="%.0f%%"),
+            "down_20": st.column_config.NumberColumn("Down 20%", format="$%,.0f"),
+            "sba_monthly_20pct": st.column_config.NumberColumn("Monthly (20%)", format="$%,.0f"),
+            "cf_after_debt_20pct": st.column_config.NumberColumn("CF After Debt (20%)", format="$%,.0f"),
+            "coc_return_20pct": st.column_config.NumberColumn("CoC (20%)", format="%.0f%%"),
+        },
+        hide_index=True,
+        use_container_width=True,
+    )
