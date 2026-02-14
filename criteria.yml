@@ -1,0 +1,150 @@
+budget:
+  min_asking_price: 500000
+  max_asking_price: 3000000
+
+targets:
+  min_annual_cash_flow: 75000
+  prefer_annual_cash_flow: 300000
+  min_dscr: 1.25
+  prefer_dscr: 1.5
+  min_coc_return: 0.15
+  prefer_coc_return: 0.30
+
+sba:
+  interest_rate: 0.10
+  loan_term_years: 10
+  down_payment_pct_low: 0.10
+  down_payment_pct_high: 0.20
+
+no_go:
+  regulated_keywords:
+    - "franchise resale"
+    - "franchise agreement"
+    - "royalty fee"
+    - "gambling"
+    - "cannabis"
+    - "adult"
+    - "pharmaceutical"
+    - "payday loan"
+    - "firearms"
+    - "liquor store"
+    - "pawn"
+    - "check cashing"
+  digital_keywords:
+    - "online only"
+    - "digital only"
+    - "ecommerce only"
+    - "internet business"
+    - "website business"
+    - "saas"
+    - "mobile app"
+    - "subscription software"
+    - "digital marketing agency"
+    - "seo agency"
+    - "dropshipping"
+    - "amazon fba"
+    - "affiliate"
+
+absentee_signals:
+  likely:
+    - "absentee owner"
+    - "absentee-owner"
+    - "semi-absentee"
+    - "owner not involved"
+    - "manager-run"
+    - "manager run"
+  possible:
+    - "part time"
+    - "part-time owner"
+    - "minimal owner"
+    - "flexible hours"
+    - "run by staff"
+    - "staff managed"
+    - "owner works few hours"
+
+tech_deficiency_signals:
+  - "paper invoicing"
+  - "manual billing"
+  - "no crm"
+  - "no website"
+  - "weak online presence"
+  - "no online booking"
+  - "manual scheduling"
+  - "no automation"
+  - "spreadsheet"
+  - "old system"
+  - "outdated software"
+  - "phone orders only"
+  - "no technology"
+
+recurring_revenue_signals:
+  - "service contract"
+  - "maintenance agreement"
+  - "recurring revenue"
+  - "repeat customers"
+  - "annual contract"
+  - "subscription"
+  - "retainer"
+  - "route based"
+  - "route-based"
+  - "service route"
+
+durable_industries:
+  - "hvac"
+  - "plumbing"
+  - "electrical"
+  - "landscaping"
+  - "lawn care"
+  - "cleaning"
+  - "janitorial"
+  - "home service"
+  - "restoration"
+  - "pest control"
+  - "roofing"
+  - "painting"
+  - "insulation"
+  - "home health"
+  - "healthcare"
+  - "medical"
+  - "physical therapy"
+  - "dental"
+  - "accounting"
+  - "bookkeeping"
+  - "insurance"
+  - "logistics"
+  - "trucking"
+  - "distribution"
+  - "manufacturing"
+  - "construction"
+  - "b2b"
+
+twin_cities_signals:
+  - "minneapolis"
+  - "saint paul"
+  - "st. paul"
+  - "bloomington"
+  - "plymouth"
+  - "eden prairie"
+  - "burnsville"
+  - "minnetonka"
+  - "eagan"
+  - "edina"
+  - "maple grove"
+  - "woodbury"
+  - "coon rapids"
+  - "brooklyn park"
+  - "st. cloud"
+  - "metro"
+  - "twin cities"
+
+weights:
+  financial_strength: 40
+  operational_simplicity: 15
+  tech_deficiency: 15
+  recurring_revenue: 10
+  industry_durability: 10
+  geographic_fit: 10
+
+thresholds:
+  shortlist: 65
+  review: 35

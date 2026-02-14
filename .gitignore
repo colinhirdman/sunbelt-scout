@@ -1,0 +1,5 @@
+__pycache__/
+*.pyc
+data/state.json
+output/candidates.backup.csv
+.env

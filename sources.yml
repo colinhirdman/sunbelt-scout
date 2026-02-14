@@ -1,0 +1,9 @@
+sunbelt:
+  base_url: "https://www.sunbeltmidwest.com/search-results/"
+  geography:
+    - "Minnesota"
+  per_page: "All"
+  rate_limit_delay: 3.0
+  detail_rate_limit_delay: 2.0
+  max_retries: 3
+  user_agent: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
