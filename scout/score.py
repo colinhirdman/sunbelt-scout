@@ -40,8 +40,12 @@ def score_listing(l: dict) -> dict:
     dscr_20 = l.get("dscr_20pct")
     cf_after_20 = l.get("cf_after_debt_20pct")
 
-    # Absentee detection (always computed)
-    absentee = _detect_absentee(ctx, c)
+    # Absentee detection — use structured field first, then text scan
+    absentee_field = (l.get("absentee_owner_field") or "").lower().strip()
+    if absentee_field == "yes":
+        absentee = "Likely"
+    else:
+        absentee = _detect_absentee(ctx, c)
 
     # --- AUTO-REJECT checks ---
 

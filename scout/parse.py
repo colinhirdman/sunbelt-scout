@@ -40,6 +40,7 @@ def parse_listings(raw_listings: list[dict]) -> list[dict]:
             "sba_available": item.get("sba_available", ""),
             "real_estate": item.get("real_estate", ""),
             "listing_agent": item.get("listing_agent", ""),
+            "absentee_owner_field": item.get("absentee_owner_field", ""),
             **financials,
         }
 

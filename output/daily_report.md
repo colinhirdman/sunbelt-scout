@@ -1,9 +1,15 @@
-# Sunbelt Scout — 2026-02-13
+# Sunbelt Scout — 2026-02-14
 
-New listings processed: **78**
-Shortlisted: **8** | Review: **30** | Auto-Rejected: **40**
+New listings processed: **75**
+Shortlisted: **10** | Review: **20** | Auto-Rejected: **45**
 
 ## SHORTLIST
+- **Complete material handling installation company located in Twin Cities metro area.** (score 75)
+  Price: $1,075,000 | CF: $306,026 | CF After Debt: $169,646
+  CoC: 79% | DSCR: 2.24x | Absentee: No
+  https://www.sunbeltmidwest.com/complete-search-listing/?id_number=58037
+  _Why_: strong CF $306,026, DSCR 2.24, CoC 79%, 4 employees, no heavy inventory, operationally simple, durable industry, Twin Cities area
+
 - **Medicare-Certified Home Health & Personal Care Agency** (score 73)
   Price: $2,200,000 | CF: $691,911 | CF After Debt: $412,809
   CoC: 94% | DSCR: 2.48x | Absentee: No
@@ -52,6 +58,12 @@ Shortlisted: **8** | Review: **30** | Auto-Rejected: **40**
   https://www.sunbeltmidwest.com/complete-search-listing/?id_number=57150
   _Why_: strong CF $1,200,144, DSCR 4.30, CoC 209%, 5 employees, no heavy inventory, operationally simple, Twin Cities area
 
+- **Unique, Turnkey, Retail Opportunity – Twin Cities Legendary Retail Shop for Sale** (score 65)
+  Price: $2,000,000 | CF: $400,131 | CF After Debt: $146,402
+  CoC: 37% | DSCR: 1.58x | Absentee: No
+  https://www.sunbeltmidwest.com/complete-search-listing/?id_number=57757
+  _Why_: strong CF $400,131, DSCR 1.58, CoC 37%, 10 employees, no heavy inventory, operationally simple, Twin Cities area
+
 ## REVIEW
 - **Profitable Twin Cities Metro Hardware Store –** (score 62) $1,860,000
   https://www.sunbeltmidwest.com/complete-search-listing/?id_number=56471
@@ -73,13 +85,29 @@ Shortlisted: **8** | Review: **30** | Auto-Rejected: **40**
   https://www.sunbeltmidwest.com/complete-search-listing/?id_number=57737
   _Why_: decent CF $268,402, DSCR 3.02, CoC 128%, 5 employees, no heavy inventory, durable industry, Twin Cities area
 
+- **Established Absentee-Owned Outdoor Services Business** (score 62) $750,000
+  https://www.sunbeltmidwest.com/complete-search-listing/?id_number=58301
+  _Why_: decent CF $289,527, DSCR 3.04, CoC 130%, 10 employees, no heavy inventory, durable industry, Twin Cities area
+
 - **Profitable Industrial Supply Distributor – 35+ Years in Business!** (score 61) $1,250,000
   https://www.sunbeltmidwest.com/complete-search-listing/?id_number=56550
   _Why_: decent CF $293,543, DSCR 1.85, CoC 54%, 5 employees, operationally simple, durable industry, Twin Cities area
 
+- **20+ Year Old Commercial Moving Company with Strong Cash Flow - $535k in Vehicles and Equipment Included** (score 61) $1,200,000
+  https://www.sunbeltmidwest.com/complete-search-listing/?id_number=58088
+  _Why_: decent CF $290,881, DSCR 1.91, CoC 58%, 8 employees, no heavy inventory, operationally simple, recurring revenue signal, Twin Cities area
+
+- **Profitable Metro Area Asian Restaurant in Premier Urban District with $265k Cash Flow!** (score 61) $780,000
+  https://www.sunbeltmidwest.com/complete-search-listing/?id_number=58098
+  _Why_: decent CF $265,011, DSCR 2.68, CoC 106%, 10 employees, no heavy inventory, operationally simple, recurring revenue signal, Twin Cities area
+
 - **Compassionate Home Health Care Business with Owner Financing!** (score 61) $500,000
   https://www.sunbeltmidwest.com/complete-search-listing/?id_number=58292
   _Why_: decent CF $172,231, DSCR 2.72, CoC 109%, 25 employees, no heavy inventory, operationally simple, durable industry, Twin Cities area
+
+- **MN Based – Full-Service Irrigation Contractor, $470k in Cash Flow, SBA Financing Available for a qualified buyer.** (score 58) $1,950,000
+  https://www.sunbeltmidwest.com/complete-search-listing/?id_number=57297
+  _Why_: strong CF $470,887, DSCR 1.90, CoC 57%, 26 employees, no heavy inventory, Twin Cities area
 
 - **Independently Owned & Operated Farm Winery, Tasting Room, & Events Venue in Minnesota.** (score 58) $1,525,000
   https://www.sunbeltmidwest.com/complete-search-listing/?id_number=57582
@@ -97,73 +125,17 @@ Shortlisted: **8** | Review: **30** | Auto-Rejected: **40**
   https://www.sunbeltmidwest.com/complete-search-listing/?id_number=57849
   _Why_: decent CF $296,740, DSCR 1.80, CoC 51%, 14 employees, no heavy inventory, operationally simple, Twin Cities area
 
+- **Pool, Spa and Outdoor Living retailer and installer, with a 50-year market presence. $82k down buys $244K in Cash Flow. SBA Financing available for a qualified buyer.** (score 52) $700,000
+  https://www.sunbeltmidwest.com/complete-search-listing/?id_number=57673
+  _Why_: decent CF $244,116, DSCR 2.75, CoC 111%, 6 employees, no heavy inventory, Twin Cities area
+
 - **Established Semi-Absentee Auto Repair Business with Strong Cash Flow** (score 52) $530,000
   https://www.sunbeltmidwest.com/complete-search-listing/?id_number=58509
   _Why_: decent CF $207,885, DSCR 3.09, CoC 133%, 5 employees, no heavy inventory, Twin Cities area
 
-- **High-Margin Home Safety Service Business with Strong Cash Flow** (score 51) 
-  https://www.sunbeltmidwest.com/complete-search-listing/?id_number=58381
-  _Why_: decent CF $161,000, 1 employees, no heavy inventory, operationally simple, recurring revenue signal, durable industry, Twin Cities area
-
-- **Unique, Turnkey, Retail Opportunity – Twin Cities Legendary Retail Shop for Sale** (score 45) 
-  https://www.sunbeltmidwest.com/complete-search-listing/?id_number=57757
-  _Why_: strong CF $400,131, 10 employees, no heavy inventory, operationally simple, Twin Cities area
-
-- **Complete material handling installation company located in Twin Cities metro area.** (score 45) 
-  https://www.sunbeltmidwest.com/complete-search-listing/?id_number=58037
-  _Why_: strong CF $306,026, 4 employees, no heavy inventory, operationally simple, Twin Cities area
-
-- **Midwest Based Independent Medical Examination Service Provider with Consistent Revenue** (score 44) 
-  https://www.sunbeltmidwest.com/complete-search-listing/?id_number=58264
-  _Why_: strong CF $717,810, no heavy inventory, durable industry, Twin Cities area
-
 - **Lake of the Woods Resort** (score 42) 
   https://www.sunbeltmidwest.com/complete-search-listing/?id_number=1960430
   _Why_: strong CF $378,500, 18 employees, no heavy inventory, Twin Cities area
-
-- **29-Year-Old Insulation Contractor Located In Northern California, 20% Down Buys Nearly $300k In SDE Cash Flow, 12 Employees, Significant Brand Recognition And Excellent Reputation. SBA Financing Avail** (score 42) 
-  https://www.sunbeltmidwest.com/complete-search-listing/?id_number=56976
-  _Why_: decent CF $288,000, 13 employees, no heavy inventory, durable industry, Twin Cities area
-
-- **Established Absentee-Owned Outdoor Services Business** (score 42) 
-  https://www.sunbeltmidwest.com/complete-search-listing/?id_number=58301
-  _Why_: decent CF $289,527, 10 employees, no heavy inventory, durable industry, Twin Cities area
-
-- **20+ Year Old Commercial Moving Company with Strong Cash Flow - $535k in Vehicles and Equipment Included** (score 41) 
-  https://www.sunbeltmidwest.com/complete-search-listing/?id_number=58088
-  _Why_: decent CF $290,881, 8 employees, no heavy inventory, operationally simple, recurring revenue signal, Twin Cities area
-
-- **Profitable Metro Area Asian Restaurant in Premier Urban District with $265k Cash Flow!** (score 41) 
-  https://www.sunbeltmidwest.com/complete-search-listing/?id_number=58098
-  _Why_: decent CF $265,011, 10 employees, no heavy inventory, operationally simple, recurring revenue signal, Twin Cities area
-
-- **MN Based – Full-Service Irrigation Contractor, $470k in Cash Flow, SBA Financing Available for a qualified buyer.** (score 38) 
-  https://www.sunbeltmidwest.com/complete-search-listing/?id_number=57297
-  _Why_: strong CF $470,887, 26 employees, no heavy inventory, Twin Cities area
-
-- **Market-Leading Franchise: Turnkey & Semi-Absentee** (score 37) 
-  https://www.sunbeltmidwest.com/complete-search-listing/?id_number=58091
-  _Why_: decent CF $207,500, 28 employees, no heavy inventory, operationally simple, recurring revenue signal, Twin Cities area
-
-- **Established Chem-Dry Franchise Serving the Twin Cities Metro** (score 37) 
-  https://www.sunbeltmidwest.com/complete-search-listing/?id_number=58284
-  _Why_: modest CF $117,380, 2 employees, no heavy inventory, durable industry, Twin Cities area
-
-- **South Metro Residential Concrete Contractor – Strong Local Reputation** (score 35) 
-  https://www.sunbeltmidwest.com/complete-search-listing/?id_number=58383
-  _Why_: decent CF $161,298, 3 employees, no heavy inventory, operationally simple, Twin Cities area
-
-- **Zippel Bay Resort** (score 34) 
-  https://www.sunbeltmidwest.com/complete-search-listing/?id_number=1960488
-  _Why_: strong CF $760,206, no heavy inventory, Twin Cities area
-
-- **Large Full-Service Fitness Club with Strong Recurring Revenue** (score 34) 
-  https://www.sunbeltmidwest.com/complete-search-listing/?id_number=58530
-  _Why_: decent CF $152,035, 27 employees, no heavy inventory, recurring revenue signal, Twin Cities area
-
-- **Pool, Spa and Outdoor Living retailer and installer, with a 50-year market presence. $82k down buys $244K in Cash Flow. SBA Financing available for a qualified buyer.** (score 32) 
-  https://www.sunbeltmidwest.com/complete-search-listing/?id_number=57673
-  _Why_: decent CF $244,116, 6 employees, no heavy inventory, Twin Cities area
 
 - **Central MN Multi-Revenue C-Store with Real Estate – Established & Growing!** (score 25) 
   https://www.sunbeltmidwest.com/complete-search-listing/?id_number=57481
@@ -173,7 +145,8 @@ Shortlisted: **8** | Review: **30** | Auto-Rejected: **40**
   https://www.sunbeltmidwest.com/complete-search-listing/?id_number=56543
   _Why_: modest CF $127,891, DSCR 1.26, CoC 16%, no heavy inventory, Twin Cities area
 
-## AUTO-REJECTED (40)
+## AUTO-REJECTED (45)
+- Zippel Bay Resort: over max price $7,750,000
 - Prime Commercial Real Estate Downtown Ely, MN: missing financials
 - Central Minnesota Meat Processor and Retailer for Sale!  Asking $750k Including Real Estate!  Revenue: $735k with Seller Financing Available!: under min price $200,000
 - Fine Art Restoration and Custom Framing Company: under min price $225,000
@@ -183,4 +156,3 @@ Shortlisted: **8** | Review: **30** | Auto-Rejected: **40**
 - Booming Pet Industry Opportunity – Premium Retail & Grooming Franchise!: no cash flow data
 - Growing Twin Cities Home Care Franchise Business – Seller Financing Available: under min price $350,000
 - Profitable Motel Near BWCA: under min price $350,000
-- Profitable Northern MN Bar & Liquor Store with Real Estate – Seller Financing Available!: under min price $300,000

@@ -109,9 +109,9 @@ def _parse_detail_page(html, id_number):
     result = {"id_number": id_number}
 
     # Extract structured data from the dl/dt/dd table
-    # Pattern: label text followed by value in next element
-    # Use the section after "Listing ID:" which has all the data
-    listing_section = re.search(r'Listing ID:.*?</dl>', html, re.DOTALL)
+    # Anchor to the <dl> tag that contains dt/dd pairs, not the stray
+    # "Listing ID:" that can appear in the description <p> tags
+    listing_section = re.search(r'<dl[^>]*>.*?Listing ID:.*?</dl>', html, re.DOTALL)
     if listing_section:
         section = listing_section.group()
         text = re.sub(r'<[^>]+>', '\n', section)
@@ -152,6 +152,7 @@ def _parse_detail_page(html, id_number):
         result["relocatable"] = field_map.get("Relocatable", "")
         result["home_based"] = field_map.get("Home-Based", "")
         result["listing_agent"] = field_map.get("Listing Agent", "")
+        result["absentee_owner_field"] = field_map.get("Absentee Owner", "")
 
     # Extract title — on detail pages it's in h3 (not h1 which is "Complete Search Listing")
     # Try h3 first (the real business name), skip generic headers
