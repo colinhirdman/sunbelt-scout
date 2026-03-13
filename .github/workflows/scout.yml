@@ -1,0 +1,31 @@
+name: Sunbelt Scout
+
+on:
+  schedule:
+    - cron: '0 17 * * 1-5'  # Weekdays at noon CT (UTC-5)
+  workflow_dispatch:          # Allow manual runs from GitHub UI
+
+jobs:
+  scout:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests pyyaml
+
+      - name: Run scout
+        run: python3 run.py
+
+      - name: Commit updated data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add output/candidates.csv output/daily_report.md data/state.json
+          git diff --cached --quiet || git commit -m "Auto: scout run $(date -u +%Y-%m-%d)"
+          git push
