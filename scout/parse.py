@@ -1,5 +1,28 @@
 import re
 
+TRADES_KEYWORDS = [
+    "plumb", "electrician", "electrical", "electric",
+    "hvac", "heating", "cooling", "air condition",
+    "roofing", "roofer",
+    "general contractor", "contractor",
+    "landscaping", "landscape", "lawn care", "lawn service",
+    "excavat", "concrete", "masonry", "mason",
+    "flooring", "carpet", "tile install",
+    "siding", "insulation", "gutter",
+    "pest control", "exterminator",
+    "septic", "drain service", "drain clean",
+    "welding", "welder",
+    "mechanical contractor", "mechanical service",
+    "snow removal", "irrigation",
+    "painting contractor", "painting company", "commercial painting",
+    "handyman", "restoration contractor", "fire restoration", "water restoration",
+]
+
+
+def _detect_trades(ctx: str) -> bool:
+    lctx = ctx.lower()
+    return any(kw in lctx for kw in TRADES_KEYWORDS)
+
 
 def parse_listings(raw_listings: list[dict]) -> list[dict]:
     """Normalize raw scraped dicts into scored-ready format with SBA financials."""
@@ -22,11 +45,15 @@ def parse_listings(raw_listings: list[dict]) -> list[dict]:
         # Derive SBA financials for both 10% and 20% down scenarios
         financials = _derive_financials(asking, annual_cf)
 
+        ctx = f"{item.get('title', '')} {item.get('description', '')} {item.get('industry', '')}"
+        is_trades = _detect_trades(ctx)
+
         out[lid] = {
             "id": lid,
             "title": (item.get("title") or "")[:200],
             "url": item.get("detail_url", ""),
             "industry": item.get("industry", ""),
+            "is_trades": is_trades,
             "location": item.get("location", ""),
             "asking_price": asking,
             "asking_price_text": _format_price(asking),

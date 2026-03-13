@@ -2,6 +2,25 @@ import streamlit as st
 import pandas as pd
 from pathlib import Path
 
+TRADES_KEYWORDS = [
+    "plumb", "electrician", "electrical", "electric",
+    "hvac", "heating", "cooling", "air condition",
+    "roofing", "roofer",
+    "general contractor", "contractor",
+    "landscaping", "landscape", "lawn care", "lawn service",
+    "excavat", "concrete", "masonry", "mason",
+    "flooring", "carpet", "tile install",
+    "siding", "insulation", "gutter",
+    "pest control", "exterminator",
+    "septic", "drain service", "drain clean",
+    "welding", "welder",
+    "mechanical contractor", "mechanical service",
+    "snow removal", "irrigation",
+    "painting contractor", "painting company", "commercial painting",
+    "handyman", "restoration contractor", "fire restoration", "water restoration",
+    "refrigeration contractor",
+]
+
 CSV_PATH = Path(__file__).resolve().parents[1] / "output" / "candidates.csv"
 
 st.set_page_config(page_title="Sunbelt Scout", layout="wide")
@@ -30,6 +49,13 @@ for col in NUMERIC_COLS:
     if col in df.columns:
         df[col] = pd.to_numeric(df[col], errors="coerce")
 
+# Compute is_trades from title + industry (works for all rows regardless of when they were crawled)
+def _is_trades(row):
+    ctx = f"{row.get('title', '')} {row.get('industry', '')}".lower()
+    return any(kw in ctx for kw in TRADES_KEYWORDS)
+
+df["is_trades"] = df.apply(_is_trades, axis=1)
+
 # --- Sidebar filters ---
 st.sidebar.header("Filters")
 
@@ -48,6 +74,7 @@ min_coc_decimal = min_coc / 100.0
 
 absentee_only = st.sidebar.checkbox("Absentee / Semi-Absentee Only")
 twin_cities_only = st.sidebar.checkbox("Twin Cities Only")
+trades_only = st.sidebar.checkbox("Trades Only (plumbing, electrical, HVAC, etc.)")
 
 # --- Apply filters ---
 mask = df["bucket"].isin(buckets) if buckets else pd.Series([True] * len(df))
@@ -60,6 +87,9 @@ if min_coc_decimal > 0:
 
 if absentee_only:
     mask &= df["absentee"].isin(["Likely", "Possible"])
+
+if trades_only:
+    mask &= df["is_trades"] == True
 
 if twin_cities_only:
     tc_pattern = "|".join([
