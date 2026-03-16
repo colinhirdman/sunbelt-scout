@@ -391,7 +391,7 @@ healthcare_only = st.sidebar.checkbox(
 
 st.sidebar.markdown("---")
 view_mode = st.sidebar.radio(
-    "View Mode", ["Table", "Cards"], horizontal=True,
+    "View Mode", ["Cards", "Table"], horizontal=True,
     help="Cards give a visual overview; Table allows sorting and row-click to open a deal sheet",
 )
 
