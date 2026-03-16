@@ -203,6 +203,6 @@ def score_listing(l: dict) -> dict:
     elif score >= t["review"]:
         bucket = "REVIEW"
     else:
-        bucket = "REVIEW"
+        bucket = "SKIP"
 
     return {"score": score, "bucket": bucket, "reasons": reasons, "absentee": absentee}
