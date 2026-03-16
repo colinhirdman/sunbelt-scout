@@ -49,7 +49,6 @@ if not CSV_PATH.exists():
 
 df = pd.read_csv(CSV_PATH)
 
-# Coerce numeric columns
 df["score"] = pd.to_numeric(df["score"], errors="coerce").fillna(0).astype(int)
 
 NUMERIC_COLS = [
@@ -66,7 +65,6 @@ for col in NUMERIC_COLS:
     if col in df.columns:
         df[col] = pd.to_numeric(df[col], errors="coerce")
 
-# Compute is_trades / is_healthcare from title + industry (works for all rows regardless of when they were crawled)
 def _is_trades(row):
     ctx = f"{row.get('title', '')} {row.get('industry', '')}".lower()
     return any(kw in ctx for kw in TRADES_KEYWORDS)
@@ -78,7 +76,7 @@ def _is_healthcare(row):
 df["is_trades"] = df.apply(_is_trades, axis=1)
 df["is_healthcare"] = df.apply(_is_healthcare, axis=1)
 
-# --- Sidebar filters ---
+# --- Sidebar ---
 st.sidebar.header("Filters")
 
 buckets = st.sidebar.multiselect(
@@ -98,6 +96,9 @@ absentee_only = st.sidebar.checkbox("Absentee / Semi-Absentee Only")
 twin_cities_only = st.sidebar.checkbox("Twin Cities Only")
 trades_only = st.sidebar.checkbox("Trades Only (plumbing, electrical, HVAC, etc.)")
 healthcare_only = st.sidebar.checkbox("Healthcare Only (medical, dental, home health, etc.)")
+
+st.sidebar.divider()
+view_mode = st.sidebar.radio("View Mode", ["Table", "Cards"], horizontal=True)
 
 # --- Apply filters ---
 mask = df["bucket"].isin(buckets) if buckets else pd.Series([True] * len(df))
@@ -141,22 +142,184 @@ col4.metric("Auto-Rejected", len(df[df["bucket"] == "AUTO-REJECT"]))
 
 st.divider()
 
-# --- Main table ---
-display_cols = [
-    "score", "bucket", "title", "asking_price",
-    "annual_cash_flow", "cf_after_debt_20pct", "coc_return_20pct",
-    "dscr_20pct", "absentee", "location", "url",
-]
-available = [c for c in display_cols if c in filtered.columns]
 
-if len(filtered) > 0:
-    display_df = filtered[available].copy()
+# --- Deal Sheet dialog ---
+@st.dialog("Deal Sheet", width="large")
+def show_deal_sheet(row):
+    title = row.get("title", "Untitled")
+    url = row.get("url", "")
+    bucket = str(row.get("bucket", ""))
+    score = int(row.get("score", 0))
 
-    # Convert CoC from decimal to percentage for display (0.97 -> 97)
+    bucket_icons = {"SHORTLIST": "🟢", "REVIEW": "🟡", "AUTO-REJECT": "🔴"}
+    icon = bucket_icons.get(bucket, "⚪")
+
+    st.markdown(f"## {title}")
+    if url and str(url) != "nan":
+        st.markdown(f"[View on Sunbelt →]({url})")
+
+    h1, h2, h3 = st.columns(3)
+    h1.metric("Score", score)
+    h2.metric("Bucket", f"{icon} {bucket}")
+    h3.metric("Absentee", row.get("absentee", "No"))
+
+    st.divider()
+
+    # Key financials
+    st.subheader("Financials")
+    asking = row.get("asking_price")
+    cf = row.get("annual_cash_flow")
+    rev = row.get("annual_revenue")
+    emps = row.get("employees")
+
+    f1, f2, f3, f4 = st.columns(4)
+    f1.metric("Asking Price", f"${asking:,.0f}" if pd.notna(asking) else "N/A")
+    f2.metric("Annual Cash Flow", f"${cf:,.0f}" if pd.notna(cf) else "N/A")
+    f3.metric("Annual Revenue", f"${rev:,.0f}" if pd.notna(rev) else "N/A")
+    f4.metric("Employees", int(emps) if pd.notna(emps) else "N/A")
+
+    st.divider()
+
+    # SBA side-by-side
+    st.subheader("SBA Financing")
+    sba_left, sba_right = st.columns(2)
+
+    with sba_left:
+        st.markdown("**10% Down**")
+        down10 = row.get("down_10")
+        monthly10 = row.get("sba_monthly_10pct")
+        cf10 = row.get("cf_after_debt_10pct")
+        coc10 = row.get("coc_return_10pct")
+        dscr10 = row.get("dscr_10pct")
+        s1, s2 = st.columns(2)
+        s1.metric("Down Payment", f"${down10:,.0f}" if pd.notna(down10) else "N/A")
+        s2.metric("Monthly Payment", f"${monthly10:,.0f}" if pd.notna(monthly10) else "N/A")
+        s3, s4 = st.columns(2)
+        s3.metric("CF After Debt", f"${cf10:,.0f}" if pd.notna(cf10) else "N/A")
+        s4.metric("CoC Return", f"{coc10*100:.0f}%" if pd.notna(coc10) else "N/A")
+        st.metric("DSCR", f"{dscr10:.2f}" if pd.notna(dscr10) else "N/A")
+
+    with sba_right:
+        st.markdown("**20% Down**")
+        down20 = row.get("down_20")
+        monthly20 = row.get("sba_monthly_20pct")
+        cf20 = row.get("cf_after_debt_20pct")
+        coc20 = row.get("coc_return_20pct")
+        dscr20 = row.get("dscr_20pct")
+        t1, t2 = st.columns(2)
+        t1.metric("Down Payment", f"${down20:,.0f}" if pd.notna(down20) else "N/A")
+        t2.metric("Monthly Payment", f"${monthly20:,.0f}" if pd.notna(monthly20) else "N/A")
+        t3, t4 = st.columns(2)
+        t3.metric("CF After Debt", f"${cf20:,.0f}" if pd.notna(cf20) else "N/A")
+        t4.metric("CoC Return", f"{coc20*100:.0f}%" if pd.notna(coc20) else "N/A")
+        st.metric("DSCR", f"{dscr20:.2f}" if pd.notna(dscr20) else "N/A")
+
+    st.divider()
+
+    # Business details
+    st.subheader("Business Details")
+    d1, d2, d3 = st.columns(3)
+    d1.metric("Location", row.get("location", "N/A") or "N/A")
+    d2.metric("Industry", row.get("industry", "N/A") or "N/A")
+    d3.metric("Years in Business", row.get("years_in_business", "N/A") or "N/A")
+
+    d4, d5, d6 = st.columns(3)
+    d4.metric("Franchise?", row.get("is_franchise", "N/A") or "N/A")
+    d5.metric("SBA Available?", row.get("sba_available", "N/A") or "N/A")
+    reason = row.get("reason_for_selling", "") or ""
+    d6.metric("Reason for Selling", reason[:30] + "…" if len(str(reason)) > 30 else reason or "N/A")
+
+    # Tags
+    tags = []
+    if row.get("absentee") in ("Likely", "Possible"):
+        tags.append("🏠 Absentee")
+    if row.get("is_trades"):
+        tags.append("🔧 Trades")
+    if row.get("is_healthcare"):
+        tags.append("🏥 Healthcare")
+    if tags:
+        st.markdown(" · ".join(tags))
+
+    # Scoring signals
+    reasons = row.get("reasons", "")
+    if reasons and str(reasons) != "nan":
+        st.divider()
+        st.subheader("Scoring Signals")
+        st.info(str(reasons))
+
+    # Description
+    desc = row.get("description", "")
+    if desc and str(desc) != "nan":
+        st.divider()
+        st.subheader("Description")
+        st.markdown(str(desc))
+
+
+# --- Card view ---
+def _bucket_color(bucket):
+    return {"SHORTLIST": "#2ecc71", "REVIEW": "#f39c12", "AUTO-REJECT": "#e74c3c"}.get(bucket, "#95a5a6")
+
+def render_cards(rows):
+    cols = st.columns(3)
+    for i, (_, row) in enumerate(rows.iterrows()):
+        with cols[i % 3]:
+            with st.container(border=True):
+                bucket = str(row.get("bucket", ""))
+                score = int(row.get("score", 0))
+                title = row.get("title", "Untitled")
+                location = row.get("location", "")
+                asking = row.get("asking_price")
+                cf = row.get("annual_cash_flow")
+                coc = row.get("coc_return_20pct")
+                dscr = row.get("dscr_20pct")
+                absentee = row.get("absentee", "No")
+
+                color = _bucket_color(bucket)
+                st.markdown(
+                    f'<span style="background:{color};color:white;padding:2px 8px;'
+                    f'border-radius:4px;font-size:11px;font-weight:bold">{bucket}</span>'
+                    f'&nbsp;<span style="font-size:12px;color:#888">Score: {score}</span>',
+                    unsafe_allow_html=True,
+                )
+                st.markdown(f"**{title}**")
+                if location and str(location) != "nan":
+                    st.caption(str(location))
+
+                m1, m2 = st.columns(2)
+                m1.metric("Price", f"${asking/1e6:.2f}M" if pd.notna(asking) else "N/A")
+                m2.metric("Cash Flow", f"${cf:,.0f}" if pd.notna(cf) else "N/A")
+                m3, m4 = st.columns(2)
+                m3.metric("CoC (20%)", f"{coc*100:.0f}%" if pd.notna(coc) else "N/A")
+                m4.metric("DSCR (20%)", f"{dscr:.2f}" if pd.notna(dscr) else "N/A")
+
+                tags = []
+                if absentee in ("Likely", "Possible"):
+                    tags.append("🏠 Absentee")
+                if row.get("is_trades"):
+                    tags.append("🔧 Trades")
+                if row.get("is_healthcare"):
+                    tags.append("🏥 Healthcare")
+                if tags:
+                    st.caption(" · ".join(tags))
+
+                if st.button("View Deal", key=f"card_{row.get('id', i)}", use_container_width=True):
+                    show_deal_sheet(row)
+
+
+# --- Table view ---
+def render_table(rows):
+    display_cols = [
+        "score", "bucket", "title", "asking_price",
+        "annual_cash_flow", "cf_after_debt_20pct", "coc_return_20pct",
+        "dscr_20pct", "absentee", "location", "url",
+    ]
+    available = [c for c in display_cols if c in rows.columns]
+    display_df = rows[available].copy()
+
     if "coc_return_20pct" in display_df.columns:
         display_df["coc_return_20pct"] = display_df["coc_return_20pct"] * 100
 
-    st.dataframe(
+    event = st.dataframe(
         display_df,
         column_config={
             "score": st.column_config.NumberColumn("Score", width="small"),
@@ -174,9 +337,22 @@ if len(filtered) > 0:
         hide_index=True,
         height=700,
         use_container_width=True,
+        selection_mode="single-row",
+        on_select="rerun",
     )
-else:
+
+    if event.selection.rows:
+        idx = event.selection.rows[0]
+        show_deal_sheet(rows.iloc[idx])
+
+
+# --- Render ---
+if len(filtered) == 0:
     st.info("No listings match the current filters.")
+elif view_mode == "Cards":
+    render_cards(filtered)
+else:
+    render_table(filtered)
 
 # --- Scoring breakdown ---
 with st.expander("Scoring Breakdown (top 20)"):
@@ -185,7 +361,7 @@ with st.expander("Scoring Breakdown (top 20)"):
         reasons = row.get("reasons", "")
         title = row.get("title", "Untitled")
         url = row.get("url", "")
-        title_display = f"[{title}]({url})" if url else f"**{title}**"
+        title_display = f"[{title}]({url})" if url and str(url) != "nan" else f"**{title}**"
         st.markdown(
             f"**{title_display}** — Score: {row.get('score', 0)} | "
             f"Absentee: {row.get('absentee', 'No')}\n\n"
@@ -203,7 +379,6 @@ with st.expander("SBA Financing Comparison (10% vs 20% Down)"):
     sba_available = [c for c in sba_cols if c in filtered.columns]
     sba_df = filtered[filtered["bucket"] != "AUTO-REJECT"][sba_available].head(20).copy()
 
-    # Convert CoC from decimal to percentage for display
     for col in ["coc_return_10pct", "coc_return_20pct"]:
         if col in sba_df.columns:
             sba_df[col] = sba_df[col] * 100
