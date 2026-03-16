@@ -202,6 +202,15 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
     margin-left: 4px;
 }
 
+/* ── Tooltips ── */
+div[data-testid="stTooltipContent"],
+div[data-testid="stTooltipContent"] *,
+[role="tooltip"],
+[role="tooltip"] * {
+    color: #0F172A !important;
+    background: white !important;
+}
+
 /* ── Section headings with tooltip ── */
 .section-heading {
     font-size: 13px;
