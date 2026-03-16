@@ -107,18 +107,20 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
 .stat-pill .value.blue   { color: #2563EB; }
 
 /* ── Cards ── */
-.biz-card {
-    background: white;
-    border-radius: 12px;
-    padding: 18px 20px 14px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
-    border: 1px solid #E2E8F0;
-    margin-bottom: 16px;
+[data-testid="stVerticalBlockBorderWrapper"] {
+    border-radius: 12px !important;
+    border: 1px solid #E2E8F0 !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07) !important;
+    background: white !important;
     transition: box-shadow 0.2s, transform 0.15s;
+    margin-bottom: 4px;
 }
-.biz-card:hover {
-    box-shadow: 0 6px 20px rgba(37,99,235,0.12);
+[data-testid="stVerticalBlockBorderWrapper"]:hover {
+    box-shadow: 0 6px 20px rgba(37,99,235,0.12) !important;
     transform: translateY(-2px);
+}
+.biz-card {
+    padding: 4px 0 8px;
 }
 .biz-card .card-header {
     display: flex;
@@ -582,38 +584,39 @@ def render_cards(rows):
         loc_html = f'<div class="card-location">📍 {location}</div>' if location and str(location) != "nan" else ""
 
         with cols[i % 3]:
-            st.markdown(f"""
-            <div class="biz-card">
-                <div class="card-header">
-                    <span class="badge {badge_cls}">{bucket}</span>
-                    <span class="score-chip">Score: {score}</span>
+            with st.container(border=True):
+                st.markdown(f"""
+                <div class="biz-card">
+                    <div class="card-header">
+                        <span class="badge {badge_cls}">{bucket}</span>
+                        <span class="score-chip">Score: {score}</span>
+                    </div>
+                    <div class="card-title">{title}</div>
+                    {loc_html}
+                    <div class="card-metrics">
+                        <div class="card-metric" title="Total asking price">
+                            <div class="cm-label">Price</div>
+                            <div class="cm-value">{_fmt(asking, "$M")}</div>
+                        </div>
+                        <div class="card-metric" title="Seller's Discretionary Earnings — pre-debt owner income">
+                            <div class="cm-label">Cash Flow</div>
+                            <div class="cm-value">{_fmt(cf)}</div>
+                        </div>
+                        <div class="card-metric" title="Cash-on-cash return with 20% down payment after SBA debt service">
+                            <div class="cm-label">CoC (20%)</div>
+                            <div class="cm-value">{_fmt(coc, "%")}</div>
+                        </div>
+                        <div class="card-metric" title="Debt Service Coverage Ratio with 20% down — must be ≥1.25 for SBA">
+                            <div class="cm-label">DSCR (20%)</div>
+                            <div class="cm-value">{_fmt(dscr, "x")}</div>
+                        </div>
+                    </div>
+                    {f'<div class="card-tags">{tags_html}</div>' if tags_html else ""}
                 </div>
-                <div class="card-title">{title}</div>
-                {loc_html}
-                <div class="card-metrics">
-                    <div class="card-metric" title="Total asking price">
-                        <div class="cm-label">Price</div>
-                        <div class="cm-value">{_fmt(asking, "$M")}</div>
-                    </div>
-                    <div class="card-metric" title="Seller's Discretionary Earnings — pre-debt owner income">
-                        <div class="cm-label">Cash Flow</div>
-                        <div class="cm-value">{_fmt(cf)}</div>
-                    </div>
-                    <div class="card-metric" title="Cash-on-cash return with 20% down payment after SBA debt service">
-                        <div class="cm-label">CoC (20%)</div>
-                        <div class="cm-value">{_fmt(coc, "%")}</div>
-                    </div>
-                    <div class="card-metric" title="Debt Service Coverage Ratio with 20% down — must be ≥1.25 for SBA">
-                        <div class="cm-label">DSCR (20%)</div>
-                        <div class="cm-value">{_fmt(dscr, "x")}</div>
-                    </div>
-                </div>
-                {f'<div class="card-tags">{tags_html}</div>' if tags_html else ""}
-            </div>
-            """, unsafe_allow_html=True)
+                """, unsafe_allow_html=True)
 
-            if st.button("View Deal →", key=f"card_{row.get('id', i)}", use_container_width=True):
-                show_deal_sheet(row)
+                if st.button("View Deal →", key=f"card_{row.get('id', i)}", use_container_width=True):
+                    show_deal_sheet(row)
 
 
 # ── Table view ──────────────────────────────────────────────────────────────────
