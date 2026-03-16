@@ -244,10 +244,11 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
     background: #1E293B !important;
     border-right: none;
 }
-[data-testid="stSidebar"] * { color: #CBD5E1 !important; }
+[data-testid="stSidebar"] p,
+[data-testid="stSidebar"] span:not([data-baseweb]),
+[data-testid="stSidebar"] div[class*="stMarkdown"] { color: #CBD5E1 !important; }
 [data-testid="stSidebar"] .stMarkdown h2,
 [data-testid="stSidebar"] .stMarkdown h3 { color: #F1F5F9 !important; font-size: 13px; text-transform: uppercase; letter-spacing: 0.6px; }
-[data-testid="stSidebar"] [data-testid="stSlider"] div[data-baseweb="slider"] div { background: #2563EB !important; }
 [data-testid="stSidebar"] label { color: #94A3B8 !important; font-size: 13px !important; }
 [data-testid="stSidebar"] .stRadio label { color: #CBD5E1 !important; font-size: 14px !important; }
 [data-testid="stSidebar"] hr { border-color: #334155 !important; }
