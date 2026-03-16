@@ -40,15 +40,270 @@ HEALTHCARE_KEYWORDS = [
 
 CSV_PATH = Path(__file__).resolve().parents[1] / "output" / "candidates.csv"
 
-st.set_page_config(page_title="Sunbelt Scout", layout="wide")
-st.title("Sunbelt Scout — Minnesota Business Acquisitions")
+st.set_page_config(page_title="Sunbelt Scout", layout="wide", page_icon="🏢")
+
+# ── Global CSS ─────────────────────────────────────────────────────────────────
+st.markdown("""
+<style>
+/* ── Fonts & base ── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
+
+/* ── Page background ── */
+.stApp { background: #F1F5F9; }
+
+/* ── Header banner ── */
+.scout-header {
+    background: linear-gradient(135deg, #1E3A5F 0%, #2563EB 100%);
+    border-radius: 14px;
+    padding: 28px 36px;
+    margin-bottom: 24px;
+    color: white;
+}
+.scout-header h1 {
+    margin: 0 0 4px 0;
+    font-size: 28px;
+    font-weight: 700;
+    color: white !important;
+    letter-spacing: -0.5px;
+}
+.scout-header p {
+    margin: 0;
+    font-size: 14px;
+    opacity: 0.75;
+    color: white;
+}
+
+/* ── Summary stat pills ── */
+.stat-bar {
+    display: flex;
+    gap: 14px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+.stat-pill {
+    background: white;
+    border-radius: 10px;
+    padding: 14px 22px;
+    min-width: 130px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+    border: 1px solid #E2E8F0;
+}
+.stat-pill .label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #64748B;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+}
+.stat-pill .value {
+    font-size: 26px;
+    font-weight: 700;
+    color: #0F172A;
+    line-height: 1.2;
+}
+.stat-pill .value.green  { color: #10B981; }
+.stat-pill .value.red    { color: #EF4444; }
+.stat-pill .value.blue   { color: #2563EB; }
+
+/* ── Cards ── */
+.biz-card {
+    background: white;
+    border-radius: 12px;
+    padding: 18px 20px 14px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    border: 1px solid #E2E8F0;
+    margin-bottom: 16px;
+    transition: box-shadow 0.2s, transform 0.15s;
+}
+.biz-card:hover {
+    box-shadow: 0 6px 20px rgba(37,99,235,0.12);
+    transform: translateY(-2px);
+}
+.biz-card .card-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+.biz-card .card-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #0F172A;
+    line-height: 1.3;
+    margin: 4px 0 2px;
+}
+.biz-card .card-location {
+    font-size: 12px;
+    color: #64748B;
+    margin-bottom: 12px;
+}
+.card-metrics {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+.card-metric {
+    background: #F8FAFC;
+    border-radius: 8px;
+    padding: 8px 10px;
+}
+.card-metric .cm-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: #94A3B8;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.card-metric .cm-value {
+    font-size: 16px;
+    font-weight: 700;
+    color: #0F172A;
+}
+.card-tags {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+    margin-bottom: 10px;
+}
+.tag {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 3px 8px;
+    border-radius: 20px;
+}
+.tag-absentee  { background: #EEF2FF; color: #4F46E5; }
+.tag-trades    { background: #FFF7ED; color: #C2410C; }
+.tag-healthcare{ background: #F0FDF4; color: #15803D; }
+
+/* ── Bucket badges ── */
+.badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 20px;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+}
+.badge-shortlist  { background: #D1FAE5; color: #065F46; }
+.badge-review     { background: #FEF3C7; color: #92400E; }
+.badge-reject     { background: #FEE2E2; color: #991B1B; }
+
+/* ── Score chip ── */
+.score-chip {
+    font-size: 12px;
+    font-weight: 600;
+    color: #475569;
+    margin-left: 4px;
+}
+
+/* ── Section headings with tooltip ── */
+.section-heading {
+    font-size: 13px;
+    font-weight: 700;
+    color: #475569;
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+    margin: 18px 0 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.tooltip-icon {
+    cursor: help;
+    color: #94A3B8;
+    font-size: 13px;
+    border-bottom: none;
+}
+[title] { cursor: help; }
+
+/* ── Deal sheet ── */
+.ds-title { font-size: 22px; font-weight: 700; color: #0F172A; margin-bottom: 2px; }
+.ds-link  { font-size: 13px; color: #2563EB; text-decoration: none; }
+.ds-section {
+    font-size: 11px;
+    font-weight: 700;
+    color: #94A3B8;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin: 20px 0 8px;
+}
+.sba-block {
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    border-radius: 10px;
+    padding: 16px;
+}
+.sba-block h4 { margin: 0 0 12px; font-size: 14px; font-weight: 600; color: #1E3A5F; }
+
+/* ── Sidebar ── */
+[data-testid="stSidebar"] {
+    background: #1E293B !important;
+    border-right: none;
+}
+[data-testid="stSidebar"] * { color: #CBD5E1 !important; }
+[data-testid="stSidebar"] .stMarkdown h2,
+[data-testid="stSidebar"] .stMarkdown h3 { color: #F1F5F9 !important; font-size: 13px; text-transform: uppercase; letter-spacing: 0.6px; }
+[data-testid="stSidebar"] [data-testid="stSlider"] div[data-baseweb="slider"] div { background: #2563EB !important; }
+[data-testid="stSidebar"] label { color: #94A3B8 !important; font-size: 13px !important; }
+[data-testid="stSidebar"] .stRadio label { color: #CBD5E1 !important; font-size: 14px !important; }
+[data-testid="stSidebar"] hr { border-color: #334155 !important; }
+
+/* ── View Deal button ── */
+.stButton > button {
+    background: #2563EB;
+    color: white !important;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 6px 0;
+    transition: background 0.15s;
+}
+.stButton > button:hover {
+    background: #1D4ED8;
+    color: white !important;
+}
+
+/* ── Streamlit metric overrides ── */
+[data-testid="metric-container"] {
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    border-radius: 10px;
+    padding: 12px 14px !important;
+}
+[data-testid="metric-container"] label { font-size: 11px !important; color: #64748B !important; font-weight: 600 !important; text-transform: uppercase; letter-spacing: 0.4px; }
+[data-testid="stMetricValue"] { font-size: 18px !important; font-weight: 700 !important; color: #0F172A !important; }
+
+/* ── Expanders ── */
+[data-testid="stExpander"] {
+    background: white;
+    border: 1px solid #E2E8F0 !important;
+    border-radius: 10px !important;
+    margin-bottom: 10px;
+}
+
+/* ── Divider ── */
+hr { border-color: #E2E8F0 !important; margin: 16px 0 !important; }
+</style>
+""", unsafe_allow_html=True)
+
+# ── Header ─────────────────────────────────────────────────────────────────────
+st.markdown("""
+<div class="scout-header">
+  <h1>🏢 Sunbelt Scout</h1>
+  <p>Minnesota business acquisition pipeline · Scored &amp; filtered daily</p>
+</div>
+""", unsafe_allow_html=True)
 
 if not CSV_PATH.exists():
     st.warning("No candidates.csv found. Run the scout first: `python3 run.py`")
     st.stop()
 
 df = pd.read_csv(CSV_PATH)
-
 df["score"] = pd.to_numeric(df["score"], errors="coerce").fillna(0).astype(int)
 
 NUMERIC_COLS = [
@@ -76,31 +331,59 @@ def _is_healthcare(row):
 df["is_trades"] = df.apply(_is_trades, axis=1)
 df["is_healthcare"] = df.apply(_is_healthcare, axis=1)
 
-# --- Sidebar ---
-st.sidebar.header("Filters")
+# ── Sidebar ─────────────────────────────────────────────────────────────────────
+st.sidebar.markdown("### Filters")
 
 buckets = st.sidebar.multiselect(
     "Bucket",
     options=sorted(df["bucket"].unique()),
     default=[b for b in ["SHORTLIST", "REVIEW"] if b in df["bucket"].unique()],
+    help="SHORTLIST = strong candidate, REVIEW = worth a look, AUTO-REJECT = failed screening criteria",
 )
 
-min_score = st.sidebar.slider("Min Score", 0, 100, 35)
-max_price = st.sidebar.number_input("Max Asking Price ($)", value=3000000, step=100000)
-min_cf = st.sidebar.number_input("Min Annual Cash Flow ($)", value=0, step=25000)
-
-min_coc = st.sidebar.slider("Min Cash-on-Cash Return (20% down)", 0, 200, 0, format="%d%%")
+min_score = st.sidebar.slider(
+    "Min Score", 0, 100, 35,
+    help="Composite 0–100 score based on financial strength, recurring revenue, tech opportunity, industry durability, and geography",
+)
+max_price = st.sidebar.number_input(
+    "Max Asking Price ($)", value=3000000, step=100000,
+    help="Filter out businesses above this asking price",
+)
+min_cf = st.sidebar.number_input(
+    "Min Annual Cash Flow ($)", value=0, step=25000,
+    help="Seller's Discretionary Earnings (SDE) — pre-debt owner income",
+)
+min_coc = st.sidebar.slider(
+    "Min Cash-on-Cash Return (20% down)", 0, 200, 0, format="%d%%",
+    help="Annual cash flow after SBA debt service divided by your 20% down payment. 30%+ is strong.",
+)
 min_coc_decimal = min_coc / 100.0
 
-absentee_only = st.sidebar.checkbox("Absentee / Semi-Absentee Only")
-twin_cities_only = st.sidebar.checkbox("Twin Cities Only")
-trades_only = st.sidebar.checkbox("Trades Only (plumbing, electrical, HVAC, etc.)")
-healthcare_only = st.sidebar.checkbox("Healthcare Only (medical, dental, home health, etc.)")
+st.sidebar.markdown("---")
+absentee_only = st.sidebar.checkbox(
+    "Absentee / Semi-Absentee Only",
+    help="Show only businesses where the owner is not actively working full-time — better for a hands-off investor",
+)
+twin_cities_only = st.sidebar.checkbox(
+    "Twin Cities Only",
+    help="Limit to listings in the Minneapolis–Saint Paul metro area",
+)
+trades_only = st.sidebar.checkbox(
+    "Trades Only",
+    help="Plumbing, electrical, HVAC, roofing, landscaping, pest control, and other field-service businesses",
+)
+healthcare_only = st.sidebar.checkbox(
+    "Healthcare Only",
+    help="Home health, dental, medical practices, physical therapy, senior care, and related healthcare businesses",
+)
 
-st.sidebar.divider()
-view_mode = st.sidebar.radio("View Mode", ["Table", "Cards"], horizontal=True)
+st.sidebar.markdown("---")
+view_mode = st.sidebar.radio(
+    "View Mode", ["Table", "Cards"], horizontal=True,
+    help="Cards give a visual overview; Table allows sorting and row-click to open a deal sheet",
+)
 
-# --- Apply filters ---
+# ── Apply filters ───────────────────────────────────────────────────────────────
 mask = df["bucket"].isin(buckets) if buckets else pd.Series([True] * len(df))
 mask &= df["score"] >= min_score
 mask &= (df["asking_price"].isna()) | (df["asking_price"] <= max_price)
@@ -108,16 +391,12 @@ mask &= (df["annual_cash_flow"].isna()) | (df["annual_cash_flow"] >= min_cf)
 
 if min_coc_decimal > 0:
     mask &= (df["coc_return_20pct"].isna()) | (df["coc_return_20pct"] >= min_coc_decimal)
-
 if absentee_only:
     mask &= df["absentee"].isin(["Likely", "Possible"])
-
 if trades_only:
     mask &= df["is_trades"] == True
-
 if healthcare_only:
     mask &= df["is_healthcare"] == True
-
 if twin_cities_only:
     tc_pattern = "|".join([
         "minneapolis", "saint paul", "st\\. paul", "bloomington", "plymouth",
@@ -133,180 +412,210 @@ if twin_cities_only:
 
 filtered = df[mask].sort_values("score", ascending=False)
 
-# --- Top metrics ---
-col1, col2, col3, col4 = st.columns(4)
-col1.metric("Total Listings", len(df))
-col2.metric("Filtered", len(filtered))
-col3.metric("Shortlisted", len(df[df["bucket"] == "SHORTLIST"]))
-col4.metric("Auto-Rejected", len(df[df["bucket"] == "AUTO-REJECT"]))
+# ── Summary stats bar ───────────────────────────────────────────────────────────
+n_total     = len(df)
+n_filtered  = len(filtered)
+n_shortlist = len(df[df["bucket"] == "SHORTLIST"])
+n_rejected  = len(df[df["bucket"] == "AUTO-REJECT"])
 
-st.divider()
+st.markdown(f"""
+<div class="stat-bar">
+  <div class="stat-pill" title="Total listings scraped from Sunbelt Midwest">
+    <div class="label">Total Listings</div>
+    <div class="value blue">{n_total}</div>
+  </div>
+  <div class="stat-pill" title="Listings matching your current filters">
+    <div class="label">Filtered</div>
+    <div class="value">{n_filtered}</div>
+  </div>
+  <div class="stat-pill" title="Listings scoring above {65} — strong acquisition candidates">
+    <div class="label">Shortlisted</div>
+    <div class="value green">{n_shortlist}</div>
+  </div>
+  <div class="stat-pill" title="Listings automatically rejected — missing financials, wrong price range, regulated industry, or digital-only">
+    <div class="label">Auto-Rejected</div>
+    <div class="value red">{n_rejected}</div>
+  </div>
+</div>
+""", unsafe_allow_html=True)
 
 
-# --- Deal Sheet dialog ---
+# ── Helpers ─────────────────────────────────────────────────────────────────────
+def _badge(bucket):
+    cls = {"SHORTLIST": "badge-shortlist", "REVIEW": "badge-review", "AUTO-REJECT": "badge-reject"}.get(bucket, "badge-review")
+    return f'<span class="badge {cls}">{bucket}</span>'
+
+def _fmt(val, fmt="$"):
+    if pd.isna(val):
+        return "—"
+    if fmt == "$":
+        return f"${val:,.0f}"
+    if fmt == "$M":
+        return f"${val/1e6:.2f}M"
+    if fmt == "%":
+        return f"{val*100:.0f}%"
+    if fmt == "x":
+        return f"{val:.2f}x"
+    return str(val)
+
+
+# ── Deal Sheet dialog ────────────────────────────────────────────────────────────
 @st.dialog("Deal Sheet", width="large")
 def show_deal_sheet(row):
-    title = row.get("title", "Untitled")
-    url = row.get("url", "")
+    title  = row.get("title", "Untitled")
+    url    = row.get("url", "")
     bucket = str(row.get("bucket", ""))
-    score = int(row.get("score", 0))
+    score  = int(row.get("score", 0))
 
-    bucket_icons = {"SHORTLIST": "🟢", "REVIEW": "🟡", "AUTO-REJECT": "🔴"}
-    icon = bucket_icons.get(bucket, "⚪")
+    # Title row
+    url_html = f'<a class="ds-link" href="{url}" target="_blank">View on Sunbelt →</a>' if url and str(url) != "nan" else ""
+    badge_cls = {"SHORTLIST": "badge-shortlist", "REVIEW": "badge-review", "AUTO-REJECT": "badge-reject"}.get(bucket, "badge-review")
+    st.markdown(f"""
+        <div class="ds-title">{title}</div>
+        <div style="display:flex;align-items:center;gap:10px;margin:6px 0 16px;">
+            <span class="badge {badge_cls}">{bucket}</span>
+            <span style="font-size:13px;color:#475569;font-weight:600;">Score: {score} / 100</span>
+            {url_html}
+        </div>
+    """, unsafe_allow_html=True)
 
-    st.markdown(f"## {title}")
-    if url and str(url) != "nan":
-        st.markdown(f"[View on Sunbelt →]({url})")
-
-    h1, h2, h3 = st.columns(3)
-    h1.metric("Score", score)
-    h2.metric("Bucket", f"{icon} {bucket}")
-    h3.metric("Absentee", row.get("absentee", "No"))
-
-    st.divider()
-
-    # Key financials
-    st.subheader("Financials")
+    # Top KPIs
     asking = row.get("asking_price")
-    cf = row.get("annual_cash_flow")
-    rev = row.get("annual_revenue")
-    emps = row.get("employees")
+    cf     = row.get("annual_cash_flow")
+    rev    = row.get("annual_revenue")
+    emps   = row.get("employees")
+    absentee = row.get("absentee", "No")
 
-    f1, f2, f3, f4 = st.columns(4)
-    f1.metric("Asking Price", f"${asking:,.0f}" if pd.notna(asking) else "N/A")
-    f2.metric("Annual Cash Flow", f"${cf:,.0f}" if pd.notna(cf) else "N/A")
-    f3.metric("Annual Revenue", f"${rev:,.0f}" if pd.notna(rev) else "N/A")
-    f4.metric("Employees", int(emps) if pd.notna(emps) else "N/A")
+    k1, k2, k3, k4, k5 = st.columns(5)
+    k1.metric("Asking Price",    _fmt(asking), help="Total business price as listed by the broker")
+    k2.metric("Cash Flow (SDE)", _fmt(cf),     help="Seller's Discretionary Earnings — owner's total pre-debt income from the business")
+    k3.metric("Annual Revenue",  _fmt(rev),    help="Total annual gross revenue reported by the seller")
+    k4.metric("Employees",       int(emps) if pd.notna(emps) else "—", help="Full-time + part-time headcount")
+    k5.metric("Absentee",        absentee,     help="Whether the current owner is hands-off. 'Likely' = explicitly stated. 'Possible' = inferred from description.")
 
-    st.divider()
+    # SBA
+    st.markdown('<div class="ds-section" title="SBA 7(a) loan modeled at 10% interest, 10-year term">SBA Financing Scenarios</div>', unsafe_allow_html=True)
+    sba_l, sba_r = st.columns(2)
 
-    # SBA side-by-side
-    st.subheader("SBA Financing")
-    sba_left, sba_right = st.columns(2)
+    def _sba_col(col, pct_label, down_key, monthly_key, cf_key, coc_key, dscr_key):
+        with col:
+            st.markdown(f'<div class="sba-block"><h4>{pct_label} Down</h4>', unsafe_allow_html=True)
+            down    = row.get(down_key)
+            monthly = row.get(monthly_key)
+            cf_aft  = row.get(cf_key)
+            coc     = row.get(coc_key)
+            dscr    = row.get(dscr_key)
+            r1, r2 = st.columns(2)
+            r1.metric("Down Payment",   _fmt(down),          help="Cash required at closing")
+            r2.metric("Monthly Payment",_fmt(monthly),       help="SBA loan monthly payment (10% rate, 10-year term)")
+            r3, r4 = st.columns(2)
+            r3.metric("CF After Debt",  _fmt(cf_aft),        help="Annual cash flow remaining after SBA debt service")
+            r4.metric("CoC Return",     _fmt(coc, "%"),      help="Cash-on-cash return: CF after debt ÷ down payment. 30%+ is strong.")
+            st.metric("DSCR",           _fmt(dscr, "x"),     help="Debt Service Coverage Ratio: cash flow ÷ annual debt. Must be ≥1.25 for SBA approval. 1.5+ is comfortable.")
+            st.markdown('</div>', unsafe_allow_html=True)
 
-    with sba_left:
-        st.markdown("**10% Down**")
-        down10 = row.get("down_10")
-        monthly10 = row.get("sba_monthly_10pct")
-        cf10 = row.get("cf_after_debt_10pct")
-        coc10 = row.get("coc_return_10pct")
-        dscr10 = row.get("dscr_10pct")
-        s1, s2 = st.columns(2)
-        s1.metric("Down Payment", f"${down10:,.0f}" if pd.notna(down10) else "N/A")
-        s2.metric("Monthly Payment", f"${monthly10:,.0f}" if pd.notna(monthly10) else "N/A")
-        s3, s4 = st.columns(2)
-        s3.metric("CF After Debt", f"${cf10:,.0f}" if pd.notna(cf10) else "N/A")
-        s4.metric("CoC Return", f"{coc10*100:.0f}%" if pd.notna(coc10) else "N/A")
-        st.metric("DSCR", f"{dscr10:.2f}" if pd.notna(dscr10) else "N/A")
-
-    with sba_right:
-        st.markdown("**20% Down**")
-        down20 = row.get("down_20")
-        monthly20 = row.get("sba_monthly_20pct")
-        cf20 = row.get("cf_after_debt_20pct")
-        coc20 = row.get("coc_return_20pct")
-        dscr20 = row.get("dscr_20pct")
-        t1, t2 = st.columns(2)
-        t1.metric("Down Payment", f"${down20:,.0f}" if pd.notna(down20) else "N/A")
-        t2.metric("Monthly Payment", f"${monthly20:,.0f}" if pd.notna(monthly20) else "N/A")
-        t3, t4 = st.columns(2)
-        t3.metric("CF After Debt", f"${cf20:,.0f}" if pd.notna(cf20) else "N/A")
-        t4.metric("CoC Return", f"{coc20*100:.0f}%" if pd.notna(coc20) else "N/A")
-        st.metric("DSCR", f"{dscr20:.2f}" if pd.notna(dscr20) else "N/A")
-
-    st.divider()
+    _sba_col(sba_l, "10%", "down_10", "sba_monthly_10pct", "cf_after_debt_10pct", "coc_return_10pct", "dscr_10pct")
+    _sba_col(sba_r, "20%", "down_20", "sba_monthly_20pct", "cf_after_debt_20pct", "coc_return_20pct", "dscr_20pct")
 
     # Business details
-    st.subheader("Business Details")
-    d1, d2, d3 = st.columns(3)
-    d1.metric("Location", row.get("location", "N/A") or "N/A")
-    d2.metric("Industry", row.get("industry", "N/A") or "N/A")
-    d3.metric("Years in Business", row.get("years_in_business", "N/A") or "N/A")
+    st.markdown('<div class="ds-section">Business Details</div>', unsafe_allow_html=True)
+    d1, d2, d3, d4, d5 = st.columns(5)
+    d1.metric("Location",         row.get("location", "—") or "—")
+    d2.metric("Industry",         row.get("industry",  "—") or "—")
+    d3.metric("Years Operating",  row.get("years_in_business", "—") or "—", help="Years the business has been in operation")
+    d4.metric("Franchise?",       row.get("is_franchise", "—") or "—",      help="Franchise resales carry ongoing royalty fees and franchisor approval requirements")
+    d5.metric("SBA Pre-Approved?",row.get("sba_available",  "—") or "—",    help="Whether the broker has indicated SBA financing is available")
 
-    d4, d5, d6 = st.columns(3)
-    d4.metric("Franchise?", row.get("is_franchise", "N/A") or "N/A")
-    d5.metric("SBA Available?", row.get("sba_available", "N/A") or "N/A")
     reason = row.get("reason_for_selling", "") or ""
-    d6.metric("Reason for Selling", reason[:30] + "…" if len(str(reason)) > 30 else reason or "N/A")
+    if reason and str(reason) != "nan":
+        st.markdown(f'<div style="font-size:13px;color:#475569;margin-top:6px;"><b>Reason for selling:</b> {reason}</div>', unsafe_allow_html=True)
 
     # Tags
     tags = []
-    if row.get("absentee") in ("Likely", "Possible"):
-        tags.append("🏠 Absentee")
+    if absentee in ("Likely", "Possible"):
+        tags.append('<span class="tag tag-absentee">🏠 Absentee</span>')
     if row.get("is_trades"):
-        tags.append("🔧 Trades")
+        tags.append('<span class="tag tag-trades">🔧 Trades</span>')
     if row.get("is_healthcare"):
-        tags.append("🏥 Healthcare")
+        tags.append('<span class="tag tag-healthcare">🏥 Healthcare</span>')
     if tags:
-        st.markdown(" · ".join(tags))
+        st.markdown(f'<div class="card-tags">{"".join(tags)}</div>', unsafe_allow_html=True)
 
     # Scoring signals
     reasons = row.get("reasons", "")
     if reasons and str(reasons) != "nan":
-        st.divider()
-        st.subheader("Scoring Signals")
+        st.markdown('<div class="ds-section" title="Factors that contributed to this listing\'s score">Scoring Signals</div>', unsafe_allow_html=True)
         st.info(str(reasons))
 
     # Description
     desc = row.get("description", "")
     if desc and str(desc) != "nan":
-        st.divider()
-        st.subheader("Description")
-        st.markdown(str(desc))
+        st.markdown('<div class="ds-section">Listing Description</div>', unsafe_allow_html=True)
+        st.markdown(f'<div style="font-size:14px;line-height:1.65;color:#334155">{desc}</div>', unsafe_allow_html=True)
 
 
-# --- Card view ---
-def _bucket_color(bucket):
-    return {"SHORTLIST": "#2ecc71", "REVIEW": "#f39c12", "AUTO-REJECT": "#e74c3c"}.get(bucket, "#95a5a6")
-
+# ── Card view ───────────────────────────────────────────────────────────────────
 def render_cards(rows):
     cols = st.columns(3)
     for i, (_, row) in enumerate(rows.iterrows()):
+        bucket   = str(row.get("bucket", ""))
+        score    = int(row.get("score", 0))
+        title    = row.get("title", "Untitled")
+        location = row.get("location", "")
+        asking   = row.get("asking_price")
+        cf       = row.get("annual_cash_flow")
+        coc      = row.get("coc_return_20pct")
+        dscr     = row.get("dscr_20pct")
+        absentee = row.get("absentee", "No")
+
+        badge_cls = {"SHORTLIST": "badge-shortlist", "REVIEW": "badge-review", "AUTO-REJECT": "badge-reject"}.get(bucket, "badge-review")
+
+        tags_html = ""
+        if absentee in ("Likely", "Possible"):
+            tags_html += '<span class="tag tag-absentee">🏠 Absentee</span>'
+        if row.get("is_trades"):
+            tags_html += '<span class="tag tag-trades">🔧 Trades</span>'
+        if row.get("is_healthcare"):
+            tags_html += '<span class="tag tag-healthcare">🏥 Healthcare</span>'
+
+        loc_html = f'<div class="card-location">📍 {location}</div>' if location and str(location) != "nan" else ""
+
         with cols[i % 3]:
-            with st.container(border=True):
-                bucket = str(row.get("bucket", ""))
-                score = int(row.get("score", 0))
-                title = row.get("title", "Untitled")
-                location = row.get("location", "")
-                asking = row.get("asking_price")
-                cf = row.get("annual_cash_flow")
-                coc = row.get("coc_return_20pct")
-                dscr = row.get("dscr_20pct")
-                absentee = row.get("absentee", "No")
+            st.markdown(f"""
+            <div class="biz-card">
+                <div class="card-header">
+                    <span class="badge {badge_cls}">{bucket}</span>
+                    <span class="score-chip">Score: {score}</span>
+                </div>
+                <div class="card-title">{title}</div>
+                {loc_html}
+                <div class="card-metrics">
+                    <div class="card-metric" title="Total asking price">
+                        <div class="cm-label">Price</div>
+                        <div class="cm-value">{_fmt(asking, "$M")}</div>
+                    </div>
+                    <div class="card-metric" title="Seller's Discretionary Earnings — pre-debt owner income">
+                        <div class="cm-label">Cash Flow</div>
+                        <div class="cm-value">{_fmt(cf)}</div>
+                    </div>
+                    <div class="card-metric" title="Cash-on-cash return with 20% down payment after SBA debt service">
+                        <div class="cm-label">CoC (20%)</div>
+                        <div class="cm-value">{_fmt(coc, "%")}</div>
+                    </div>
+                    <div class="card-metric" title="Debt Service Coverage Ratio with 20% down — must be ≥1.25 for SBA">
+                        <div class="cm-label">DSCR (20%)</div>
+                        <div class="cm-value">{_fmt(dscr, "x")}</div>
+                    </div>
+                </div>
+                {f'<div class="card-tags">{tags_html}</div>' if tags_html else ""}
+            </div>
+            """, unsafe_allow_html=True)
 
-                color = _bucket_color(bucket)
-                st.markdown(
-                    f'<span style="background:{color};color:white;padding:2px 8px;'
-                    f'border-radius:4px;font-size:11px;font-weight:bold">{bucket}</span>'
-                    f'&nbsp;<span style="font-size:12px;color:#888">Score: {score}</span>',
-                    unsafe_allow_html=True,
-                )
-                st.markdown(f"**{title}**")
-                if location and str(location) != "nan":
-                    st.caption(str(location))
-
-                m1, m2 = st.columns(2)
-                m1.metric("Price", f"${asking/1e6:.2f}M" if pd.notna(asking) else "N/A")
-                m2.metric("Cash Flow", f"${cf:,.0f}" if pd.notna(cf) else "N/A")
-                m3, m4 = st.columns(2)
-                m3.metric("CoC (20%)", f"{coc*100:.0f}%" if pd.notna(coc) else "N/A")
-                m4.metric("DSCR (20%)", f"{dscr:.2f}" if pd.notna(dscr) else "N/A")
-
-                tags = []
-                if absentee in ("Likely", "Possible"):
-                    tags.append("🏠 Absentee")
-                if row.get("is_trades"):
-                    tags.append("🔧 Trades")
-                if row.get("is_healthcare"):
-                    tags.append("🏥 Healthcare")
-                if tags:
-                    st.caption(" · ".join(tags))
-
-                if st.button("View Deal", key=f"card_{row.get('id', i)}", use_container_width=True):
-                    show_deal_sheet(row)
+            if st.button("View Deal →", key=f"card_{row.get('id', i)}", use_container_width=True):
+                show_deal_sheet(row)
 
 
-# --- Table view ---
+# ── Table view ──────────────────────────────────────────────────────────────────
 def render_table(rows):
     display_cols = [
         "score", "bucket", "title", "asking_price",
@@ -322,31 +631,30 @@ def render_table(rows):
     event = st.dataframe(
         display_df,
         column_config={
-            "score": st.column_config.NumberColumn("Score", width="small"),
-            "bucket": st.column_config.TextColumn("Bucket", width="small"),
-            "title": st.column_config.TextColumn("Business", width="large"),
-            "asking_price": st.column_config.NumberColumn("Price ($)", format="%.0f", width="small"),
-            "annual_cash_flow": st.column_config.NumberColumn("Cash Flow ($)", format="%.0f", width="small"),
-            "cf_after_debt_20pct": st.column_config.NumberColumn("CF After Debt ($)", format="%.0f", width="small"),
-            "coc_return_20pct": st.column_config.NumberColumn("CoC (%)", format="%.0f", width="small"),
-            "dscr_20pct": st.column_config.NumberColumn("DSCR", format="%.2f", width="small"),
-            "absentee": st.column_config.TextColumn("Absentee", width="small"),
-            "location": st.column_config.TextColumn("Location", width="small"),
-            "url": st.column_config.LinkColumn("Link", width="small"),
+            "score":              st.column_config.NumberColumn("Score", width="small",  help="Composite 0–100 acquisition score"),
+            "bucket":             st.column_config.TextColumn("Bucket",   width="small",  help="SHORTLIST / REVIEW / AUTO-REJECT"),
+            "title":              st.column_config.TextColumn("Business", width="large"),
+            "asking_price":       st.column_config.NumberColumn("Price ($)",        format="%.0f", width="small", help="Asking price"),
+            "annual_cash_flow":   st.column_config.NumberColumn("Cash Flow ($)",    format="%.0f", width="small", help="Seller's Discretionary Earnings"),
+            "cf_after_debt_20pct":st.column_config.NumberColumn("CF After Debt ($)",format="%.0f", width="small", help="Annual cash remaining after SBA payments at 20% down"),
+            "coc_return_20pct":   st.column_config.NumberColumn("CoC (%)",          format="%.0f", width="small", help="Cash-on-cash return at 20% down. 30%+ is strong."),
+            "dscr_20pct":         st.column_config.NumberColumn("DSCR",             format="%.2f", width="small", help="Debt Service Coverage Ratio at 20% down. Must be ≥1.25."),
+            "absentee":           st.column_config.TextColumn("Absentee",  width="small",  help="Owner involvement level"),
+            "location":           st.column_config.TextColumn("Location",  width="small"),
+            "url":                st.column_config.LinkColumn("Link",      width="small"),
         },
         hide_index=True,
-        height=700,
+        height=680,
         use_container_width=True,
         selection_mode="single-row",
         on_select="rerun",
     )
 
     if event.selection.rows:
-        idx = event.selection.rows[0]
-        show_deal_sheet(rows.iloc[idx])
+        show_deal_sheet(rows.iloc[event.selection.rows[0]])
 
 
-# --- Render ---
+# ── Render ───────────────────────────────────────────────────────────────────────
 if len(filtered) == 0:
     st.info("No listings match the current filters.")
 elif view_mode == "Cards":
@@ -354,23 +662,20 @@ elif view_mode == "Cards":
 else:
     render_table(filtered)
 
-# --- Scoring breakdown ---
-with st.expander("Scoring Breakdown (top 20)"):
-    top = filtered.head(20)
-    for _, row in top.iterrows():
+# ── Expanders ────────────────────────────────────────────────────────────────────
+with st.expander("📊 Scoring Breakdown (top 20)"):
+    for _, row in filtered.head(20).iterrows():
         reasons = row.get("reasons", "")
-        title = row.get("title", "Untitled")
-        url = row.get("url", "")
-        title_display = f"[{title}]({url})" if url and str(url) != "nan" else f"**{title}**"
+        title   = row.get("title", "Untitled")
+        url     = row.get("url", "")
+        link    = f"[{title}]({url})" if url and str(url) != "nan" else f"**{title}**"
         st.markdown(
-            f"**{title_display}** — Score: {row.get('score', 0)} | "
-            f"Absentee: {row.get('absentee', 'No')}\n\n"
+            f"{link} — Score: **{row.get('score', 0)}** | Absentee: {row.get('absentee', 'No')}\n\n"
             f"_{reasons}_"
         )
         st.divider()
 
-# --- SBA Comparison ---
-with st.expander("SBA Financing Comparison (10% vs 20% Down)"):
+with st.expander("💰 SBA Financing Comparison (10% vs 20% Down)"):
     sba_cols = [
         "title",
         "asking_price", "down_10", "sba_monthly_10pct", "cf_after_debt_10pct", "coc_return_10pct",
@@ -378,7 +683,6 @@ with st.expander("SBA Financing Comparison (10% vs 20% Down)"):
     ]
     sba_available = [c for c in sba_cols if c in filtered.columns]
     sba_df = filtered[filtered["bucket"] != "AUTO-REJECT"][sba_available].head(20).copy()
-
     for col in ["coc_return_10pct", "coc_return_20pct"]:
         if col in sba_df.columns:
             sba_df[col] = sba_df[col] * 100
@@ -386,16 +690,16 @@ with st.expander("SBA Financing Comparison (10% vs 20% Down)"):
     st.dataframe(
         sba_df,
         column_config={
-            "title": st.column_config.TextColumn("Business", width="large"),
-            "asking_price": st.column_config.NumberColumn("Price ($)", format="%.0f"),
-            "down_10": st.column_config.NumberColumn("Down 10% ($)", format="%.0f"),
-            "sba_monthly_10pct": st.column_config.NumberColumn("Monthly 10% ($)", format="%.0f"),
-            "cf_after_debt_10pct": st.column_config.NumberColumn("CF After Debt 10% ($)", format="%.0f"),
-            "coc_return_10pct": st.column_config.NumberColumn("CoC 10% (%)", format="%.0f"),
-            "down_20": st.column_config.NumberColumn("Down 20% ($)", format="%.0f"),
-            "sba_monthly_20pct": st.column_config.NumberColumn("Monthly 20% ($)", format="%.0f"),
-            "cf_after_debt_20pct": st.column_config.NumberColumn("CF After Debt 20% ($)", format="%.0f"),
-            "coc_return_20pct": st.column_config.NumberColumn("CoC 20% (%)", format="%.0f"),
+            "title":               st.column_config.TextColumn("Business", width="large"),
+            "asking_price":        st.column_config.NumberColumn("Price ($)",           format="%.0f"),
+            "down_10":             st.column_config.NumberColumn("Down 10% ($)",        format="%.0f", help="10% down payment"),
+            "sba_monthly_10pct":   st.column_config.NumberColumn("Monthly 10% ($)",     format="%.0f", help="Monthly SBA payment at 10% down"),
+            "cf_after_debt_10pct": st.column_config.NumberColumn("CF After Debt 10%($)",format="%.0f", help="Cash flow after SBA debt at 10% down"),
+            "coc_return_10pct":    st.column_config.NumberColumn("CoC 10% (%)",         format="%.0f", help="Cash-on-cash return at 10% down"),
+            "down_20":             st.column_config.NumberColumn("Down 20% ($)",        format="%.0f", help="20% down payment"),
+            "sba_monthly_20pct":   st.column_config.NumberColumn("Monthly 20% ($)",     format="%.0f", help="Monthly SBA payment at 20% down"),
+            "cf_after_debt_20pct": st.column_config.NumberColumn("CF After Debt 20%($)",format="%.0f", help="Cash flow after SBA debt at 20% down"),
+            "coc_return_20pct":    st.column_config.NumberColumn("CoC 20% (%)",         format="%.0f", help="Cash-on-cash return at 20% down"),
         },
         hide_index=True,
         use_container_width=True,
