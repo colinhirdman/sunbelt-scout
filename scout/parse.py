@@ -18,10 +18,32 @@ TRADES_KEYWORDS = [
     "handyman", "restoration contractor", "fire restoration", "water restoration",
 ]
 
+HEALTHCARE_KEYWORDS = [
+    "home health", "home care", "home healthcare",
+    "senior care", "elder care", "assisted living", "memory care",
+    "medical", "dental", "optometry", "optometrist", "ophthalmol",
+    "veterinary", "veterinarian", "vet clinic", "animal hospital",
+    "physical therapy", "occupational therapy", "speech therapy",
+    "chiropractic", "chiropractor",
+    "pharmacy", "pharmacist",
+    "mental health", "behavioral health", "counseling practice",
+    "nursing", "nurse staffing", "healthcare staffing",
+    "urgent care", "clinic", "medical practice",
+    "hospice", "palliative",
+    "medical billing", "medical coding",
+    "radiology", "laboratory", "lab service",
+    "health care", "healthcare",
+]
+
 
 def _detect_trades(ctx: str) -> bool:
     lctx = ctx.lower()
     return any(kw in lctx for kw in TRADES_KEYWORDS)
+
+
+def _detect_healthcare(ctx: str) -> bool:
+    lctx = ctx.lower()
+    return any(kw in lctx for kw in HEALTHCARE_KEYWORDS)
 
 
 def parse_listings(raw_listings: list[dict]) -> list[dict]:
@@ -47,6 +69,7 @@ def parse_listings(raw_listings: list[dict]) -> list[dict]:
 
         ctx = f"{item.get('title', '')} {item.get('description', '')} {item.get('industry', '')}"
         is_trades = _detect_trades(ctx)
+        is_healthcare = _detect_healthcare(ctx)
 
         out[lid] = {
             "id": lid,
@@ -54,6 +77,7 @@ def parse_listings(raw_listings: list[dict]) -> list[dict]:
             "url": item.get("detail_url", ""),
             "industry": item.get("industry", ""),
             "is_trades": is_trades,
+            "is_healthcare": is_healthcare,
             "location": item.get("location", ""),
             "asking_price": asking,
             "asking_price_text": _format_price(asking),

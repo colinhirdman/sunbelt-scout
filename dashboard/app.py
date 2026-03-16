@@ -21,6 +21,23 @@ TRADES_KEYWORDS = [
     "refrigeration contractor",
 ]
 
+HEALTHCARE_KEYWORDS = [
+    "home health", "home care", "home healthcare",
+    "senior care", "elder care", "assisted living", "memory care",
+    "medical", "dental", "optometry", "optometrist", "ophthalmol",
+    "veterinary", "veterinarian", "vet clinic", "animal hospital",
+    "physical therapy", "occupational therapy", "speech therapy",
+    "chiropractic", "chiropractor",
+    "pharmacy", "pharmacist",
+    "mental health", "behavioral health", "counseling practice",
+    "nursing", "nurse staffing", "healthcare staffing",
+    "urgent care", "clinic", "medical practice",
+    "hospice", "palliative",
+    "medical billing", "medical coding",
+    "radiology", "laboratory", "lab service",
+    "health care", "healthcare",
+]
+
 CSV_PATH = Path(__file__).resolve().parents[1] / "output" / "candidates.csv"
 
 st.set_page_config(page_title="Sunbelt Scout", layout="wide")
@@ -49,12 +66,17 @@ for col in NUMERIC_COLS:
     if col in df.columns:
         df[col] = pd.to_numeric(df[col], errors="coerce")
 
-# Compute is_trades from title + industry (works for all rows regardless of when they were crawled)
+# Compute is_trades / is_healthcare from title + industry (works for all rows regardless of when they were crawled)
 def _is_trades(row):
     ctx = f"{row.get('title', '')} {row.get('industry', '')}".lower()
     return any(kw in ctx for kw in TRADES_KEYWORDS)
 
+def _is_healthcare(row):
+    ctx = f"{row.get('title', '')} {row.get('industry', '')} {row.get('description', '')}".lower()
+    return any(kw in ctx for kw in HEALTHCARE_KEYWORDS)
+
 df["is_trades"] = df.apply(_is_trades, axis=1)
+df["is_healthcare"] = df.apply(_is_healthcare, axis=1)
 
 # --- Sidebar filters ---
 st.sidebar.header("Filters")
@@ -75,6 +97,7 @@ min_coc_decimal = min_coc / 100.0
 absentee_only = st.sidebar.checkbox("Absentee / Semi-Absentee Only")
 twin_cities_only = st.sidebar.checkbox("Twin Cities Only")
 trades_only = st.sidebar.checkbox("Trades Only (plumbing, electrical, HVAC, etc.)")
+healthcare_only = st.sidebar.checkbox("Healthcare Only (medical, dental, home health, etc.)")
 
 # --- Apply filters ---
 mask = df["bucket"].isin(buckets) if buckets else pd.Series([True] * len(df))
@@ -90,6 +113,9 @@ if absentee_only:
 
 if trades_only:
     mask &= df["is_trades"] == True
+
+if healthcare_only:
+    mask &= df["is_healthcare"] == True
 
 if twin_cities_only:
     tc_pattern = "|".join([
