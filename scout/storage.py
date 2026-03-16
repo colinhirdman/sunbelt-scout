@@ -13,7 +13,7 @@ FIELDNAMES = [
     "cf_after_debt_20pct", "coc_return_20pct", "dscr_20pct", "payoff_years_20pct",
     "score", "bucket", "absentee", "reasons", "is_trades",
     "years_in_business", "is_franchise", "reason_for_selling",
-    "sba_available", "listing_agent",
+    "sba_available", "listing_agent", "narrative",
     "last_seen",
 ]
 
@@ -89,6 +89,7 @@ def upsert_rows(rows: list[dict]):
             "reason_for_selling": r.get("reason_for_selling", ""),
             "sba_available": r.get("sba_available", ""),
             "listing_agent": r.get("listing_agent", ""),
+            "narrative": r.get("narrative", ""),
             "last_seen": datetime.utcnow().isoformat(),
         }
 

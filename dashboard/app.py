@@ -553,6 +553,65 @@ def show_deal_sheet(row):
     if tags:
         st.markdown(f'<div class="card-tags">{"".join(tags)}</div>', unsafe_allow_html=True)
 
+    # Rule-based narrative
+    narrative = row.get("narrative", "")
+    if narrative and str(narrative) != "nan":
+        st.markdown('<div class="ds-section" title="Auto-generated deal summary based on scored signals">Deal Summary</div>', unsafe_allow_html=True)
+        st.markdown(f'<div style="font-size:14px;line-height:1.75;color:#1E293B;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:16px">{narrative}</div>', unsafe_allow_html=True)
+
+    # AI analysis (on-demand)
+    st.markdown('<div class="ds-section" title="Claude AI analysis generated on demand">AI Analysis</div>', unsafe_allow_html=True)
+    ai_key = f"ai_analysis_{row.get('id', '')}"
+    if ai_key not in st.session_state:
+        st.session_state[ai_key] = None
+
+    if st.session_state[ai_key]:
+        st.markdown(f'<div style="font-size:14px;line-height:1.75;color:#1E293B;background:#EFF6FF;border:1px solid #BFDBFE;border-radius:10px;padding:16px">{st.session_state[ai_key]}</div>', unsafe_allow_html=True)
+    else:
+        if st.button("Generate AI Analysis", key=f"ai_btn_{row.get('id', '')}", use_container_width=True):
+            api_key = st.secrets.get("ANTHROPIC_API_KEY", "")
+            if not api_key:
+                st.warning("Set ANTHROPIC_API_KEY in Streamlit secrets to enable AI analysis.")
+            else:
+                import anthropic
+                asking   = row.get("asking_price")
+                cf       = row.get("annual_cash_flow")
+                coc20    = row.get("coc_return_20pct")
+                dscr20   = row.get("dscr_20pct")
+                cf20     = row.get("cf_after_debt_20pct")
+                desc     = row.get("description", "") or ""
+                reasons  = row.get("reasons", "") or ""
+                prompt = f"""You are a business acquisition analyst. Analyze this business listing and write a concise 3-paragraph deal memo.
+
+Business: {row.get('title', '')}
+Industry: {row.get('industry', '')} | Location: {row.get('location', '')}
+Asking Price: ${asking:,.0f if asking else 'N/A'}
+Annual Cash Flow (SDE): ${cf:,.0f if cf else 'N/A'}
+CF After SBA Debt (20% down): ${cf20:,.0f if cf20 else 'N/A'}
+Cash-on-Cash Return (20% down): {f'{coc20:.0%}' if coc20 else 'N/A'}
+DSCR (20% down): {f'{dscr20:.2f}x' if dscr20 else 'N/A'}
+Absentee Owner: {row.get('absentee', 'No')}
+Years in Business: {row.get('years_in_business', 'Unknown')}
+Scored Signals: {reasons}
+Listing Description: {desc[:800]}
+
+Write exactly 3 short paragraphs:
+1. What makes this deal attractive (be specific and quantitative)
+2. Key risks and unknowns to investigate
+3. Recommendation — pursue, pass, or conditional (and why)
+
+Be direct and opinionated. No bullet points."""
+
+                with st.spinner("Analyzing..."):
+                    client = anthropic.Anthropic(api_key=api_key)
+                    msg = client.messages.create(
+                        model="claude-opus-4-6",
+                        max_tokens=500,
+                        messages=[{"role": "user", "content": prompt}],
+                    )
+                    st.session_state[ai_key] = msg.content[0].text
+                    st.rerun()
+
     # Scoring signals
     reasons = row.get("reasons", "")
     if reasons and str(reasons) != "nan":
