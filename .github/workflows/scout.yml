@@ -26,6 +26,6 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add output/candidates.csv output/daily_report.md data/state.json
+          git add output/candidates.csv output/daily_report.md
           git diff --cached --quiet || git commit -m "Auto: scout run $(date -u +%Y-%m-%d)"
           git push
