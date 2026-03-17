@@ -557,7 +557,49 @@ def show_deal_sheet(row):
     narrative = row.get("narrative", "")
     if narrative and str(narrative) != "nan":
         st.markdown('<div class="ds-section" title="Auto-generated deal summary based on scored signals">Deal Summary</div>', unsafe_allow_html=True)
-        st.markdown(f'<div style="font-size:14px;line-height:1.75;color:#1E293B;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:10px;padding:16px">{narrative}</div>', unsafe_allow_html=True)
+
+        def _narrative_section(text, prefix, icon, bg, border, label_color):
+            if prefix not in text:
+                return ""
+            body = text.split(prefix, 1)[1]
+            # Trim at next known section
+            for stop in ["What's attractive:", "Watch-outs:", "Bottom line:"]:
+                if stop != prefix and stop in body:
+                    body = body.split(stop)[0]
+            body = body.strip().rstrip(".")
+            items = [s.strip().rstrip(".") for s in body.split(";") if s.strip()]
+            bullets = "".join(f'<li style="margin-bottom:4px">{i}.</li>' for i in items)
+            return f"""
+            <div style="background:{bg};border:1px solid {border};border-radius:10px;padding:14px 18px;margin-bottom:10px">
+                <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:{label_color};margin-bottom:8px">{icon} {prefix.rstrip(':')}</div>
+                <ul style="margin:0;padding-left:18px;font-size:13px;line-height:1.7;color:#1E293B">{bullets}</ul>
+            </div>"""
+
+        def _verdict_section(text):
+            if "Bottom line:" not in text:
+                return ""
+            body = text.split("Bottom line:", 1)[1].strip()
+            return f"""
+            <div style="background:#1E3A5F;border-radius:10px;padding:14px 18px;margin-bottom:10px">
+                <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.6px;color:#93C5FD;margin-bottom:6px">⚖️ Bottom Line</div>
+                <div style="font-size:14px;font-weight:600;color:white;line-height:1.6">{body}</div>
+            </div>"""
+
+        intro_html = ""
+        if "What's attractive:" in narrative:
+            intro = narrative.split("What's attractive:")[0].strip()
+        else:
+            intro = narrative
+        if intro:
+            intro_html = f'<div style="font-size:13px;color:#475569;margin-bottom:10px;line-height:1.65">{intro}</div>'
+
+        html = (
+            intro_html
+            + _narrative_section(narrative, "What's attractive:", "✅", "#F0FDF4", "#86EFAC", "#15803D")
+            + _narrative_section(narrative, "Watch-outs:", "⚠️", "#FFFBEB", "#FCD34D", "#B45309")
+            + _verdict_section(narrative)
+        )
+        st.markdown(html, unsafe_allow_html=True)
 
     # Scoring signals
     reasons = row.get("reasons", "")
