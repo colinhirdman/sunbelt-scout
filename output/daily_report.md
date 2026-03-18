@@ -1,7 +1,7 @@
-# Sunbelt Scout — 2026-03-17
+# Sunbelt Scout — 2026-03-18
 
 New listings processed: **77**
-Shortlisted: **13** | Review: **17** | Auto-Rejected: **45**
+Shortlisted: **14** | Review: **16** | Auto-Rejected: **45**
 
 ## SHORTLIST
 - **Complete material handling installation company located in Twin Cities metro area.** (score 75)
@@ -70,6 +70,12 @@ Shortlisted: **13** | Review: **17** | Auto-Rejected: **45**
   https://www.sunbeltmidwest.com/complete-search-listing/?id_number=58449
   _Why_: strong CF $513,535, DSCR 3.24, CoC 142%, recurring revenue signal, durable industry, Twin Cities area
 
+- **Busy Downtown Retail Store – $200K Inventory Included – Northern MN – SBA Qualified** (score 65)
+  Price: $585,000 | CF: $350,753 | CF After Debt: $276,537
+  CoC: 236% | DSCR: 4.73x | Absentee: No
+  https://www.sunbeltmidwest.com/complete-search-listing/?id_number=56339
+  _Why_: strong CF $350,753, DSCR 4.73, CoC 236%, 5 employees, no heavy inventory, operationally simple, Twin Cities area
+
 - **Established Architecture & Design Firm with Strong Project Pipeline – $1.2MM Cash Flow** (score 65)
   Price: $2,200,000 | CF: $1,200,144 | CF After Debt: $921,042
   CoC: 209% | DSCR: 4.30x | Absentee: No
@@ -107,9 +113,9 @@ Shortlisted: **13** | Review: **17** | Auto-Rejected: **45**
   https://www.sunbeltmidwest.com/complete-search-listing/?id_number=56550
   _Why_: decent CF $265,898, DSCR 2.10, CoC 70%, 4 employees, operationally simple, durable industry, Twin Cities area
 
-- **Profitable Metro Area Asian Restaurant in Premier Urban District with $265k Cash Flow!** (score 61) $780,000
+- **Profitable Metro Area Asian Restaurant in Premier Urban District with $265k Cash Flow!** (score 61) $725,000
   https://www.sunbeltmidwest.com/complete-search-listing/?id_number=58098
-  _Why_: decent CF $265,011, DSCR 2.68, CoC 106%, 10 employees, no heavy inventory, operationally simple, recurring revenue signal, Twin Cities area
+  _Why_: decent CF $265,011, DSCR 2.88, CoC 119%, 10 employees, no heavy inventory, operationally simple, recurring revenue signal, Twin Cities area
 
 - **Compassionate Home Health Care Business with Owner Financing!** (score 61) $500,000
   https://www.sunbeltmidwest.com/complete-search-listing/?id_number=58292
@@ -122,10 +128,6 @@ Shortlisted: **13** | Review: **17** | Auto-Rejected: **45**
 - **Independently Owned & Operated Farm Winery, Tasting Room, & Events Venue in Minnesota.** (score 58) $1,525,000
   https://www.sunbeltmidwest.com/complete-search-listing/?id_number=57582
   _Why_: strong CF $316,100, DSCR 1.63, CoC 40%, 35 employees, no heavy inventory, Twin Cities area
-
-- **Busy Downtown Retail Store – $200K Inventory Included – Northern MN – SBA Qualified** (score 55) $585,000
-  https://www.sunbeltmidwest.com/complete-search-listing/?id_number=56339
-  _Why_: decent CF $222,732, DSCR 3.00, CoC 127%, 5 employees, no heavy inventory, operationally simple, Twin Cities area
 
 - **Industrial Ventilation & Equipment Solutions – Sales, Installation & Service** (score 55) $700,000
   https://www.sunbeltmidwest.com/complete-search-listing/?id_number=56807
