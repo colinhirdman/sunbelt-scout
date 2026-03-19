@@ -1,4 +1,4 @@
-# Sunbelt Scout — 2026-03-18
+# Sunbelt Scout — 2026-03-19
 
 New listings processed: **77**
 Shortlisted: **14** | Review: **16** | Auto-Rejected: **45**
