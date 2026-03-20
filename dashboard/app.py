@@ -529,6 +529,27 @@ def show_deal_sheet(row):
     _sba_col(sba_l, "10%", "down_10", "sba_monthly_10pct", "cf_after_debt_10pct", "coc_return_10pct", "dscr_10pct")
     _sba_col(sba_r, "20%", "down_20", "sba_monthly_20pct", "cf_after_debt_20pct", "coc_return_20pct", "dscr_20pct")
 
+    # Seller Financing
+    st.markdown('<div class="ds-section" title="Seller carries the 10% down payment as a subordinated note (6% / 5yr). No cash out of pocket.">Seller Financing Scenario (Zero Cash Down)</div>', unsafe_allow_html=True)
+    sf_note = row.get("seller_note_amount")
+    sf_monthly = row.get("seller_note_monthly")
+    sf_standby = row.get("cf_during_standby")
+    sf_after = row.get("cf_after_seller_financing")
+    sf_dscr = row.get("dscr_seller_financed")
+
+    sf1, sf2, sf3, sf4, sf5 = st.columns(5)
+    sf1.metric("Your Cash Down", "$0", help="Seller carries the 10% down payment — you put in nothing at close")
+    sf2.metric("Seller Note", _fmt(sf_note), help="10% of purchase price carried by seller at 6% / 5-year term")
+    sf3.metric("Seller Note Payment", _fmt(sf_monthly) + "/mo" if sf_monthly else "—", help="Monthly seller note payment (kicks in after 24-month standby)")
+    sf4.metric("CF Years 1–2", _fmt(sf_standby), help="Annual cash flow after SBA only — seller note on standby for first 24 months")
+    sf5.metric("CF Years 3+", _fmt(sf_after), help="Annual cash flow after both SBA loan and seller note payments")
+
+    if sf_dscr is not None:
+        dscr_color = "normal" if sf_dscr >= 1.25 else "inverse"
+        st.metric("DSCR (Years 3+)", f"{sf_dscr:.2f}x", help="Combined debt coverage after standby ends. SBA requires ≥1.25.", delta="SBA eligible" if sf_dscr >= 1.25 else "Below SBA minimum", delta_color=dscr_color)
+
+    st.caption("⚠️ SBA requires seller note to be on full standby (no payments) for first 24 months. Seller must agree to this structure.")
+
     # Business details
     st.markdown('<div class="ds-section">Business Details</div>', unsafe_allow_html=True)
     d1, d2, d3, d4, d5 = st.columns(5)

@@ -99,7 +99,7 @@ def parse_listings(raw_listings: list[dict]) -> list[dict]:
 
 
 def _derive_financials(asking, annual_cf):
-    """Derive all SBA modeling fields for 10% and 20% down scenarios."""
+    """Derive all SBA modeling fields for 10% and 20% down scenarios, plus seller financing."""
     result = {
         "down_10": None, "down_20": None,
         "sba_loan_90": None, "sba_loan_80": None,
@@ -109,6 +109,13 @@ def _derive_financials(asking, annual_cf):
         "coc_return_10pct": None, "coc_return_20pct": None,
         "dscr_10pct": None, "dscr_20pct": None,
         "payoff_years_10pct": None, "payoff_years_20pct": None,
+        # Seller financing scenario (seller carries 10% note, buyer puts $0 down)
+        "seller_note_amount": None,
+        "seller_note_monthly": None,
+        "seller_note_annual": None,
+        "cf_during_standby": None,       # Years 1-2: only SBA payment (seller note on standby)
+        "cf_after_seller_financing": None, # Years 3+: SBA + seller note payments
+        "dscr_seller_financed": None,     # DSCR after both payments (years 3+)
     }
 
     if not asking or asking <= 0:
@@ -153,7 +160,35 @@ def _derive_financials(asking, annual_cf):
             if cf_after_20 > 0 and down_20 > 0:
                 result["payoff_years_20pct"] = round(down_20 / cf_after_20, 2)
 
+        # Seller financing scenario:
+        # SBA covers 90%, seller carries 10% note at 6% / 5 years, 24-month standby
+        seller_note = round(asking * 0.10, 2)
+        seller_monthly = _loan_payment(seller_note, annual_rate=0.06, years=5)
+        seller_annual = round(seller_monthly * 12, 2) if seller_monthly else None
+        result["seller_note_amount"] = seller_note
+        result["seller_note_monthly"] = seller_monthly
+        result["seller_note_annual"] = seller_annual
+
+        if result["annual_debt_service_10pct"]:
+            # Years 1-2: seller note on standby, only SBA payment
+            result["cf_during_standby"] = round(annual_cf - result["annual_debt_service_10pct"], 2)
+            # Years 3+: both SBA + seller note
+            if seller_annual:
+                total_debt = result["annual_debt_service_10pct"] + seller_annual
+                result["cf_after_seller_financing"] = round(annual_cf - total_debt, 2)
+                result["dscr_seller_financed"] = round(annual_cf / total_debt, 2)
+
     return result
+
+
+def _loan_payment(principal, annual_rate=0.06, years=5):
+    """Monthly payment for any amortizing loan."""
+    if not principal or principal <= 0:
+        return None
+    r = annual_rate / 12
+    n = years * 12
+    payment = principal * (r * (1 + r) ** n) / ((1 + r) ** n - 1)
+    return round(payment, 2)
 
 
 def _sba_payment(principal, annual_rate=0.10, years=10):
