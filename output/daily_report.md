@@ -1,7 +1,7 @@
-# Sunbelt Scout — 2026-03-19
+# Sunbelt Scout — 2026-03-20
 
-New listings processed: **77**
-Shortlisted: **14** | Review: **16** | Auto-Rejected: **45**
+New listings processed: **76**
+Shortlisted: **14** | Review: **15** | Auto-Rejected: **45**
 
 ## SHORTLIST
 - **Complete material handling installation company located in Twin Cities metro area.** (score 75)
@@ -109,6 +109,10 @@ Shortlisted: **14** | Review: **16** | Auto-Rejected: **45**
   https://www.sunbeltmidwest.com/complete-search-listing/?id_number=57737
   _Why_: decent CF $268,402, DSCR 3.02, CoC 128%, 5 employees, no heavy inventory, durable industry, Twin Cities area
 
+- **Established Window Treatment Sales & Installation Business – Diversified Commercial & Residential - Northern Minnesota** (score 62) $575,000
+  https://www.sunbeltmidwest.com/complete-search-listing/?id_number=58633
+  _Why_: decent CF $166,929, DSCR 2.29, CoC 82%, 3 employees, no heavy inventory, durable industry, Twin Cities area
+
 - **Industrial Supply Distributor – $250,000 price reduction! 35+ Years in Business! 265k cash flow!** (score 61) $1,000,000
   https://www.sunbeltmidwest.com/complete-search-listing/?id_number=56550
   _Why_: decent CF $265,898, DSCR 2.10, CoC 70%, 4 employees, operationally simple, durable industry, Twin Cities area
@@ -116,10 +120,6 @@ Shortlisted: **14** | Review: **16** | Auto-Rejected: **45**
 - **Profitable Metro Area Asian Restaurant in Premier Urban District with $265k Cash Flow!** (score 61) $725,000
   https://www.sunbeltmidwest.com/complete-search-listing/?id_number=58098
   _Why_: decent CF $265,011, DSCR 2.88, CoC 119%, 10 employees, no heavy inventory, operationally simple, recurring revenue signal, Twin Cities area
-
-- **Compassionate Home Health Care Business with Owner Financing!** (score 61) $500,000
-  https://www.sunbeltmidwest.com/complete-search-listing/?id_number=58292
-  _Why_: decent CF $172,231, DSCR 2.72, CoC 109%, 25 employees, no heavy inventory, operationally simple, durable industry, Twin Cities area
 
 - **MN Based – Full-Service Irrigation Contractor, $470k in Cash Flow, SBA Financing Available for a qualified buyer.** (score 58) $1,950,000
   https://www.sunbeltmidwest.com/complete-search-listing/?id_number=57297
@@ -140,10 +140,6 @@ Shortlisted: **14** | Review: **16** | Auto-Rejected: **45**
 - **Pool, Spa and Outdoor Living retailer and installer, with a 50-year market presence. $82k down buys $244K in Cash Flow. SBA Financing available for a qualified buyer.** (score 52) $700,000
   https://www.sunbeltmidwest.com/complete-search-listing/?id_number=57673
   _Why_: decent CF $244,116, DSCR 2.75, CoC 111%, 6 employees, no heavy inventory, Twin Cities area
-
-- **Established Semi-Absentee Auto Repair Business with Strong Cash Flow** (score 52) $530,000
-  https://www.sunbeltmidwest.com/complete-search-listing/?id_number=58509
-  _Why_: decent CF $207,885, DSCR 3.09, CoC 133%, 5 employees, no heavy inventory, Twin Cities area
 
 - **Neighborhood Favorite Bar & Restaurant with Real Estate Included – Northern Minnesota – Seller Financing** (score 50) $500,000
   https://www.sunbeltmidwest.com/complete-search-listing/?id_number=58538
