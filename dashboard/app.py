@@ -139,6 +139,7 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
     align-items: center;
     gap: 8px;
     margin-bottom: 6px;
+    width: 100%;
 }
 .biz-card .card-title {
     font-size: 15px;
@@ -677,6 +678,16 @@ def render_cards(rows):
 
         badge_cls = {"SHORTLIST": "badge-shortlist", "REVIEW": "badge-review", "AUTO-REJECT": "badge-reject"}.get(bucket, "badge-review")
 
+        # Category emoji — pick the most specific match
+        if row.get("is_healthcare"):
+            cat_emoji = "🩺"
+        elif row.get("is_lawn_snow"):
+            cat_emoji = "🌿"
+        elif row.get("is_trades"):
+            cat_emoji = "🔧"
+        else:
+            cat_emoji = "🏢"
+
         tags_html = ""
         if absentee in ("Likely", "Possible"):
             tags_html += '<span class="tag tag-absentee">🏠 Absentee</span>'
@@ -684,6 +695,8 @@ def render_cards(rows):
             tags_html += '<span class="tag tag-trades">🔧 Trades</span>'
         if row.get("is_healthcare"):
             tags_html += '<span class="tag tag-healthcare">🏥 Healthcare</span>'
+        if row.get("is_lawn_snow"):
+            tags_html += '<span class="tag tag-lawn-snow">🌿 Lawn / Snow</span>'
 
         loc_html = f'<div class="card-location">📍 {location}</div>' if location and str(location) != "nan" else ""
 
@@ -694,6 +707,7 @@ def render_cards(rows):
                     <div class="card-header">
                         <span class="badge {badge_cls}">{bucket}</span>
                         <span class="score-chip">Score: {score}</span>
+                        <span style="margin-left:auto;font-size:22px">{cat_emoji}</span>
                     </div>
                     <div class="card-title">{title}</div>
                     {loc_html}
