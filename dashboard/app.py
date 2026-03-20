@@ -21,6 +21,18 @@ TRADES_KEYWORDS = [
     "refrigeration contractor",
 ]
 
+LAWN_SNOW_KEYWORDS = [
+    "lawn care", "lawn service", "lawn mowing", "lawn maintenance", "lawn cutting",
+    "landscaping", "landscape", "landscape maintenance",
+    "snow removal", "snow plowing", "snow plow", "snow management", "snow contracting",
+    "grounds maintenance", "grounds care", "grounds keeping", "groundskeeping",
+    "turf", "mowing", "mow",
+    "irrigation", "sprinkler",
+    "fertiliz", "weed control",
+    "tree service", "tree trimming", "tree removal", "arborist",
+    "leaf removal", "mulch",
+]
+
 HEALTHCARE_KEYWORDS = [
     "home health", "home care", "home healthcare",
     "senior care", "elder care", "assisted living", "memory care",
@@ -179,6 +191,7 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
 .tag-absentee  { background: #EEF2FF; color: #4F46E5; }
 .tag-trades    { background: #FFF7ED; color: #C2410C; }
 .tag-healthcare{ background: #F0FDF4; color: #15803D; }
+.tag-lawn-snow { background: #F0FDF4; color: #166534; }
 
 /* ── Bucket badges ── */
 .badge {
@@ -340,8 +353,13 @@ def _is_healthcare(row):
     ctx = f"{row.get('title', '')} {row.get('industry', '')} {row.get('description', '')}".lower()
     return any(kw in ctx for kw in HEALTHCARE_KEYWORDS)
 
+def _is_lawn_snow(row):
+    ctx = f"{row.get('title', '')} {row.get('industry', '')} {row.get('description', '')}".lower()
+    return any(kw in ctx for kw in LAWN_SNOW_KEYWORDS)
+
 df["is_trades"] = df.apply(_is_trades, axis=1)
 df["is_healthcare"] = df.apply(_is_healthcare, axis=1)
+df["is_lawn_snow"] = df.apply(_is_lawn_snow, axis=1)
 
 # ── Sidebar ─────────────────────────────────────────────────────────────────────
 st.sidebar.markdown("### Filters")
@@ -388,6 +406,10 @@ healthcare_only = st.sidebar.checkbox(
     "Healthcare Only",
     help="Home health, dental, medical practices, physical therapy, senior care, and related healthcare businesses",
 )
+lawn_snow_only = st.sidebar.checkbox(
+    "Lawn Care / Snow Only",
+    help="Landscaping, lawn maintenance, snow removal, tree service, irrigation, and grounds care businesses",
+)
 
 st.sidebar.markdown("---")
 view_mode = st.sidebar.radio(
@@ -409,6 +431,8 @@ if trades_only:
     mask &= df["is_trades"] == True
 if healthcare_only:
     mask &= df["is_healthcare"] == True
+if lawn_snow_only:
+    mask &= df["is_lawn_snow"] == True
 if twin_cities_only:
     tc_pattern = "|".join([
         "minneapolis", "saint paul", "st\\. paul", "bloomington", "plymouth",
@@ -571,6 +595,8 @@ def show_deal_sheet(row):
         tags.append('<span class="tag tag-trades">🔧 Trades</span>')
     if row.get("is_healthcare"):
         tags.append('<span class="tag tag-healthcare">🏥 Healthcare</span>')
+    if row.get("is_lawn_snow"):
+        tags.append('<span class="tag tag-lawn-snow">🌿 Lawn / Snow</span>')
     if tags:
         st.markdown(f'<div class="card-tags">{"".join(tags)}</div>', unsafe_allow_html=True)
 
