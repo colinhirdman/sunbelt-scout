@@ -441,10 +441,7 @@ if twin_cities_only:
         "maple grove", "woodbury", "coon rapids", "brooklyn park",
         "twin cities", "metro",
     ])
-    tc_mask = (
-        df["location"].str.contains(tc_pattern, case=False, na=False) |
-        df["reasons"].str.contains("Twin Cities", case=False, na=False)
-    )
+    tc_mask = df["location"].str.contains(tc_pattern, case=False, na=False)
     mask &= tc_mask
 
 filtered = df[mask].sort_values("score", ascending=False)
