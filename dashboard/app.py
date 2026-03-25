@@ -213,27 +213,30 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
 }
 
 /* ── Cards ── */
-[data-testid="stVerticalBlockBorderWrapper"] {
+/* ── Card column (replaces st.container border) ── */
+div[data-testid="stColumn"]:has(.biz-card) {
+    background-color: #FFFFFF !important;
     border-radius: 12px !important;
     border: 1px solid #E2E8F0 !important;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.06) !important;
-    background: #FFFFFF !important;
-    transition: box-shadow 0.2s, transform 0.15s;
-    margin-bottom: 4px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08) !important;
+    overflow: hidden !important;
+    transition: box-shadow 0.2s, transform 0.15s !important;
+    margin-bottom: 8px !important;
+    padding: 0 !important;
 }
-[data-testid="stVerticalBlockBorderWrapper"] [data-testid="stVerticalBlock"] {
-    background: #FFFFFF !important;
+div[data-testid="stColumn"]:has(.biz-card):hover {
+    box-shadow: 0 6px 20px rgba(37,99,235,0.14) !important;
+    transform: translateY(-2px) !important;
 }
-[data-testid="stVerticalBlockBorderWrapper"]:hover {
-    box-shadow: 0 6px 20px rgba(37,99,235,0.12) !important;
-    transform: translateY(-2px);
+div[data-testid="stColumn"]:has(.biz-card) > div {
+    background-color: #FFFFFF !important;
+    padding: 0 !important;
 }
-.biz-card { padding: 2px 0 6px; min-height: 340px; display: flex; flex-direction: column; }
+.biz-card { padding: 14px 14px 6px; min-height: 340px; display: flex; flex-direction: column; }
 .card-metrics { margin-top: auto; }
 .card-border-bar {
-    height: 4px;
-    border-radius: 4px 4px 0 0;
-    margin: -2px -2px 10px -2px;
+    height: 5px;
+    margin: -14px -14px 12px -14px;
 }
 .card-header { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
 .card-title { font-size: 17px; font-weight: 700; color: #0F172A; line-height: 1.35; margin: 4px 0; }
@@ -986,24 +989,22 @@ def render_cards(rows, ncols=3):
         )
 
         with cols[i % ncols]:
-            with st.container(border=True):
-                st.markdown(card_html, unsafe_allow_html=True)
-
-                btn_col, star_col = st.columns([4, 1])
-                with btn_col:
-                    if st.button("View Deal →", key=f"view_{lid}", use_container_width=True, type="primary"):
-                        st.session_state.selected_id = lid
-                        st.rerun()
-                with star_col:
-                    star_label = "⭐" if is_saved else "☆"
-                    if st.button(star_label, key=f"wl_{lid}", use_container_width=True):
-                        new_wl = set(st.session_state.watchlist)
-                        if is_saved:
-                            new_wl.discard(lid)
-                        else:
-                            new_wl.add(lid)
-                        st.session_state.watchlist = new_wl
-                        st.rerun()
+            st.markdown(card_html, unsafe_allow_html=True)
+            btn_col, star_col = st.columns([4, 1])
+            with btn_col:
+                if st.button("View Deal →", key=f"view_{lid}", use_container_width=True, type="primary"):
+                    st.session_state.selected_id = lid
+                    st.rerun()
+            with star_col:
+                star_label = "⭐" if is_saved else "☆"
+                if st.button(star_label, key=f"wl_{lid}", use_container_width=True):
+                    new_wl = set(st.session_state.watchlist)
+                    if is_saved:
+                        new_wl.discard(lid)
+                    else:
+                        new_wl.add(lid)
+                    st.session_state.watchlist = new_wl
+                    st.rerun()
 
 
 # ── Table renderer ─────────────────────────────────────────────────────────────
