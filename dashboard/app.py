@@ -489,6 +489,22 @@ div[data-testid="stTooltipContent"] *,
     margin-bottom: 10px;
 }
 
+/* ── Sidebar expander text ── */
+[data-testid="stSidebar"] [data-testid="stExpander"] {
+    background: #1E293B !important;
+    border: 1px solid #334155 !important;
+}
+[data-testid="stSidebar"] [data-testid="stExpander"] p,
+[data-testid="stSidebar"] [data-testid="stExpander"] li,
+[data-testid="stSidebar"] [data-testid="stExpander"] span,
+[data-testid="stSidebar"] [data-testid="stExpander"] strong,
+[data-testid="stSidebar"] [data-testid="stExpander"] div {
+    color: #F1F5F9 !important;
+}
+[data-testid="stSidebar"] [data-testid="stExpander"] summary {
+    color: #F1F5F9 !important;
+}
+
 /* ── Divider ── */
 hr { border-color: #E2E8F0 !important; margin: 16px 0 !important; }
 </style>
