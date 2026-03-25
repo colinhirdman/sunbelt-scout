@@ -213,14 +213,16 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
 }
 
 /* ── Cards ── */
-[data-testid="stVerticalBlockBorderWrapper"],
-[data-testid="stVerticalBlockBorderWrapper"] > div {
+[data-testid="stVerticalBlockBorderWrapper"] {
     border-radius: 12px !important;
     border: 1px solid #E2E8F0 !important;
     box-shadow: 0 2px 6px rgba(0,0,0,0.06) !important;
     background: #FFFFFF !important;
     transition: box-shadow 0.2s, transform 0.15s;
     margin-bottom: 4px;
+}
+[data-testid="stVerticalBlockBorderWrapper"] [data-testid="stVerticalBlock"] {
+    background: #FFFFFF !important;
 }
 [data-testid="stVerticalBlockBorderWrapper"]:hover {
     box-shadow: 0 6px 20px rgba(37,99,235,0.12) !important;
