@@ -2,11 +2,12 @@ import streamlit as st
 import pandas as pd
 from pathlib import Path
 
+# ── Category keyword lists ────────────────────────────────────────────────────
+
 TRADES_KEYWORDS = [
     "plumb", "electrician", "electrical", "electric",
     "hvac", "heating", "cooling", "air condition",
     "roofing", "roofer",
-    "general contractor", "contractor",
     "landscaping", "landscape", "lawn care", "lawn service",
     "excavat", "concrete", "masonry", "mason",
     "flooring", "carpet", "tile install",
@@ -49,6 +50,170 @@ HEALTHCARE_KEYWORDS = [
     "radiology", "laboratory", "lab service",
     "health care", "healthcare",
 ]
+
+CONSTRUCTION_KEYWORDS = [
+    "general contractor", "general construction",
+    "commercial construction", "commercial contractor",
+    "residential construction", "home builder", "homebuilder",
+    "remodel", "remodeling", "renovation", "build",
+    "framing", "drywall", "finish carpenter", "finish carpentry",
+    "foundation", "earthwork", "site work",
+    "construction company", "construction firm",
+    "civil contractor", "civil construction",
+]
+
+AUTOMOTIVE_KEYWORDS = [
+    "auto repair", "auto service", "automotive repair", "automotive service",
+    "car repair", "vehicle repair", "mechanic", "auto mechanic",
+    "body shop", "collision", "auto body",
+    "oil change", "lube",
+    "car wash", "auto detailing", "vehicle detailing",
+    "auto parts", "used car", "car dealership", "auto dealer",
+    "tire shop", "tire service", "wheel alignment",
+    "transmission", "brake shop",
+    "towing", "roadside assistance",
+    "fleet service", "fleet maintenance",
+]
+
+RESTAURANT_KEYWORDS = [
+    "restaurant", "bar ", "tavern", "pub ", "brewery", "brewpub",
+    "cafe", "coffee shop", "diner",
+    "fast food", "quick service", "qsr",
+    "catering", "food service", "food truck",
+    "pizza", "sandwich shop", "deli",
+    "bakery", "pastry", "donut",
+    "food and beverage", "f&b",
+    "dining", "eatery",
+    "breakfast", "brunch",
+    "sushi", "steakhouse", "grill",
+]
+
+RETAIL_KEYWORDS = [
+    "retail", "retail store", "retail shop",
+    "gift shop", "specialty store", "boutique",
+    "clothing store", "apparel",
+    "furniture store", "home goods",
+    "sporting goods", "outdoor gear",
+    "hardware store",
+    "pet store", "pet supply",
+    "toy store", "hobby shop",
+    "book store",
+    "convenience store", "c-store",
+    "liquor store",
+    "vape shop", "smoke shop",
+    "dollar store", "discount retail",
+    "ecommerce", "online retail",
+    "jewelry store",
+    "florist", "flower shop",
+]
+
+MANUFACTURING_KEYWORDS = [
+    "manufacturing", "manufacturer",
+    "fabrication", "fabricator",
+    "machining", "machine shop", "cnc",
+    "production", "assembly",
+    "metal fabrication", "sheet metal",
+    "plastic injection", "injection molding",
+    "food manufacturing", "food processing", "food production",
+    "packaging",
+    "printing", "print shop",
+    "woodworking", "cabinet making", "millwork",
+    "industrial", "factory",
+    "contract manufacturing",
+]
+
+DISTRIBUTION_KEYWORDS = [
+    "distribution", "distributor",
+    "logistics", "supply chain",
+    "trucking", "trucking company", "freight",
+    "warehouse", "warehousing",
+    "delivery service", "delivery company",
+    "courier", "last mile",
+    "wholesale", "wholesaler",
+    "import", "export",
+    "fulfillment",
+    "cold storage",
+]
+
+FINANCIAL_KEYWORDS = [
+    "accounting", "accountant", "cpa",
+    "bookkeeping", "bookkeeper",
+    "tax preparation", "tax service", "tax firm",
+    "financial planning", "financial advisor", "financial services",
+    "insurance agency", "insurance broker",
+    "payroll service", "payroll processing",
+    "wealth management",
+    "mortgage", "lending",
+    "credit union",
+]
+
+HOSPITALITY_KEYWORDS = [
+    "hotel", "motel", "inn ",
+    "bed and breakfast", "b&b",
+    "lodge", "lodging",
+    "resort",
+    "vacation rental",
+    "extended stay",
+]
+
+TECHNOLOGY_KEYWORDS = [
+    "managed service", "msp",
+    "it service", "it support", "it consulting",
+    "computer repair", "tech repair",
+    "software", "saas", "technology company",
+    "web development", "web design",
+    "cybersecurity", "cyber security",
+    "data", "cloud services",
+    "telecom", "telecommunications",
+    "staffing technology", "tech staffing",
+]
+
+EDUCATION_KEYWORDS = [
+    "daycare", "day care", "childcare", "child care",
+    "preschool", "pre-school", "pre school",
+    "tutoring", "tutor",
+    "learning center",
+    "after school",
+    "early childhood",
+    "montessori",
+    "dance studio", "music school", "music lesson",
+    "martial arts", "karate", "judo",
+    "test prep",
+    "driving school",
+    "trade school", "vocational",
+]
+
+BEAUTY_KEYWORDS = [
+    "salon", "hair salon", "beauty salon",
+    "barber", "barbershop",
+    "nail salon", "nail spa",
+    "spa", "day spa", "med spa",
+    "massage", "massage therapy",
+    "skincare", "skin care",
+    "tanning salon", "tanning studio",
+    "gym", "fitness", "fitness center",
+    "yoga", "pilates", "crossfit",
+    "personal training",
+    "wellness center",
+    "cosmetic",
+]
+
+CATEGORY_CONFIG = {
+    "Healthcare":            {"keywords": HEALTHCARE_KEYWORDS,  "emoji": "🩺", "col": "is_healthcare",  "tag_cls": "tag-healthcare"},
+    "Lawn / Snow":           {"keywords": LAWN_SNOW_KEYWORDS,   "emoji": "🌿", "col": "is_lawn_snow",   "tag_cls": "tag-lawn-snow"},
+    "Trades":                {"keywords": TRADES_KEYWORDS,      "emoji": "🔧", "col": "is_trades",      "tag_cls": "tag-trades"},
+    "Construction":          {"keywords": CONSTRUCTION_KEYWORDS,"emoji": "🏗️", "col": "is_construction","tag_cls": "tag-construction"},
+    "Automotive":            {"keywords": AUTOMOTIVE_KEYWORDS,  "emoji": "🚗", "col": "is_automotive",  "tag_cls": "tag-automotive"},
+    "Restaurant & Bar":      {"keywords": RESTAURANT_KEYWORDS,  "emoji": "🍽️", "col": "is_restaurant",  "tag_cls": "tag-restaurant"},
+    "Retail":                {"keywords": RETAIL_KEYWORDS,      "emoji": "🛍️", "col": "is_retail",      "tag_cls": "tag-retail"},
+    "Manufacturing":         {"keywords": MANUFACTURING_KEYWORDS,"emoji":"🏭", "col": "is_manufacturing","tag_cls":"tag-manufacturing"},
+    "Distribution":          {"keywords": DISTRIBUTION_KEYWORDS,"emoji": "🚚", "col": "is_distribution","tag_cls": "tag-distribution"},
+    "Financial Services":    {"keywords": FINANCIAL_KEYWORDS,   "emoji": "💼", "col": "is_financial",   "tag_cls": "tag-financial"},
+    "Hospitality":           {"keywords": HOSPITALITY_KEYWORDS, "emoji": "🏨", "col": "is_hospitality", "tag_cls": "tag-hospitality"},
+    "Technology / IT":       {"keywords": TECHNOLOGY_KEYWORDS,  "emoji": "💻", "col": "is_technology",  "tag_cls": "tag-technology"},
+    "Education & Childcare": {"keywords": EDUCATION_KEYWORDS,   "emoji": "🎓", "col": "is_education",   "tag_cls": "tag-education"},
+    "Beauty & Wellness":     {"keywords": BEAUTY_KEYWORDS,      "emoji": "💇", "col": "is_beauty",      "tag_cls": "tag-beauty"},
+}
 
 CSV_PATH = Path(__file__).resolve().parents[1] / "output" / "candidates.csv"
 
@@ -189,10 +354,21 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
     padding: 3px 8px;
     border-radius: 20px;
 }
-.tag-absentee  { background: #EEF2FF; color: #4F46E5; }
-.tag-trades    { background: #FFF7ED; color: #C2410C; }
-.tag-healthcare{ background: #F0FDF4; color: #15803D; }
-.tag-lawn-snow { background: #F0FDF4; color: #166534; }
+.tag-absentee      { background: #EEF2FF; color: #4F46E5; }
+.tag-trades        { background: #FFF7ED; color: #C2410C; }
+.tag-healthcare    { background: #F0FDF4; color: #15803D; }
+.tag-lawn-snow     { background: #ECFDF5; color: #166534; }
+.tag-construction  { background: #FEF3C7; color: #92400E; }
+.tag-automotive    { background: #EFF6FF; color: #1D4ED8; }
+.tag-restaurant    { background: #FFF1F2; color: #BE123C; }
+.tag-retail        { background: #FDF4FF; color: #7E22CE; }
+.tag-manufacturing { background: #F0F9FF; color: #0369A1; }
+.tag-distribution  { background: #F0FDF4; color: #065F46; }
+.tag-financial     { background: #FFFBEB; color: #B45309; }
+.tag-hospitality   { background: #FFF7ED; color: #C2410C; }
+.tag-technology    { background: #EFF6FF; color: #1E40AF; }
+.tag-education     { background: #FFF1F2; color: #9F1239; }
+.tag-beauty        { background: #FDF4FF; color: #86198F; }
 
 /* ── Bucket badges ── */
 .badge {
@@ -207,6 +383,7 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
 .badge-shortlist  { background: #D1FAE5; color: #065F46; }
 .badge-review     { background: #FEF3C7; color: #92400E; }
 .badge-reject     { background: #FEE2E2; color: #991B1B; }
+.badge-skip       { background: #F1F5F9; color: #475569; }
 
 /* ── Score chip ── */
 .score-chip {
@@ -321,7 +498,7 @@ hr { border-color: #E2E8F0 !important; margin: 16px 0 !important; }
 st.markdown("""
 <div class="scout-header">
   <h1>🏢 Sunbelt Scout</h1>
-  <p>Minnesota business acquisition pipeline · Scored &amp; filtered daily</p>
+  <p>Minnesota business acquisition pipeline · All listings · Scored &amp; filtered daily</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -346,39 +523,70 @@ for col in NUMERIC_COLS:
     if col in df.columns:
         df[col] = pd.to_numeric(df[col], errors="coerce")
 
-def _is_trades(row):
-    ctx = f"{row.get('title', '')} {row.get('industry', '')}".lower()
-    return any(kw in ctx for kw in TRADES_KEYWORDS)
-
-def _is_healthcare(row):
+# ── Category detection ─────────────────────────────────────────────────────────
+def _detect(row, keywords):
     ctx = f"{row.get('title', '')} {row.get('industry', '')} {row.get('description', '')}".lower()
-    return any(kw in ctx for kw in HEALTHCARE_KEYWORDS)
+    return any(kw in ctx for kw in keywords)
 
-def _is_lawn_snow(row):
-    ctx = f"{row.get('title', '')} {row.get('industry', '')} {row.get('description', '')}".lower()
-    return any(kw in ctx for kw in LAWN_SNOW_KEYWORDS)
+for cat_name, cat_cfg in CATEGORY_CONFIG.items():
+    col = cat_cfg["col"]
+    kws = cat_cfg["keywords"]
+    df[col] = df.apply(lambda r: _detect(r, kws), axis=1)
 
-df["is_trades"] = df.apply(_is_trades, axis=1)
-df["is_healthcare"] = df.apply(_is_healthcare, axis=1)
-df["is_lawn_snow"] = df.apply(_is_lawn_snow, axis=1)
+# ── Derived metrics ────────────────────────────────────────────────────────────
+df["revenue_multiple"] = df.apply(
+    lambda r: round(r["asking_price"] / r["annual_revenue"], 2)
+    if pd.notna(r.get("asking_price")) and pd.notna(r.get("annual_revenue")) and r["annual_revenue"] > 0
+    else None, axis=1
+)
+df["sde_margin"] = df.apply(
+    lambda r: round(r["annual_cash_flow"] / r["annual_revenue"], 4)
+    if pd.notna(r.get("annual_cash_flow")) and pd.notna(r.get("annual_revenue")) and r["annual_revenue"] > 0
+    else None, axis=1
+)
+df["revenue_per_employee"] = df.apply(
+    lambda r: round(r["annual_revenue"] / r["employees"], 0)
+    if pd.notna(r.get("annual_revenue")) and pd.notna(r.get("employees")) and r["employees"] > 0
+    else None, axis=1
+)
 
 # ── Sidebar ─────────────────────────────────────────────────────────────────────
 st.sidebar.markdown("### Filters")
 
-buckets = st.sidebar.multiselect(
-    "Bucket",
-    options=sorted(df["bucket"].unique()),
-    default=[b for b in ["SHORTLIST", "REVIEW"] if b in df["bucket"].unique()],
-    help="SHORTLIST = strong candidate, REVIEW = worth a look, AUTO-REJECT = failed screening criteria",
+# Scoring section
+st.sidebar.markdown("#### Scoring")
+apply_scoring = st.sidebar.checkbox(
+    "Apply scoring filters",
+    value=False,
+    help="When enabled, restrict to specific buckets and minimum score. Off by default so all listings are visible.",
 )
+if apply_scoring:
+    all_buckets = sorted(df["bucket"].dropna().unique().tolist())
+    buckets = st.sidebar.multiselect(
+        "Bucket",
+        options=all_buckets,
+        default=[b for b in ["SHORTLIST", "REVIEW"] if b in all_buckets],
+        help="SHORTLIST = strong candidate, REVIEW = worth a look, AUTO-REJECT = failed screening criteria",
+    )
+    min_score = st.sidebar.slider(
+        "Min Score", 0, 100, 35,
+        help="Composite 0–100 score: financial strength, recurring revenue, tech opportunity, industry durability, geography",
+    )
+else:
+    buckets = None
+    min_score = 0
 
-min_score = st.sidebar.slider(
-    "Min Score", 0, 100, 35,
-    help="Composite 0–100 score based on financial strength, recurring revenue, tech opportunity, industry durability, and geography",
-)
+st.sidebar.markdown("---")
+
+# Financial section
+st.sidebar.markdown("#### Financial")
 max_price = st.sidebar.number_input(
-    "Max Asking Price ($)", value=3000000, step=100000,
+    "Max Asking Price ($)", value=5000000, step=100000,
     help="Filter out businesses above this asking price",
+)
+min_price = st.sidebar.number_input(
+    "Min Asking Price ($)", value=50000, step=50000,
+    help="Filter out businesses below this asking price",
 )
 min_cf = st.sidebar.number_input(
     "Min Annual Cash Flow ($)", value=0, step=25000,
@@ -386,54 +594,59 @@ min_cf = st.sidebar.number_input(
 )
 min_coc = st.sidebar.slider(
     "Min Cash-on-Cash Return (20% down)", 0, 200, 0, format="%d%%",
-    help="Annual cash flow after SBA debt service divided by your 20% down payment. 30%+ is strong.",
+    help="Annual cash flow after SBA debt service divided by 20% down payment. 30%+ is strong.",
 )
 min_coc_decimal = min_coc / 100.0
 
 st.sidebar.markdown("---")
-absentee_only = st.sidebar.checkbox(
-    "Absentee / Semi-Absentee Only",
-    help="Show only businesses where the owner is not actively working full-time — better for a hands-off investor",
-)
+
+# Location & Operator section
+st.sidebar.markdown("#### Location & Operator")
 twin_cities_only = st.sidebar.checkbox(
     "Twin Cities Only",
     help="Limit to listings in the Minneapolis–Saint Paul metro area",
 )
-trades_only = st.sidebar.checkbox(
-    "Trades Only",
-    help="Plumbing, electrical, HVAC, roofing, landscaping, pest control, and other field-service businesses",
-)
-healthcare_only = st.sidebar.checkbox(
-    "Healthcare Only",
-    help="Home health, dental, medical practices, physical therapy, senior care, and related healthcare businesses",
-)
-lawn_snow_only = st.sidebar.checkbox(
-    "Lawn Care / Snow Only",
-    help="Landscaping, lawn maintenance, snow removal, tree service, irrigation, and grounds care businesses",
+absentee_only = st.sidebar.checkbox(
+    "Absentee / Semi-Absentee Only",
+    help="Show only businesses where the owner is not actively working full-time",
 )
 
 st.sidebar.markdown("---")
+
+# Category section
+st.sidebar.markdown("#### Category")
+all_cat_names = list(CATEGORY_CONFIG.keys())
+selected_categories = st.sidebar.multiselect(
+    "Show categories",
+    options=all_cat_names,
+    default=[],
+    placeholder="All categories",
+    help="Select one or more categories to filter. Leave empty to show all.",
+)
+
+st.sidebar.markdown("---")
+
 view_mode = st.sidebar.radio(
     "View Mode", ["Cards", "Table"], horizontal=True,
     help="Cards give a visual overview; Table allows sorting and row-click to open a deal sheet",
 )
 
 # ── Apply filters ───────────────────────────────────────────────────────────────
-mask = df["bucket"].isin(buckets) if buckets else pd.Series([True] * len(df))
-mask &= df["score"] >= min_score
+mask = pd.Series([True] * len(df))
+
+if apply_scoring and buckets:
+    mask &= df["bucket"].isin(buckets)
+if apply_scoring:
+    mask &= df["score"] >= min_score
+
 mask &= (df["asking_price"].isna()) | (df["asking_price"] <= max_price)
+mask &= (df["asking_price"].isna()) | (df["asking_price"] >= min_price)
 mask &= (df["annual_cash_flow"].isna()) | (df["annual_cash_flow"] >= min_cf)
 
 if min_coc_decimal > 0:
     mask &= (df["coc_return_20pct"].isna()) | (df["coc_return_20pct"] >= min_coc_decimal)
 if absentee_only:
     mask &= df["absentee"].isin(["Likely", "Possible"])
-if trades_only:
-    mask &= df["is_trades"] == True
-if healthcare_only:
-    mask &= df["is_healthcare"] == True
-if lawn_snow_only:
-    mask &= df["is_lawn_snow"] == True
 if twin_cities_only:
     tc_pattern = "|".join([
         "minneapolis", "saint paul", "st\\. paul", "bloomington", "plymouth",
@@ -441,8 +654,13 @@ if twin_cities_only:
         "maple grove", "woodbury", "coon rapids", "brooklyn park",
         "twin cities", "metro",
     ])
-    tc_mask = df["location"].str.contains(tc_pattern, case=False, na=False)
-    mask &= tc_mask
+    mask &= df["location"].str.contains(tc_pattern, case=False, na=False)
+if selected_categories:
+    cat_mask = pd.Series([False] * len(df))
+    for cat_name in selected_categories:
+        col = CATEGORY_CONFIG[cat_name]["col"]
+        cat_mask |= df[col].fillna(False).astype(bool)
+    mask &= cat_mask
 
 filtered = df[mask].sort_values("score", ascending=False)
 
@@ -450,6 +668,7 @@ filtered = df[mask].sort_values("score", ascending=False)
 n_total     = len(df)
 n_filtered  = len(filtered)
 n_shortlist = len(df[df["bucket"] == "SHORTLIST"])
+n_review    = len(df[df["bucket"] == "REVIEW"])
 n_rejected  = len(df[df["bucket"] == "AUTO-REJECT"])
 
 st.markdown(f"""
@@ -459,14 +678,18 @@ st.markdown(f"""
     <div class="value blue">{n_total}</div>
   </div>
   <div class="stat-pill" title="Listings matching your current filters">
-    <div class="label">Filtered</div>
+    <div class="label">Showing</div>
     <div class="value">{n_filtered}</div>
   </div>
-  <div class="stat-pill" title="Listings scoring above {65} — strong acquisition candidates">
+  <div class="stat-pill" title="Listings scoring above 65 — strong acquisition candidates">
     <div class="label">Shortlisted</div>
     <div class="value green">{n_shortlist}</div>
   </div>
-  <div class="stat-pill" title="Listings automatically rejected — missing financials, wrong price range, regulated industry, or digital-only">
+  <div class="stat-pill" title="Listings in the REVIEW bucket">
+    <div class="label">Review</div>
+    <div class="value">{n_review}</div>
+  </div>
+  <div class="stat-pill" title="Listings auto-rejected by screening criteria">
     <div class="label">Auto-Rejected</div>
     <div class="value red">{n_rejected}</div>
   </div>
@@ -476,11 +699,16 @@ st.markdown(f"""
 
 # ── Helpers ─────────────────────────────────────────────────────────────────────
 def _badge(bucket):
-    cls = {"SHORTLIST": "badge-shortlist", "REVIEW": "badge-review", "AUTO-REJECT": "badge-reject"}.get(bucket, "badge-review")
+    cls = {
+        "SHORTLIST": "badge-shortlist",
+        "REVIEW": "badge-review",
+        "AUTO-REJECT": "badge-reject",
+        "SKIP": "badge-skip",
+    }.get(bucket, "badge-skip")
     return f'<span class="badge {cls}">{bucket}</span>'
 
 def _fmt(val, fmt="$"):
-    if pd.isna(val):
+    if val is None or (isinstance(val, float) and pd.isna(val)):
         return "—"
     if fmt == "$":
         return f"${val:,.0f}"
@@ -491,6 +719,24 @@ def _fmt(val, fmt="$"):
     if fmt == "x":
         return f"{val:.2f}x"
     return str(val)
+
+def _row_categories(row):
+    """Return list of (name, config) for all matching categories."""
+    return [
+        (name, cfg) for name, cfg in CATEGORY_CONFIG.items()
+        if row.get(cfg["col"])
+    ]
+
+def _primary_category(row):
+    """Return the most specific matching category config, or None."""
+    cats = _row_categories(row)
+    # Priority order: healthcare > lawn/snow > trades > construction > automotive > ...
+    priority = list(CATEGORY_CONFIG.keys())
+    for name in priority:
+        cfg = CATEGORY_CONFIG[name]
+        if row.get(cfg["col"]):
+            return name, cfg
+    return "Other", {"emoji": "🏢", "col": None, "tag_cls": ""}
 
 
 # ── Deal Sheet dialog ────────────────────────────────────────────────────────────
@@ -503,7 +749,7 @@ def show_deal_sheet(row):
 
     # Title row
     url_html = f'<a class="ds-link" href="{url}" target="_blank">View on Sunbelt →</a>' if url and str(url) != "nan" else ""
-    badge_cls = {"SHORTLIST": "badge-shortlist", "REVIEW": "badge-review", "AUTO-REJECT": "badge-reject"}.get(bucket, "badge-review")
+    badge_cls = {"SHORTLIST": "badge-shortlist", "REVIEW": "badge-review", "AUTO-REJECT": "badge-reject"}.get(bucket, "badge-skip")
     st.markdown(f"""
         <div class="ds-title">{title}</div>
         <div style="display:flex;align-items:center;gap:10px;margin:6px 0 16px;">
@@ -526,6 +772,68 @@ def show_deal_sheet(row):
     k3.metric("Annual Revenue",  _fmt(rev),    help="Total annual gross revenue reported by the seller")
     k4.metric("Employees",       int(emps) if pd.notna(emps) else "—", help="Full-time + part-time headcount")
     k5.metric("Absentee",        absentee,     help="Whether the current owner is hands-off. 'Likely' = explicitly stated. 'Possible' = inferred from description.")
+
+    # ── Category Insights ──────────────────────────────────────────────────────
+    cats = _row_categories(row)
+    rev_multiple = row.get("revenue_multiple")
+    sde_margin   = row.get("sde_margin")
+    rev_per_emp  = row.get("revenue_per_employee")
+
+    has_derived = any(v is not None and not (isinstance(v, float) and pd.isna(v))
+                      for v in [rev_multiple, sde_margin, rev_per_emp])
+
+    if cats or has_derived:
+        st.markdown('<div class="ds-section">Category & Deal Metrics</div>', unsafe_allow_html=True)
+        m1, m2, m3 = st.columns(3)
+        m1.metric(
+            "Revenue Multiple",
+            f"{rev_multiple:.2f}x" if rev_multiple else "—",
+            help="Asking price ÷ annual revenue. Lower = better value. Service biz: 0.5–1.5x typical. Manufacturing: 0.5–1x. Retail: 0.3–0.8x.",
+        )
+        m2.metric(
+            "SDE Margin",
+            f"{sde_margin*100:.0f}%" if sde_margin else "—",
+            help="Cash flow ÷ revenue. Shows how much profit the owner takes home per dollar of sales. 20%+ is healthy for service businesses.",
+        )
+        m3.metric(
+            "Revenue / Employee",
+            _fmt(rev_per_emp) if rev_per_emp else "—",
+            help="Annual revenue divided by headcount — a proxy for operational efficiency. $150K+ per employee is strong for service businesses.",
+        )
+
+        # Category-specific benchmarks
+        cat_notes = []
+        for cat_name, _ in cats:
+            if cat_name == "Restaurant & Bar":
+                cat_notes.append("🍽️ **Restaurant**: Thin margins industry. SDE margins of 10–20% are normal. Verify lease terms and equipment condition.")
+            elif cat_name == "Retail":
+                cat_notes.append("🛍️ **Retail**: Inventory (FF&E) value matters — confirm what's included in asking price. Revenue multiples of 0.3–0.8x are typical.")
+            elif cat_name == "Manufacturing":
+                cat_notes.append("🏭 **Manufacturing**: Equipment (FF&E) drives value. Verify age and condition of machinery. Customer concentration risk to probe.")
+            elif cat_name == "Automotive":
+                cat_notes.append("🚗 **Automotive**: Count service bays and check equipment. Labor is the key constraint — technician tenure matters.")
+            elif cat_name == "Distribution":
+                cat_notes.append("🚚 **Distribution**: Verify fleet condition and age. Route density and customer contract lengths determine defensibility.")
+            elif cat_name == "Financial Services":
+                cat_notes.append("💼 **Financial Services**: Client retention rate is the critical metric. Revenue multiples of 1–2x are typical for CPA/bookkeeping firms.")
+            elif cat_name == "Hospitality":
+                cat_notes.append("🏨 **Hospitality**: Revenue per available room (RevPAR) and occupancy rate are key. Verify franchise agreement terms if applicable.")
+            elif cat_name == "Technology / IT":
+                cat_notes.append("💻 **Technology/IT**: MSP recurring MRR (monthly recurring revenue) is the key metric. High SDE margins (30–50%) are typical.")
+            elif cat_name == "Education & Childcare":
+                cat_notes.append("🎓 **Education/Childcare**: Licensing and capacity utilization matter. Enrollment trends are the leading revenue indicator.")
+            elif cat_name == "Healthcare":
+                cat_notes.append("🩺 **Healthcare**: Verify payer mix (insurance vs. self-pay) and reimbursement rates. Licensing and credentialing transfer requirements.")
+            elif cat_name == "Trades":
+                cat_notes.append("🔧 **Trades**: Technician headcount and tenure are key. Service contracts / recurring routes add defensibility.")
+            elif cat_name == "Construction":
+                cat_notes.append("🏗️ **Construction**: Backlog size and contract types (fixed-price vs. T&M) drive risk profile. Equipment condition matters.")
+            elif cat_name == "Beauty & Wellness":
+                cat_notes.append("💇 **Beauty/Wellness**: Chair/suite rentals vs. employee model affects transferability. Clientele retention post-sale risk is high.")
+
+        if cat_notes:
+            for note in cat_notes:
+                st.info(note)
 
     # SBA
     st.markdown('<div class="ds-section" title="SBA 7(a) loan modeled at 10% interest, 10-year term">SBA Financing Scenarios</div>', unsafe_allow_html=True)
@@ -553,11 +861,11 @@ def show_deal_sheet(row):
 
     # Seller Financing
     st.markdown('<div class="ds-section" title="Seller carries the 10% down payment as a subordinated note (6% / 5yr). No cash out of pocket.">Seller Financing Scenario (Zero Cash Down)</div>', unsafe_allow_html=True)
-    sf_note = row.get("seller_note_amount")
+    sf_note    = row.get("seller_note_amount")
     sf_monthly = row.get("seller_note_monthly")
     sf_standby = row.get("cf_during_standby")
-    sf_after = row.get("cf_after_seller_financing")
-    sf_dscr = row.get("dscr_seller_financed")
+    sf_after   = row.get("cf_after_seller_financing")
+    sf_dscr    = row.get("dscr_seller_financed")
 
     sf1, sf2, sf3, sf4, sf5 = st.columns(5)
     sf1.metric("Your Cash Down", "$0", help="Seller carries the 10% down payment — you put in nothing at close")
@@ -566,7 +874,7 @@ def show_deal_sheet(row):
     sf4.metric("CF Years 1–2", _fmt(sf_standby), help="Annual cash flow after SBA only — seller note on standby for first 24 months")
     sf5.metric("CF Years 3+", _fmt(sf_after), help="Annual cash flow after both SBA loan and seller note payments")
 
-    if sf_dscr is not None:
+    if sf_dscr is not None and not (isinstance(sf_dscr, float) and pd.isna(sf_dscr)):
         dscr_color = "normal" if sf_dscr >= 1.25 else "inverse"
         st.metric("DSCR (Years 3+)", f"{sf_dscr:.2f}x", help="Combined debt coverage after standby ends. SBA requires ≥1.25.", delta="SBA eligible" if sf_dscr >= 1.25 else "Below SBA minimum", delta_color=dscr_color)
 
@@ -589,12 +897,8 @@ def show_deal_sheet(row):
     tags = []
     if absentee in ("Likely", "Possible"):
         tags.append('<span class="tag tag-absentee">🏠 Absentee</span>')
-    if row.get("is_trades"):
-        tags.append('<span class="tag tag-trades">🔧 Trades</span>')
-    if row.get("is_healthcare"):
-        tags.append('<span class="tag tag-healthcare">🏥 Healthcare</span>')
-    if row.get("is_lawn_snow"):
-        tags.append('<span class="tag tag-lawn-snow">🌿 Lawn / Snow</span>')
+    for cat_name, cfg in cats:
+        tags.append(f'<span class="tag {cfg["tag_cls"]}">{cfg["emoji"]} {cat_name}</span>')
     if tags:
         st.markdown(f'<div class="card-tags">{"".join(tags)}</div>', unsafe_allow_html=True)
 
@@ -607,7 +911,6 @@ def show_deal_sheet(row):
             if prefix not in text:
                 return ""
             body = text.split(prefix, 1)[1]
-            # Trim at next known section
             for stop in ["What's attractive:", "Watch-outs:", "Bottom line:"]:
                 if stop != prefix and stop in body:
                     body = body.split(stop)[0]
@@ -673,27 +976,22 @@ def render_cards(rows):
         dscr     = row.get("dscr_20pct")
         absentee = row.get("absentee", "No")
 
-        badge_cls = {"SHORTLIST": "badge-shortlist", "REVIEW": "badge-review", "AUTO-REJECT": "badge-reject"}.get(bucket, "badge-review")
+        badge_cls = {
+            "SHORTLIST": "badge-shortlist",
+            "REVIEW": "badge-review",
+            "AUTO-REJECT": "badge-reject",
+        }.get(bucket, "badge-skip")
 
-        # Category emoji — pick the most specific match
-        if row.get("is_healthcare"):
-            cat_emoji = "🩺"
-        elif row.get("is_lawn_snow"):
-            cat_emoji = "🌿"
-        elif row.get("is_trades"):
-            cat_emoji = "🔧"
-        else:
-            cat_emoji = "🏢"
+        # Primary category emoji
+        cat_name, cat_cfg = _primary_category(row)
+        cat_emoji = cat_cfg["emoji"]
 
+        # Category tags
         tags_html = ""
         if absentee in ("Likely", "Possible"):
             tags_html += '<span class="tag tag-absentee">🏠 Absentee</span>'
-        if row.get("is_trades"):
-            tags_html += '<span class="tag tag-trades">🔧 Trades</span>'
-        if row.get("is_healthcare"):
-            tags_html += '<span class="tag tag-healthcare">🏥 Healthcare</span>'
-        if row.get("is_lawn_snow"):
-            tags_html += '<span class="tag tag-lawn-snow">🌿 Lawn / Snow</span>'
+        for c_name, c_cfg in _row_categories(row):
+            tags_html += f'<span class="tag {c_cfg["tag_cls"]}">{c_cfg["emoji"]} {c_name}</span>'
 
         loc_html = f'<div class="card-location">📍 {location}</div>' if location and str(location) != "nan" else ""
 
@@ -737,30 +1035,36 @@ def render_cards(rows):
 # ── Table view ──────────────────────────────────────────────────────────────────
 def render_table(rows):
     display_cols = [
-        "score", "bucket", "title", "asking_price",
+        "score", "bucket", "title", "industry", "asking_price",
         "annual_cash_flow", "cf_after_debt_20pct", "coc_return_20pct",
-        "dscr_20pct", "absentee", "location", "url",
+        "dscr_20pct", "revenue_multiple", "sde_margin",
+        "absentee", "location", "url",
     ]
     available = [c for c in display_cols if c in rows.columns]
     display_df = rows[available].copy()
 
     if "coc_return_20pct" in display_df.columns:
         display_df["coc_return_20pct"] = display_df["coc_return_20pct"] * 100
+    if "sde_margin" in display_df.columns:
+        display_df["sde_margin"] = display_df["sde_margin"] * 100
 
     event = st.dataframe(
         display_df,
         column_config={
-            "score":              st.column_config.NumberColumn("Score", width="small",  help="Composite 0–100 acquisition score"),
-            "bucket":             st.column_config.TextColumn("Bucket",   width="small",  help="SHORTLIST / REVIEW / AUTO-REJECT"),
-            "title":              st.column_config.TextColumn("Business", width="large"),
-            "asking_price":       st.column_config.NumberColumn("Price ($)",        format="%.0f", width="small", help="Asking price"),
-            "annual_cash_flow":   st.column_config.NumberColumn("Cash Flow ($)",    format="%.0f", width="small", help="Seller's Discretionary Earnings"),
-            "cf_after_debt_20pct":st.column_config.NumberColumn("CF After Debt ($)",format="%.0f", width="small", help="Annual cash remaining after SBA payments at 20% down"),
-            "coc_return_20pct":   st.column_config.NumberColumn("CoC (%)",          format="%.0f", width="small", help="Cash-on-cash return at 20% down. 30%+ is strong."),
-            "dscr_20pct":         st.column_config.NumberColumn("DSCR",             format="%.2f", width="small", help="Debt Service Coverage Ratio at 20% down. Must be ≥1.25."),
-            "absentee":           st.column_config.TextColumn("Absentee",  width="small",  help="Owner involvement level"),
-            "location":           st.column_config.TextColumn("Location",  width="small"),
-            "url":                st.column_config.LinkColumn("Link",      width="small"),
+            "score":               st.column_config.NumberColumn("Score",           width="small",  help="Composite 0–100 acquisition score"),
+            "bucket":              st.column_config.TextColumn("Bucket",            width="small",  help="SHORTLIST / REVIEW / AUTO-REJECT"),
+            "title":               st.column_config.TextColumn("Business",          width="large"),
+            "industry":            st.column_config.TextColumn("Industry",          width="medium"),
+            "asking_price":        st.column_config.NumberColumn("Price ($)",        format="%.0f", width="small"),
+            "annual_cash_flow":    st.column_config.NumberColumn("Cash Flow ($)",    format="%.0f", width="small"),
+            "cf_after_debt_20pct": st.column_config.NumberColumn("CF After Debt ($)",format="%.0f", width="small"),
+            "coc_return_20pct":    st.column_config.NumberColumn("CoC (%)",          format="%.0f", width="small"),
+            "dscr_20pct":          st.column_config.NumberColumn("DSCR",             format="%.2f", width="small"),
+            "revenue_multiple":    st.column_config.NumberColumn("Rev Multiple",     format="%.2f", width="small", help="Asking price ÷ annual revenue"),
+            "sde_margin":          st.column_config.NumberColumn("SDE Margin (%)",   format="%.0f", width="small", help="Cash flow ÷ revenue"),
+            "absentee":            st.column_config.TextColumn("Absentee",           width="small"),
+            "location":            st.column_config.TextColumn("Location",           width="small"),
+            "url":                 st.column_config.LinkColumn("Link",               width="small"),
         },
         hide_index=True,
         height=680,
@@ -789,7 +1093,7 @@ with st.expander("📊 Scoring Breakdown (top 20)"):
         url     = row.get("url", "")
         link    = f"[{title}]({url})" if url and str(url) != "nan" else f"**{title}**"
         st.markdown(
-            f"{link} — Score: **{row.get('score', 0)}** | Absentee: {row.get('absentee', 'No')}\n\n"
+            f"{link} — Score: **{row.get('score', 0)}** | Bucket: {row.get('bucket', '—')} | Absentee: {row.get('absentee', 'No')}\n\n"
             f"_{reasons}_"
         )
         st.divider()
@@ -801,7 +1105,7 @@ with st.expander("💰 SBA Financing Comparison (10% vs 20% Down)"):
         "down_20", "sba_monthly_20pct", "cf_after_debt_20pct", "coc_return_20pct",
     ]
     sba_available = [c for c in sba_cols if c in filtered.columns]
-    sba_df = filtered[filtered["bucket"] != "AUTO-REJECT"][sba_available].head(20).copy()
+    sba_df = filtered[sba_available].head(20).copy()
     for col in ["coc_return_10pct", "coc_return_20pct"]:
         if col in sba_df.columns:
             sba_df[col] = sba_df[col] * 100
@@ -809,16 +1113,16 @@ with st.expander("💰 SBA Financing Comparison (10% vs 20% Down)"):
     st.dataframe(
         sba_df,
         column_config={
-            "title":               st.column_config.TextColumn("Business", width="large"),
-            "asking_price":        st.column_config.NumberColumn("Price ($)",           format="%.0f"),
-            "down_10":             st.column_config.NumberColumn("Down 10% ($)",        format="%.0f", help="10% down payment"),
-            "sba_monthly_10pct":   st.column_config.NumberColumn("Monthly 10% ($)",     format="%.0f", help="Monthly SBA payment at 10% down"),
-            "cf_after_debt_10pct": st.column_config.NumberColumn("CF After Debt 10%($)",format="%.0f", help="Cash flow after SBA debt at 10% down"),
-            "coc_return_10pct":    st.column_config.NumberColumn("CoC 10% (%)",         format="%.0f", help="Cash-on-cash return at 10% down"),
-            "down_20":             st.column_config.NumberColumn("Down 20% ($)",        format="%.0f", help="20% down payment"),
-            "sba_monthly_20pct":   st.column_config.NumberColumn("Monthly 20% ($)",     format="%.0f", help="Monthly SBA payment at 20% down"),
-            "cf_after_debt_20pct": st.column_config.NumberColumn("CF After Debt 20%($)",format="%.0f", help="Cash flow after SBA debt at 20% down"),
-            "coc_return_20pct":    st.column_config.NumberColumn("CoC 20% (%)",         format="%.0f", help="Cash-on-cash return at 20% down"),
+            "title":               st.column_config.TextColumn("Business",                width="large"),
+            "asking_price":        st.column_config.NumberColumn("Price ($)",             format="%.0f"),
+            "down_10":             st.column_config.NumberColumn("Down 10% ($)",          format="%.0f"),
+            "sba_monthly_10pct":   st.column_config.NumberColumn("Monthly 10% ($)",       format="%.0f"),
+            "cf_after_debt_10pct": st.column_config.NumberColumn("CF After Debt 10% ($)", format="%.0f"),
+            "coc_return_10pct":    st.column_config.NumberColumn("CoC 10% (%)",           format="%.0f"),
+            "down_20":             st.column_config.NumberColumn("Down 20% ($)",          format="%.0f"),
+            "sba_monthly_20pct":   st.column_config.NumberColumn("Monthly 20% ($)",       format="%.0f"),
+            "cf_after_debt_20pct": st.column_config.NumberColumn("CF After Debt 20% ($)", format="%.0f"),
+            "coc_return_20pct":    st.column_config.NumberColumn("CoC 20% (%)",           format="%.0f"),
         },
         hide_index=True,
         use_container_width=True,

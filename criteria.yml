@@ -1,6 +1,6 @@
 budget:
-  min_asking_price: 500000
-  max_asking_price: 3000000
+  min_asking_price: 50000
+  max_asking_price: 5000000
 
 targets:
   min_annual_cash_flow: 75000
