@@ -631,6 +631,51 @@ view_mode = st.sidebar.radio(
     help="Cards give a visual overview; Table allows sorting and row-click to open a deal sheet",
 )
 
+st.sidebar.markdown("---")
+
+with st.sidebar.expander("📊 How scores work"):
+    st.markdown("""
+**Scores run 0–100. Buckets:**
+- 🟢 **SHORTLIST** — 65+
+- 🟡 **REVIEW** — 35–64
+- ⚪ **SKIP** — below 35
+- 🔴 **AUTO-REJECT** — 0 (failed screening)
+
+---
+
+**Auto-Reject triggers:**
+- Price outside $50K–$5M
+- No cash flow data
+- DSCR < 1.25 at 20% down
+- Negative CF after SBA debt
+- Not Minnesota
+- Regulated: franchise resale, cannabis, firearms, gambling, pawn, payday loan, liquor store
+- Digital-only: SaaS, Amazon FBA, dropshipping, affiliate, online-only
+
+---
+
+**Scoring (100 pts total):**
+
+💰 **Financial** — 40 pts
+Cash flow $75K+, DSCR ≥1.25, CoC ≥15%
+
+⚙️ **Operations** — 15 pts
+<20 employees, no heavy inventory, turnkey signals
+
+💻 **Tech gap** — 15 pts
+No CRM, manual billing, no website, paper invoicing
+
+🔁 **Recurring revenue** — 10 pts
+Service contracts, routes, retainers, maintenance agreements
+
+🏗️ **Industry durability** — 10 pts
+HVAC, plumbing, healthcare, accounting, trucking, manufacturing
+
+📍 **Geography** — 10 pts
+Twin Cities = 10 pts · Outstate MN = 5 pts
+""")
+
+
 # ── Apply filters ───────────────────────────────────────────────────────────────
 mask = pd.Series([True] * len(df))
 
