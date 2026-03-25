@@ -155,7 +155,7 @@ st.markdown("""
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
 
-.stApp { background: #F1F5F9; }
+.stApp { background: #D1D9E6; }
 
 /* ── Slim header ── */
 .scout-header {
@@ -213,7 +213,8 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
 }
 
 /* ── Cards ── */
-[data-testid="stVerticalBlockBorderWrapper"] {
+[data-testid="stVerticalBlockBorderWrapper"],
+[data-testid="stVerticalBlockBorderWrapper"] > div {
     border-radius: 12px !important;
     border: 1px solid #E2E8F0 !important;
     box-shadow: 0 2px 6px rgba(0,0,0,0.06) !important;
