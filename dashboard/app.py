@@ -217,7 +217,7 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
     border-radius: 12px !important;
     border: 1px solid #E2E8F0 !important;
     box-shadow: 0 2px 6px rgba(0,0,0,0.06) !important;
-    background: white !important;
+    background: #FFFFFF !important;
     transition: box-shadow 0.2s, transform 0.15s;
     margin-bottom: 4px;
 }
@@ -233,12 +233,12 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
     margin: -2px -2px 10px -2px;
 }
 .card-header { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
-.card-title { font-size: 14px; font-weight: 700; color: #0F172A; line-height: 1.3; margin: 2px 0; }
-.card-meta { font-size: 11px; color: #64748B; margin-bottom: 10px; display: flex; gap: 10px; }
-.card-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 8px; }
-.card-metric { background: #F8FAFC; border-radius: 8px; padding: 7px 9px; }
-.card-metric .cm-label { font-size: 9px; font-weight: 700; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.5px; }
-.card-metric .cm-value { font-size: 15px; font-weight: 700; color: #0F172A; }
+.card-title { font-size: 17px; font-weight: 700; color: #0F172A; line-height: 1.35; margin: 4px 0; }
+.card-meta { font-size: 12px; color: #64748B; margin-bottom: 10px; display: flex; gap: 10px; }
+.card-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
+.card-metric { background: #F8FAFC; border-radius: 8px; padding: 9px 11px; }
+.card-metric .cm-label { font-size: 10px; font-weight: 700; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.5px; }
+.card-metric .cm-value { font-size: 18px; font-weight: 700; color: #0F172A; }
 
 /* ── Score bar ── */
 .score-bar-wrap { margin: 6px 0 10px; }
@@ -307,16 +307,31 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
 
 /* ── Buttons ── */
 .stButton > button {
-    background: #2563EB;
-    color: white !important;
-    border: none;
     border-radius: 8px;
     font-size: 12px;
     font-weight: 700;
     padding: 6px 0;
-    transition: background 0.15s;
+    transition: all 0.15s;
 }
-.stButton > button:hover { background: #1D4ED8; color: white !important; }
+[data-testid="stBaseButton-primary"] {
+    background: #2563EB !important;
+    color: white !important;
+    border: none !important;
+}
+[data-testid="stBaseButton-primary"]:hover {
+    background: #1D4ED8 !important;
+    color: white !important;
+}
+[data-testid="stBaseButton-secondary"] {
+    background: white !important;
+    color: #475569 !important;
+    border: 1.5px solid #CBD5E1 !important;
+}
+[data-testid="stBaseButton-secondary"]:hover {
+    background: #F1F5F9 !important;
+    color: #0F172A !important;
+    border-color: #94A3B8 !important;
+}
 
 /* ── Metrics ── */
 [data-testid="metric-container"] {
@@ -959,7 +974,7 @@ def render_cards(rows, ncols=3):
 
                 btn_col, star_col = st.columns([4, 1])
                 with btn_col:
-                    if st.button("View Deal →", key=f"view_{lid}", use_container_width=True):
+                    if st.button("View Deal →", key=f"view_{lid}", use_container_width=True, type="primary"):
                         st.session_state.selected_id = lid
                         st.rerun()
                 with star_col:
