@@ -925,46 +925,36 @@ def render_cards(rows, ncols=3):
             tags_html += f'<span class="tag" style="background:{c_cfg["bg"]};color:{c_cfg["color"]}">{c_cfg["emoji"]} {c_name}</span>'
 
         is_saved = lid in watchlist
-        is_selected = lid == str(st.session_state.selected_id)
-        selected_indicator = ' style="outline:2px solid #2563EB;outline-offset:2px"' if is_selected else ""
+
+        saved_icon = '<span style="font-size:16px">⭐</span>' if is_saved else ""
+        tags_block = f'<div class="card-tags">{tags_html}</div>' if tags_html else ""
+        card_html = (
+            f'<div class="biz-card">'
+            f'<div class="card-border-bar" style="background:{border_color}"></div>'
+            f'<div class="card-header">'
+            f'<span class="badge {badge_cls}">{bucket}</span>'
+            f'<span style="font-size:20px;margin-left:auto">{cat_emoji}</span>'
+            f'{saved_icon}'
+            f'</div>'
+            f'<div class="card-title">{title}</div>'
+            f'{meta_html}'
+            f'<div class="score-bar-wrap">'
+            f'<div class="score-bar-label"><span>Score</span><span>{score}/100</span></div>'
+            f'<div class="score-bar-bg"><div class="score-bar-fill" style="width:{score}%;background:{score_bar_color}"></div></div>'
+            f'</div>'
+            f'<div class="card-metrics">'
+            f'<div class="card-metric"><div class="cm-label">Price</div><div class="cm-value">{_fmt(asking, "$M")}</div></div>'
+            f'<div class="card-metric"><div class="cm-label">Cash Flow</div><div class="cm-value">{_fmt(cf)}</div></div>'
+            f'<div class="card-metric"><div class="cm-label">CoC (20%)</div><div class="cm-value" style="color:{coc_color}">{_fmt(coc, "%")}</div></div>'
+            f'<div class="card-metric"><div class="cm-label">DSCR (20%)</div><div class="cm-value" style="color:{dscr_color}">{_fmt(dscr, "x")}</div></div>'
+            f'</div>'
+            f'{tags_block}'
+            f'</div>'
+        )
 
         with cols[i % ncols]:
             with st.container(border=True):
-                st.markdown(f"""
-                <div class="biz-card">
-                    <div class="card-border-bar" style="background:{border_color}"></div>
-                    <div class="card-header">
-                        <span class="badge {badge_cls}">{bucket}</span>
-                        <span style="font-size:20px;margin-left:auto">{cat_emoji}</span>
-                        {'<span style="font-size:16px">⭐</span>' if is_saved else ''}
-                    </div>
-                    <div class="card-title">{title}</div>
-                    {meta_html}
-                    <div class="score-bar-wrap">
-                        <div class="score-bar-label"><span>Score</span><span>{score}/100</span></div>
-                        <div class="score-bar-bg"><div class="score-bar-fill" style="width:{score}%;background:{score_bar_color}"></div></div>
-                    </div>
-                    <div class="card-metrics">
-                        <div class="card-metric">
-                            <div class="cm-label">Price</div>
-                            <div class="cm-value">{_fmt(asking, "$M")}</div>
-                        </div>
-                        <div class="card-metric">
-                            <div class="cm-label">Cash Flow</div>
-                            <div class="cm-value">{_fmt(cf)}</div>
-                        </div>
-                        <div class="card-metric">
-                            <div class="cm-label">CoC (20%)</div>
-                            <div class="cm-value" style="color:{coc_color}">{_fmt(coc, "%")}</div>
-                        </div>
-                        <div class="card-metric">
-                            <div class="cm-label">DSCR (20%)</div>
-                            <div class="cm-value" style="color:{dscr_color}">{_fmt(dscr, "x")}</div>
-                        </div>
-                    </div>
-                    {f'<div class="card-tags">{tags_html}</div>' if tags_html else ""}
-                </div>
-                """, unsafe_allow_html=True)
+                st.markdown(card_html, unsafe_allow_html=True)
 
                 btn_col, star_col = st.columns([4, 1])
                 with btn_col:
