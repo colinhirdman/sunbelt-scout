@@ -355,6 +355,20 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
 /* ── Divider ── */
 hr { border-color: #E2E8F0 !important; margin: 14px 0 !important; }
 </style>
+<script>
+(function() {
+    function fixCardBg() {
+        document.querySelectorAll('[data-testid="stVerticalBlockBorderWrapper"]').forEach(function(el) {
+            el.style.setProperty('background-color', '#FFFFFF', 'important');
+            el.querySelectorAll('[data-testid="stVerticalBlock"], [class*="block-container"]').forEach(function(inner) {
+                inner.style.setProperty('background-color', '#FFFFFF', 'important');
+            });
+        });
+    }
+    new MutationObserver(fixCardBg).observe(document.documentElement, {childList: true, subtree: true});
+    fixCardBg();
+})();
+</script>
 """, unsafe_allow_html=True)
 
 
