@@ -225,7 +225,8 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
     box-shadow: 0 6px 20px rgba(37,99,235,0.12) !important;
     transform: translateY(-2px);
 }
-.biz-card { padding: 2px 0 6px; }
+.biz-card { padding: 2px 0 6px; min-height: 340px; display: flex; flex-direction: column; }
+.card-metrics { margin-top: auto; }
 .card-border-bar {
     height: 4px;
     border-radius: 4px 4px 0 0;
@@ -964,10 +965,12 @@ def render_cards(rows, ncols=3):
                 with star_col:
                     star_label = "⭐" if is_saved else "☆"
                     if st.button(star_label, key=f"wl_{lid}", use_container_width=True):
+                        new_wl = set(st.session_state.watchlist)
                         if is_saved:
-                            st.session_state.watchlist.discard(lid)
+                            new_wl.discard(lid)
                         else:
-                            st.session_state.watchlist.add(lid)
+                            new_wl.add(lid)
+                        st.session_state.watchlist = new_wl
                         st.rerun()
 
 
@@ -1030,7 +1033,7 @@ else:
         card_col, detail_col = st.columns([3, 2], gap="large")
         with card_col:
             if view_mode == "Cards":
-                render_cards(filtered, ncols=2)
+                render_cards(filtered, ncols=1)
             else:
                 render_table(filtered)
         with detail_col:
@@ -1038,7 +1041,7 @@ else:
                 render_detail_panel(selected_row)
     else:
         if view_mode == "Cards":
-            render_cards(filtered, ncols=3)
+            render_cards(filtered, ncols=2)
         else:
             render_table(filtered)
 
