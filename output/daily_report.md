@@ -1,7 +1,7 @@
-# Sunbelt Scout — 2026-03-24
+# Sunbelt Scout — 2026-03-25
 
-New listings processed: **76**
-Shortlisted: **14** | Review: **15** | Auto-Rejected: **45**
+New listings processed: **77**
+Shortlisted: **14** | Review: **15** | Auto-Rejected: **46**
 
 ## SHORTLIST
 - **Complete material handling installation company located in Twin Cities metro area.** (score 75)
@@ -149,7 +149,7 @@ Shortlisted: **14** | Review: **15** | Auto-Rejected: **45**
   https://www.sunbeltmidwest.com/complete-search-listing/?id_number=1960430
   _Why_: strong CF $378,500, 18 employees, no heavy inventory, Twin Cities area
 
-## AUTO-REJECTED (45)
+## AUTO-REJECTED (46)
 - Zippel Bay Resort: over max price $7,750,000
 - Central Minnesota Meat Processor and Retailer for Sale!  Asking $750k Including Real Estate!  Revenue: $735k with Seller Financing Available!: under min price $200,000
 - Fine Art Restoration and Custom Framing Company: under min price $225,000
