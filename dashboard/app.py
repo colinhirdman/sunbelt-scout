@@ -138,7 +138,7 @@ CATEGORY_CONFIG = {
     "Beauty & Wellness":     {"keywords": BEAUTY_KEYWORDS,       "emoji": "💇", "col": "is_beauty",       "color": "#86198F", "bg": "#FDF4FF"},
 }
 
-BUCKET_BORDER = {
+BUCKET_COLOR = {
     "SHORTLIST":   "#10B981",
     "REVIEW":      "#F59E0B",
     "SKIP":        "#94A3B8",
@@ -155,227 +155,214 @@ st.markdown("""
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
 
-.stApp { background: #D1D9E6; }
-
-/* ── Slim header ── */
-.scout-header {
+/* ── Top header bar ── */
+.top-bar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: linear-gradient(135deg, #1E3A5F 0%, #2563EB 100%);
-    border-radius: 12px;
-    padding: 18px 28px;
+    padding: 14px 0 16px;
+    border-bottom: 2px solid #E2E8F0;
     margin-bottom: 20px;
 }
-.scout-header-left h1 {
-    margin: 0 0 2px;
-    font-size: 22px;
+.top-bar-title {
+    font-size: 20px;
     font-weight: 800;
-    color: white;
+    color: #0F172A;
     letter-spacing: -0.5px;
 }
-.scout-header-left p { margin: 0; font-size: 12px; opacity: 0.7; color: white; }
+.top-bar-title span { color: #2563EB; }
+.top-bar-sub { font-size: 12px; color: #94A3B8; margin-top: 1px; }
 
 /* ── Stat pills ── */
-.stat-bar { display: flex; gap: 12px; margin-bottom: 18px; flex-wrap: wrap; }
+.stats-row { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
 .stat-pill {
     background: white;
-    border-radius: 10px;
-    padding: 12px 18px;
-    min-width: 110px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.07);
     border: 1px solid #E2E8F0;
+    border-radius: 10px;
+    padding: 10px 16px;
+    min-width: 100px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
-.stat-pill .label { font-size: 10px; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.6px; }
-.stat-pill .value { font-size: 24px; font-weight: 800; color: #0F172A; line-height: 1.2; }
-.stat-pill .value.green  { color: #10B981; }
-.stat-pill .value.red    { color: #EF4444; }
-.stat-pill .value.blue   { color: #2563EB; }
-.stat-pill .value.amber  { color: #F59E0B; }
+.stat-pill .sp-label { font-size: 10px; font-weight: 700; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.5px; }
+.stat-pill .sp-value { font-size: 22px; font-weight: 800; color: #0F172A; line-height: 1.2; margin-top: 2px; }
+.stat-pill .sp-value.green  { color: #10B981; }
+.stat-pill .sp-value.amber  { color: #F59E0B; }
+.stat-pill .sp-value.red    { color: #EF4444; }
+.stat-pill .sp-value.blue   { color: #2563EB; }
 
-/* ── Quick filter buttons ── */
-.preset-row { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
-.preset-btn {
+/* ── Deal list rows ── */
+.deal-row {
     background: white;
-    border: 1.5px solid #E2E8F0;
-    border-radius: 20px;
-    padding: 6px 14px;
-    font-size: 12px;
-    font-weight: 600;
-    color: #475569;
+    border: 1px solid #E2E8F0;
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-bottom: 6px;
     cursor: pointer;
-    transition: all 0.15s;
+    transition: box-shadow 0.15s, border-color 0.15s;
+    border-left: 4px solid transparent;
 }
-.preset-btn.active {
-    background: #2563EB;
-    border-color: #2563EB;
-    color: white;
+.deal-row:hover {
+    box-shadow: 0 3px 12px rgba(37,99,235,0.1);
+    border-color: #BFDBFE;
+}
+.deal-row.selected {
+    border-left-color: #2563EB;
+    background: #EFF6FF;
+    border-color: #BFDBFE;
+}
+.dr-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 5px; }
+.dr-title { font-size: 14px; font-weight: 700; color: #0F172A; line-height: 1.35; }
+.dr-price { font-size: 13px; font-weight: 700; color: #0F172A; white-space: nowrap; }
+.dr-meta { font-size: 11px; color: #64748B; margin-bottom: 6px; }
+.dr-bottom { display: flex; align-items: center; gap: 8px; }
+
+/* ── Bucket badge ── */
+.bucket-badge {
+    display: inline-block;
+    font-size: 9px;
+    font-weight: 800;
+    padding: 2px 7px;
+    border-radius: 20px;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+}
+.bb-shortlist { background: #D1FAE5; color: #065F46; }
+.bb-review    { background: #FEF3C7; color: #92400E; }
+.bb-skip      { background: #F1F5F9; color: #475569; }
+.bb-reject    { background: #FEE2E2; color: #991B1B; }
+
+/* ── Score chip ── */
+.score-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 10px;
+    font-weight: 700;
+    color: #475569;
+}
+.score-dot {
+    width: 28px;
+    height: 6px;
+    border-radius: 3px;
 }
 
-/* ── Cards ── */
-/* ── Card column (replaces st.container border) ── */
-div[data-testid="stColumn"]:has(.biz-card) {
-    background-color: #FFFFFF !important;
-    border-radius: 12px !important;
-    border: 1px solid #E2E8F0 !important;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08) !important;
-    overflow: hidden !important;
-    transition: box-shadow 0.2s, transform 0.15s !important;
-    margin-bottom: 8px !important;
-    padding: 0 !important;
+/* ── Category tag ── */
+.cat-tag {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 20px;
 }
-div[data-testid="stColumn"]:has(.biz-card):hover {
-    box-shadow: 0 6px 20px rgba(37,99,235,0.14) !important;
-    transform: translateY(-2px) !important;
-}
-div[data-testid="stColumn"]:has(.biz-card) > div {
-    background-color: #FFFFFF !important;
-    padding: 0 !important;
-}
-.biz-card { padding: 14px 14px 6px; min-height: 340px; display: flex; flex-direction: column; }
-.card-metrics { margin-top: auto; }
-.card-border-bar {
-    height: 5px;
-    margin: -14px -14px 12px -14px;
-}
-.card-header { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
-.card-title { font-size: 17px; font-weight: 700; color: #0F172A; line-height: 1.35; margin: 4px 0; }
-.card-meta { font-size: 12px; color: #64748B; margin-bottom: 10px; display: flex; gap: 10px; }
-.card-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
-.card-metric { background: #F8FAFC; border-radius: 8px; padding: 9px 11px; }
-.card-metric .cm-label { font-size: 10px; font-weight: 700; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.5px; }
-.card-metric .cm-value { font-size: 18px; font-weight: 700; color: #0F172A; }
-
-/* ── Score bar ── */
-.score-bar-wrap { margin: 6px 0 10px; }
-.score-bar-label { display: flex; justify-content: space-between; font-size: 10px; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 3px; }
-.score-bar-bg { background: #F1F5F9; border-radius: 4px; height: 5px; overflow: hidden; }
-.score-bar-fill { height: 5px; border-radius: 4px; transition: width 0.3s; }
-
-/* ── Tags ── */
-.card-tags { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 6px; margin-bottom: 8px; }
-.tag { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 20px; }
-.tag-absentee { background: #EEF2FF; color: #4F46E5; }
-
-/* ── Badges ── */
-.badge { display: inline-block; font-size: 9px; font-weight: 800; padding: 2px 8px; border-radius: 20px; letter-spacing: 0.4px; text-transform: uppercase; }
-.badge-shortlist  { background: #D1FAE5; color: #065F46; }
-.badge-review     { background: #FEF3C7; color: #92400E; }
-.badge-reject     { background: #FEE2E2; color: #991B1B; }
-.badge-skip       { background: #F1F5F9; color: #475569; }
 
 /* ── Detail panel ── */
-.detail-panel {
-    background: white;
-    border-radius: 14px;
-    border: 1px solid #E2E8F0;
-    padding: 24px;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
-    position: sticky;
-    top: 20px;
-    max-height: 90vh;
-    overflow-y: auto;
-}
-.ds-title { font-size: 20px; font-weight: 800; color: #0F172A; margin-bottom: 2px; line-height: 1.3; }
-.ds-link  { font-size: 12px; color: #2563EB; text-decoration: none; }
-.ds-section {
+.dp-header { padding-bottom: 16px; border-bottom: 1px solid #F1F5F9; margin-bottom: 16px; }
+.dp-title { font-size: 18px; font-weight: 800; color: #0F172A; line-height: 1.35; margin-bottom: 6px; }
+.dp-section {
     font-size: 10px;
     font-weight: 800;
     color: #94A3B8;
     text-transform: uppercase;
     letter-spacing: 0.8px;
-    margin: 18px 0 8px;
-    border-top: 1px solid #F1F5F9;
+    margin: 18px 0 10px;
     padding-top: 14px;
+    border-top: 1px solid #F1F5F9;
 }
-.sba-block { background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 10px; padding: 14px; }
-.sba-block h4 { margin: 0 0 10px; font-size: 13px; font-weight: 700; color: #1E3A5F; }
+
+/* ── Score bar ── */
+.score-bar-wrap { margin: 10px 0; }
+.score-bar-label { display: flex; justify-content: space-between; font-size: 10px; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 4px; }
+.score-bar-track { background: #F1F5F9; border-radius: 4px; height: 6px; overflow: hidden; }
+.score-bar-fill { height: 6px; border-radius: 4px; }
+
+/* ── Finance grid ── */
+.fin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+.fin-cell {
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    border-radius: 8px;
+    padding: 10px 12px;
+}
+.fin-label { font-size: 10px; font-weight: 700; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.4px; }
+.fin-value { font-size: 17px; font-weight: 800; color: #0F172A; margin-top: 2px; }
+.fin-value.green { color: #10B981; }
+.fin-value.red   { color: #EF4444; }
+.fin-value.amber { color: #F59E0B; }
+
+/* ── Narrative blocks ── */
+.nar-block { border-radius: 8px; padding: 12px 14px; margin-bottom: 8px; }
+.nar-label { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 6px; }
+.nar-list { margin: 0; padding-left: 16px; font-size: 12px; line-height: 1.7; color: #1E293B; }
+.nar-bottom { background: #1E3A5F; border-radius: 8px; padding: 12px 14px; margin-bottom: 8px; }
+.nar-bottom-label { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px; color: #93C5FD; margin-bottom: 4px; }
+.nar-bottom-text { font-size: 13px; font-weight: 600; color: white; line-height: 1.5; }
 
 /* ── Sidebar ── */
-[data-testid="stSidebar"] { background: #1E293B !important; border-right: none; }
-[data-testid="stSidebar"] p,
-[data-testid="stSidebar"] span:not([data-baseweb]),
-[data-testid="stSidebar"] div[class*="stMarkdown"] { color: #CBD5E1 !important; }
-[data-testid="stSidebar"] .stMarkdown h2,
-[data-testid="stSidebar"] .stMarkdown h3 { color: #F1F5F9 !important; font-size: 13px; text-transform: uppercase; letter-spacing: 0.6px; }
-[data-testid="stSidebar"] label { color: #94A3B8 !important; font-size: 13px !important; }
-[data-testid="stSidebar"] .stRadio label { color: #CBD5E1 !important; font-size: 14px !important; }
-[data-testid="stSidebar"] hr { border-color: #334155 !important; }
+[data-testid="stSidebar"] {
+    background: white !important;
+    border-right: 1px solid #E2E8F0 !important;
+}
+[data-testid="stSidebar"] label { font-size: 13px !important; color: #374151 !important; }
+[data-testid="stSidebar"] .stMarkdown h3 {
+    font-size: 11px !important;
+    font-weight: 800 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.6px !important;
+    color: #94A3B8 !important;
+}
 
-/* ── Sidebar expander ── */
-[data-testid="stSidebar"] [data-testid="stExpander"] { background: #1E293B !important; border: 1px solid #334155 !important; }
-[data-testid="stSidebar"] [data-testid="stExpander"] p,
-[data-testid="stSidebar"] [data-testid="stExpander"] li,
-[data-testid="stSidebar"] [data-testid="stExpander"] span,
-[data-testid="stSidebar"] [data-testid="stExpander"] strong,
-[data-testid="stSidebar"] [data-testid="stExpander"] div { color: #F1F5F9 !important; }
-[data-testid="stSidebar"] [data-testid="stExpander"] summary { color: #F1F5F9 !important; }
+/* ── Expander ── */
+[data-testid="stExpander"] { background: white !important; border: 1px solid #E2E8F0 !important; border-radius: 10px !important; }
 
 /* ── Buttons ── */
 .stButton > button {
-    border-radius: 8px;
+    border-radius: 7px;
     font-size: 12px;
     font-weight: 700;
-    padding: 6px 0;
-    transition: all 0.15s;
+    padding: 5px 0;
+    transition: all 0.12s;
 }
 [data-testid="stBaseButton-primary"] {
     background: #2563EB !important;
     color: white !important;
     border: none !important;
 }
-[data-testid="stBaseButton-primary"]:hover {
-    background: #1D4ED8 !important;
-    color: white !important;
-}
+[data-testid="stBaseButton-primary"]:hover { background: #1D4ED8 !important; }
 [data-testid="stBaseButton-secondary"] {
     background: white !important;
-    color: #475569 !important;
-    border: 1.5px solid #CBD5E1 !important;
+    color: #374151 !important;
+    border: 1.5px solid #D1D5DB !important;
 }
 [data-testid="stBaseButton-secondary"]:hover {
-    background: #F1F5F9 !important;
-    color: #0F172A !important;
-    border-color: #94A3B8 !important;
+    background: #F9FAFB !important;
+    border-color: #9CA3AF !important;
 }
 
 /* ── Metrics ── */
 [data-testid="metric-container"] {
-    background: #F8FAFC;
-    border: 1px solid #E2E8F0;
-    border-radius: 10px;
+    background: #F8FAFC !important;
+    border: 1px solid #E2E8F0 !important;
+    border-radius: 8px !important;
     padding: 10px 12px !important;
 }
-[data-testid="metric-container"] label { font-size: 10px !important; color: #64748B !important; font-weight: 700 !important; text-transform: uppercase; letter-spacing: 0.4px; }
-[data-testid="stMetricValue"] { font-size: 16px !important; font-weight: 800 !important; color: #0F172A !important; }
-
-/* ── Expanders ── */
-[data-testid="stExpander"] { background: white; border: 1px solid #E2E8F0 !important; border-radius: 10px !important; margin-bottom: 10px; }
+[data-testid="metric-container"] label {
+    font-size: 10px !important;
+    font-weight: 700 !important;
+    color: #64748B !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.4px !important;
+}
+[data-testid="stMetricValue"] { font-size: 15px !important; font-weight: 800 !important; }
 
 /* ── Tabs ── */
 [data-testid="stTabs"] [data-baseweb="tab"] { font-size: 13px; font-weight: 600; }
 
 /* ── Divider ── */
-hr { border-color: #E2E8F0 !important; margin: 14px 0 !important; }
+hr { border-color: #F1F5F9 !important; margin: 12px 0 !important; }
 </style>
-<script>
-(function() {
-    function fixCardBg() {
-        document.querySelectorAll('[data-testid="stVerticalBlockBorderWrapper"]').forEach(function(el) {
-            el.style.setProperty('background-color', '#FFFFFF', 'important');
-            el.querySelectorAll('[data-testid="stVerticalBlock"], [class*="block-container"]').forEach(function(inner) {
-                inner.style.setProperty('background-color', '#FFFFFF', 'important');
-            });
-        });
-    }
-    new MutationObserver(fixCardBg).observe(document.documentElement, {childList: true, subtree: true});
-    fixCardBg();
-})();
-</script>
 """, unsafe_allow_html=True)
 
 
-# ── Data loading (cached) ──────────────────────────────────────────────────────
+# ── Data loading ───────────────────────────────────────────────────────────────
 @st.cache_data(ttl=300)
 def load_data():
     if not CSV_PATH.exists():
@@ -398,7 +385,6 @@ def load_data():
         if col in df.columns:
             df[col] = pd.to_numeric(df[col], errors="coerce")
 
-    # Category detection
     def _detect(row, keywords):
         ctx = f"{row.get('title', '')} {row.get('industry', '')} {row.get('description', '')}".lower()
         return any(kw in ctx for kw in keywords)
@@ -406,7 +392,6 @@ def load_data():
     for cfg in CATEGORY_CONFIG.values():
         df[cfg["col"]] = df.apply(lambda r, k=cfg["keywords"]: _detect(r, k), axis=1)
 
-    # Derived metrics
     df["revenue_multiple"] = df.apply(
         lambda r: round(r["asking_price"] / r["annual_revenue"], 2)
         if pd.notna(r.get("asking_price")) and pd.notna(r.get("annual_revenue")) and r["annual_revenue"] > 0
@@ -422,7 +407,6 @@ def load_data():
         if pd.notna(r.get("annual_revenue")) and pd.notna(r.get("employees")) and r["employees"] > 0
         else None, axis=1
     )
-
     return df
 
 
@@ -443,55 +427,51 @@ def _fmt(val, fmt="$"):
     if val is None or (isinstance(val, float) and pd.isna(val)):
         return "—"
     if fmt == "$":  return f"${val:,.0f}"
-    if fmt == "$M": return f"${val/1e6:.2f}M"
+    if fmt == "$M":
+        if val >= 1_000_000: return f"${val/1e6:.2f}M"
+        return f"${val:,.0f}"
     if fmt == "%":  return f"{val*100:.0f}%"
     if fmt == "x":  return f"{val:.2f}x"
     return str(val)
 
 def _val_color(val, good, ok):
     if val is None or (isinstance(val, float) and pd.isna(val)):
-        return "#94A3B8"
-    return "#10B981" if val >= good else ("#F59E0B" if val >= ok else "#EF4444")
+        return ""
+    return "green" if val >= good else ("amber" if val >= ok else "red")
 
 def _score_color(score):
     if score >= 65: return "#10B981"
     if score >= 35: return "#F59E0B"
     return "#94A3B8"
 
-def _badge_cls(bucket):
-    return {"SHORTLIST": "badge-shortlist", "REVIEW": "badge-review", "AUTO-REJECT": "badge-reject"}.get(bucket, "badge-skip")
+def _bucket_cls(bucket):
+    return {"SHORTLIST": "bb-shortlist", "REVIEW": "bb-review", "AUTO-REJECT": "bb-reject"}.get(bucket, "bb-skip")
 
 def _row_categories(row):
     return [(name, cfg) for name, cfg in CATEGORY_CONFIG.items() if row.get(cfg["col"])]
 
 def _primary_category(row):
     cats = _row_categories(row)
-    if cats:
-        return cats[0]
-    return ("Other", {"emoji": "🏢", "col": None, "color": "#475569", "bg": "#F1F5F9"})
+    return cats[0] if cats else ("Other", {"emoji": "🏢", "col": None, "color": "#475569", "bg": "#F1F5F9"})
 
 
 # ── Sidebar ────────────────────────────────────────────────────────────────────
 st.sidebar.markdown("### Filters")
 
-st.sidebar.markdown("#### Scoring")
-apply_scoring = st.sidebar.checkbox(
-    "Apply scoring filters", value=False,
-    help="When off, all listings are shown regardless of score or bucket.",
-)
+st.sidebar.markdown("### Scoring")
+apply_scoring = st.sidebar.checkbox("Apply scoring filters", value=False,
+    help="When off, all listings are shown regardless of score.")
 if apply_scoring:
     all_buckets = sorted(df["bucket"].dropna().unique().tolist())
-    buckets = st.sidebar.multiselect(
-        "Bucket", options=all_buckets,
-        default=[b for b in ["SHORTLIST", "REVIEW"] if b in all_buckets],
-    )
+    buckets = st.sidebar.multiselect("Bucket", options=all_buckets,
+        default=[b for b in ["SHORTLIST", "REVIEW"] if b in all_buckets])
     min_score = st.sidebar.slider("Min Score", 0, 100, 35)
 else:
-    buckets = None
+    buckets   = None
     min_score = 0
 
 st.sidebar.markdown("---")
-st.sidebar.markdown("#### Financial")
+st.sidebar.markdown("### Financial")
 max_price = st.sidebar.number_input("Max Asking Price ($)", value=5000000, step=100000)
 min_price = st.sidebar.number_input("Min Asking Price ($)", value=50000,   step=50000)
 min_cf    = st.sidebar.number_input("Min Cash Flow ($)",    value=0,       step=25000)
@@ -499,51 +479,20 @@ min_coc   = st.sidebar.slider("Min CoC Return (20% down)", 0, 200, 0, format="%d
 min_coc_decimal = min_coc / 100.0
 
 st.sidebar.markdown("---")
-st.sidebar.markdown("#### Location & Operator")
+st.sidebar.markdown("### Location & Operator")
 twin_cities_only = st.sidebar.checkbox("Twin Cities Only")
 absentee_only    = st.sidebar.checkbox("Absentee / Semi-Absentee Only")
 
 st.sidebar.markdown("---")
 with st.sidebar.expander("📊 How scores work"):
     st.markdown("""
-**Buckets:**
-- 🟢 **SHORTLIST** — 65+
-- 🟡 **REVIEW** — 35–64
-- ⚪ **SKIP** — below 35
-- 🔴 **AUTO-REJECT** — 0 (failed screening)
-
----
+**Buckets:** 🟢 SHORTLIST 65+ · 🟡 REVIEW 35–64 · ⚪ SKIP <35 · 🔴 AUTO-REJECT 0
 
 **Auto-Reject triggers:**
-- Price outside $50K–$5M
-- No cash flow data
-- DSCR < 1.25 at 20% down
-- Negative CF after SBA debt
-- Not Minnesota
-- Regulated: franchise resale, cannabis, firearms, gambling, pawn, payday loan
-- Digital-only: SaaS, Amazon FBA, dropshipping, affiliate
-
----
+Price outside $50K–$5M · No cash flow · DSCR<1.25 · Not MN · Franchise/cannabis/gambling/digital-only
 
 **Scoring (100 pts):**
-
-💰 **Financial** — 40 pts
-CF $75K+, DSCR ≥1.25, CoC ≥15%
-
-⚙️ **Operations** — 15 pts
-<20 employees, no heavy inventory, turnkey
-
-💻 **Tech gap** — 15 pts
-No CRM, manual billing, no website
-
-🔁 **Recurring revenue** — 10 pts
-Service contracts, routes, retainers
-
-🏗️ **Industry durability** — 10 pts
-HVAC, plumbing, healthcare, accounting, trucking
-
-📍 **Geography** — 10 pts
-Twin Cities = 10 pts · Outstate MN = 5 pts
+💰 Financial 40 · ⚙️ Operations 15 · 💻 Tech gap 15 · 🔁 Recurring 10 · 🏗️ Industry 10 · 📍 Geography 10
 """)
 
 
@@ -569,7 +518,7 @@ if twin_cities_only:
 base_filtered = df[mask].copy()
 
 
-# ── Header ─────────────────────────────────────────────────────────────────────
+# ── Top bar ─────────────────────────────────────────────────────────────────────
 n_total     = len(df)
 n_filtered  = len(base_filtered)
 n_shortlist = len(df[df["bucket"] == "SHORTLIST"])
@@ -578,57 +527,61 @@ n_rejected  = len(df[df["bucket"] == "AUTO-REJECT"])
 n_watchlist = len(st.session_state.watchlist)
 
 st.markdown(f"""
-<div class="scout-header">
-  <div class="scout-header-left">
-    <h1>🏢 Sunbelt Scout</h1>
-    <p>Minnesota business acquisition pipeline · Scored &amp; filtered daily</p>
+<div class="top-bar">
+  <div>
+    <div class="top-bar-title">🏢 Sunbelt <span>Scout</span></div>
+    <div class="top-bar-sub">Minnesota business acquisition pipeline · updated daily</div>
   </div>
 </div>
 """, unsafe_allow_html=True)
 
 st.markdown(f"""
-<div class="stat-bar">
-  <div class="stat-pill"><div class="label">Total</div><div class="value blue">{n_total}</div></div>
-  <div class="stat-pill"><div class="label">Showing</div><div class="value">{n_filtered}</div></div>
-  <div class="stat-pill"><div class="label">Shortlisted</div><div class="value green">{n_shortlist}</div></div>
-  <div class="stat-pill"><div class="label">Review</div><div class="value amber">{n_review}</div></div>
-  <div class="stat-pill"><div class="label">Auto-Rejected</div><div class="value red">{n_rejected}</div></div>
-  <div class="stat-pill"><div class="label">Saved</div><div class="value">{n_watchlist} ⭐</div></div>
+<div class="stats-row">
+  <div class="stat-pill"><div class="sp-label">Total</div><div class="sp-value blue">{n_total}</div></div>
+  <div class="stat-pill"><div class="sp-label">Showing</div><div class="sp-value">{n_filtered}</div></div>
+  <div class="stat-pill"><div class="sp-label">Shortlisted</div><div class="sp-value green">{n_shortlist}</div></div>
+  <div class="stat-pill"><div class="sp-label">Review</div><div class="sp-value amber">{n_review}</div></div>
+  <div class="stat-pill"><div class="sp-label">Auto-Rejected</div><div class="sp-value red">{n_rejected}</div></div>
+  <div class="stat-pill"><div class="sp-label">Saved ⭐</div><div class="sp-value">{n_watchlist}</div></div>
 </div>
 """, unsafe_allow_html=True)
 
 
-# ── Search ─────────────────────────────────────────────────────────────────────
-search_query = st.text_input(
-    "", placeholder="🔍  Search by business name, industry, or location...",
-    label_visibility="collapsed",
-)
+# ── Search & quick filters ─────────────────────────────────────────────────────
+search_col, _ = st.columns([2, 1])
+with search_col:
+    search_query = st.text_input(
+        "", placeholder="🔍  Search business name, industry, or location...",
+        label_visibility="collapsed",
+    )
 
-# ── Quick filter presets ───────────────────────────────────────────────────────
-preset_col1, preset_col2, preset_col3, preset_col4, preset_col5, preset_col6 = st.columns(6)
+p1, p2, p3, p4, p5, p6, p7 = st.columns(7)
 active = st.session_state.active_preset
 
-def _preset_btn(col, label, key):
+def _preset(col, label, key):
     with col:
         is_active = active == key
-        btn_type = "primary" if is_active else "secondary"
-        if st.button(label, key=f"preset_{key}", type=btn_type, use_container_width=True):
+        if st.button(label, key=f"preset_{key}",
+                     type="primary" if is_active else "secondary",
+                     use_container_width=True):
             st.session_state.active_preset = None if is_active else key
             st.rerun()
 
-_preset_btn(preset_col1, "🏆 Best Returns",   "best_returns")
-_preset_btn(preset_col2, "📍 Twin Cities",    "twin_cities")
-_preset_btn(preset_col3, "💰 Under $500K",    "under_500k")
-_preset_btn(preset_col4, "🏠 Absentee",       "absentee")
-_preset_btn(preset_col5, "⭐ My Watchlist",   "watchlist")
-_preset_btn(preset_col6, "🔴 Auto-Rejected",  "rejected")
+_preset(p1, "All",           "all")
+_preset(p2, "🏆 Best CoC",  "best_returns")
+_preset(p3, "📍 Twin Cities","twin_cities")
+_preset(p4, "💰 Under $500K","under_500k")
+_preset(p5, "🏠 Absentee",  "absentee")
+_preset(p6, "⭐ Watchlist",  "watchlist")
+_preset(p7, "🔴 Rejected",   "rejected")
 
-# ── Category pills ─────────────────────────────────────────────────────────────
+# Category filter
 selected_categories = st.multiselect(
     "", options=list(CATEGORY_CONFIG.keys()),
-    placeholder="Filter by category  (leave empty for all)",
+    placeholder="Filter by category  (leave empty = all)",
     label_visibility="collapsed",
 )
+
 
 # ── Apply search + preset + category filters ───────────────────────────────────
 filtered = base_filtered.copy()
@@ -672,80 +625,17 @@ elif ap == "rejected":
 if ap != "best_returns":
     filtered = filtered.sort_values("score", ascending=False)
 
-# Clear selected listing if it's no longer in filtered set
+# Clear selection if no longer visible
 if st.session_state.selected_id is not None:
     if not any(filtered["id"].astype(str) == str(st.session_state.selected_id)):
         st.session_state.selected_id = None
-
-
-# ── View mode ──────────────────────────────────────────────────────────────────
-view_mode = st.sidebar.radio("View Mode", ["Cards", "Table"], horizontal=True)
-
-
-# ── Pipeline Analytics ─────────────────────────────────────────────────────────
-with st.expander("📈 Pipeline Analytics"):
-    chart_df = filtered[filtered["asking_price"].notna() & filtered["annual_cash_flow"].notna()].copy()
-    chart_df["bucket_display"] = chart_df["bucket"].fillna("SKIP")
-
-    if len(chart_df) > 0:
-        col_scatter, col_hist = st.columns(2)
-
-        with col_scatter:
-            color_map = {"SHORTLIST": "#10B981", "REVIEW": "#F59E0B", "AUTO-REJECT": "#EF4444", "SKIP": "#94A3B8"}
-            fig_scatter = px.scatter(
-                chart_df,
-                x="asking_price", y="annual_cash_flow",
-                color="bucket_display",
-                color_discrete_map=color_map,
-                hover_data={"title": True, "location": True, "score": True, "bucket_display": False},
-                labels={"asking_price": "Asking Price ($)", "annual_cash_flow": "Annual Cash Flow ($)", "bucket_display": "Bucket"},
-                title="Price vs. Cash Flow",
-                size_max=12,
-            )
-            fig_scatter.update_traces(marker=dict(size=8, opacity=0.8))
-            fig_scatter.update_layout(
-                plot_bgcolor="white", paper_bgcolor="white",
-                font=dict(family="Inter", size=12),
-                margin=dict(l=40, r=20, t=40, b=40),
-                legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
-                height=320,
-            )
-            fig_scatter.update_xaxes(tickprefix="$", tickformat=",.0f", gridcolor="#F1F5F9")
-            fig_scatter.update_yaxes(tickprefix="$", tickformat=",.0f", gridcolor="#F1F5F9")
-            st.plotly_chart(fig_scatter, use_container_width=True)
-
-        with col_hist:
-            score_bins = list(range(0, 110, 10))
-            chart_df["score_bin"] = pd.cut(chart_df["score"], bins=score_bins, right=False, labels=[f"{i}–{i+9}" for i in range(0, 100, 10)])
-            hist_data = chart_df.groupby(["score_bin", "bucket_display"], observed=True).size().reset_index(name="count")
-            fig_hist = px.bar(
-                hist_data,
-                x="score_bin", y="count",
-                color="bucket_display",
-                color_discrete_map=color_map,
-                labels={"score_bin": "Score Range", "count": "# Listings", "bucket_display": "Bucket"},
-                title="Score Distribution",
-            )
-            fig_hist.update_layout(
-                plot_bgcolor="white", paper_bgcolor="white",
-                font=dict(family="Inter", size=12),
-                margin=dict(l=40, r=20, t=40, b=40),
-                legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
-                height=320,
-                barmode="stack",
-            )
-            fig_hist.update_xaxes(gridcolor="#F1F5F9")
-            fig_hist.update_yaxes(gridcolor="#F1F5F9")
-            st.plotly_chart(fig_hist, use_container_width=True)
-    else:
-        st.info("Not enough data to render charts for current filters.")
 
 
 # ── Detail panel renderer ──────────────────────────────────────────────────────
 def render_detail_panel(row):
     title    = row.get("title", "Untitled")
     url      = row.get("url", "")
-    bucket   = str(row.get("bucket", ""))
+    bucket   = str(row.get("bucket", "SKIP"))
     score    = int(row.get("score", 0))
     asking   = row.get("asking_price")
     cf       = row.get("annual_cash_flow")
@@ -753,78 +643,79 @@ def render_detail_panel(row):
     emps     = row.get("employees")
     absentee = row.get("absentee", "No")
 
-    # Close button
-    if st.button("✕ Close", key="close_panel"):
-        st.session_state.selected_id = None
-        st.rerun()
+    col_close, col_link = st.columns([1, 1])
+    with col_close:
+        if st.button("✕ Close", key="close_panel", use_container_width=True):
+            st.session_state.selected_id = None
+            st.rerun()
+    with col_link:
+        if url and str(url) != "nan":
+            st.link_button("View on Sunbelt →", url, use_container_width=True)
 
-    url_html = f'<a class="ds-link" href="{url}" target="_blank">View on Sunbelt →</a>' if url and str(url) != "nan" else ""
-    st.markdown(f"""
-        <div class="ds-title">{title}</div>
-        <div style="display:flex;align-items:center;gap:10px;margin:6px 0 12px;">
-            <span class="badge {_badge_cls(bucket)}">{bucket}</span>
-            <span style="font-size:12px;color:#475569;font-weight:700;">Score {score}/100</span>
-            {url_html}
-        </div>
-    """, unsafe_allow_html=True)
-
-    # Score bar
     sc = _score_color(score)
+    bclass = _bucket_cls(bucket)
     st.markdown(f"""
-        <div class="score-bar-wrap">
-            <div class="score-bar-bg"><div class="score-bar-fill" style="width:{score}%;background:{sc}"></div></div>
-        </div>
-    """, unsafe_allow_html=True)
+<div class="dp-header">
+  <div class="dp-title">{title}</div>
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+    <span class="bucket-badge {bclass}">{bucket}</span>
+    <span style="font-size:12px;color:#64748B;font-weight:700">Score {score}/100</span>
+  </div>
+  <div class="score-bar-wrap">
+    <div class="score-bar-track"><div class="score-bar-fill" style="width:{score}%;background:{sc}"></div></div>
+  </div>
+</div>
+""", unsafe_allow_html=True)
 
-    # Top KPIs
+    # KPIs
     k1, k2, k3 = st.columns(3)
-    k1.metric("Asking Price",    _fmt(asking), help="Total asking price")
-    k2.metric("Cash Flow (SDE)", _fmt(cf),     help="Seller's Discretionary Earnings")
-    k3.metric("Annual Revenue",  _fmt(rev),    help="Gross annual revenue")
+    k1.metric("Asking Price",    _fmt(asking))
+    k2.metric("Cash Flow (SDE)", _fmt(cf))
+    k3.metric("Annual Revenue",  _fmt(rev))
 
     k4, k5, k6 = st.columns(3)
     k4.metric("Employees",   int(emps) if pd.notna(emps) else "—")
     k5.metric("Absentee",    absentee)
     k6.metric("Location",    row.get("location", "—") or "—")
 
-    # Category insights
-    cats = _row_categories(row)
-    rev_multiple  = row.get("revenue_multiple")
-    sde_margin    = row.get("sde_margin")
-    rev_per_emp   = row.get("revenue_per_employee")
+    # Deal metrics
+    rev_multiple = row.get("revenue_multiple")
+    sde_margin   = row.get("sde_margin")
+    rev_per_emp  = row.get("revenue_per_employee")
 
-    st.markdown('<div class="ds-section">Deal Metrics</div>', unsafe_allow_html=True)
+    st.markdown('<div class="dp-section">Deal Metrics</div>', unsafe_allow_html=True)
     m1, m2, m3 = st.columns(3)
     m1.metric("Revenue Multiple", f"{rev_multiple:.2f}x" if rev_multiple else "—",
-              help="Asking price ÷ revenue. Service: 0.5–1.5x typical.")
+              help="Asking ÷ revenue. Service: 0.5–1.5x typical.")
     m2.metric("SDE Margin",  f"{sde_margin*100:.0f}%" if sde_margin else "—",
-              help="Cash flow ÷ revenue. 20%+ is healthy.")
+              help="CF ÷ revenue. 20%+ is healthy.")
     m3.metric("Rev / Employee", _fmt(rev_per_emp) if rev_per_emp else "—",
-              help="Revenue per employee. $150K+ is strong.")
+              help="$150K+ is strong.")
 
     # Category notes
     cat_notes = {
         "Restaurant & Bar":      "🍽️ Thin margins (10–20% SDE normal). Verify lease terms and equipment.",
-        "Retail":                "🛍️ Confirm inventory included in price. Rev multiples 0.3–0.8x typical.",
-        "Manufacturing":         "🏭 Equipment (FF&E) drives value. Check machinery age and customer concentration.",
+        "Retail":                "🛍️ Confirm inventory included. Rev multiples 0.3–0.8x typical.",
+        "Manufacturing":         "🏭 Equipment drives value. Check machinery age and customer concentration.",
         "Automotive":            "🚗 Count service bays. Technician tenure is the key constraint.",
-        "Distribution":          "🚚 Verify fleet condition. Route density and contract lengths determine defensibility.",
-        "Financial Services":    "💼 Client retention rate is critical. CPA/bookkeeping multiples: 1–2x revenue.",
-        "Hospitality":           "🏨 Check occupancy rate and RevPAR. Verify any franchise agreement terms.",
-        "Technology / IT":       "💻 MSP recurring MRR is key. Expect SDE margins of 30–50%.",
-        "Education & Childcare": "🎓 Licensing and capacity utilization matter. Track enrollment trends.",
-        "Healthcare":            "🩺 Verify payer mix and reimbursement rates. Check licensing transfer requirements.",
+        "Distribution":          "🚚 Verify fleet condition. Route density determines defensibility.",
+        "Financial Services":    "💼 Client retention rate is critical. CPA multiples: 1–2x revenue.",
+        "Hospitality":           "🏨 Check occupancy rate and RevPAR. Verify franchise agreement terms.",
+        "Technology / IT":       "💻 MSP recurring MRR is key. Expect SDE margins 30–50%.",
+        "Education & Childcare": "🎓 Licensing and enrollment trends matter.",
+        "Healthcare":            "🩺 Verify payer mix. Check licensing transfer requirements.",
         "Trades":                "🔧 Technician headcount and tenure are key. Service contracts add defensibility.",
-        "Construction":          "🏗️ Backlog size and contract types (fixed vs T&M) drive risk profile.",
+        "Construction":          "🏗️ Backlog size and contract types (fixed vs T&M) drive risk.",
         "Beauty & Wellness":     "💇 Chair/suite rental vs. employee model affects transferability.",
     }
+    cats = _row_categories(row)
     for cat_name, _ in cats:
         if cat_name in cat_notes:
             st.info(cat_notes[cat_name])
 
-    # SBA tabs
-    st.markdown('<div class="ds-section">SBA Financing</div>', unsafe_allow_html=True)
-    tab_10, tab_20, tab_sf = st.tabs(["10% Down", "20% Down", "Seller Financed (0% Down)"])
+    # SBA financing tabs
+    st.markdown('<div class="dp-section">SBA Financing</div>', unsafe_allow_html=True)
+    tab_10, tab_20, tab_sf = st.tabs(["10% Down", "20% Down", "Seller Financed"])
 
     def _sba_tab(down_key, monthly_key, cf_key, coc_key, dscr_key):
         down    = row.get(down_key)
@@ -833,61 +724,57 @@ def render_detail_panel(row):
         coc     = row.get(coc_key)
         dscr    = row.get(dscr_key)
         c1, c2 = st.columns(2)
-        c1.metric("Down Payment",    _fmt(down),   help="Cash required at close")
-        c2.metric("Monthly Payment", _fmt(monthly), help="SBA loan payment (10% rate, 10yr)")
+        c1.metric("Down Payment",    _fmt(down))
+        c2.metric("Monthly Payment", _fmt(monthly))
         c3, c4, c5 = st.columns(3)
-        c3.metric("CF After Debt",   _fmt(cf_aft), help="Annual CF after SBA payments")
-        c4.metric("CoC Return",      _fmt(coc, "%"), help="CF after debt ÷ down. 30%+ strong.")
-        c5.metric("DSCR",            _fmt(dscr, "x"), help="≥1.25 required for SBA. 1.5+ comfortable.")
+        c3.metric("CF After Debt",   _fmt(cf_aft))
+        c4.metric("CoC Return",      _fmt(coc, "%"))
+        c5.metric("DSCR",            _fmt(dscr, "x"))
 
     with tab_10:
-        _sba_tab("down_10", "sba_monthly_10pct", "cf_after_debt_10pct", "coc_return_10pct", "dscr_10pct")
+        _sba_tab("down_10","sba_monthly_10pct","cf_after_debt_10pct","coc_return_10pct","dscr_10pct")
     with tab_20:
-        _sba_tab("down_20", "sba_monthly_20pct", "cf_after_debt_20pct", "coc_return_20pct", "dscr_20pct")
+        _sba_tab("down_20","sba_monthly_20pct","cf_after_debt_20pct","coc_return_20pct","dscr_20pct")
     with tab_sf:
-        sf_note    = row.get("seller_note_amount")
-        sf_monthly = row.get("seller_note_monthly")
-        sf_standby = row.get("cf_during_standby")
-        sf_after   = row.get("cf_after_seller_financing")
-        sf_dscr    = row.get("dscr_seller_financed")
-
         s1, s2, s3 = st.columns(3)
-        s1.metric("Your Cash Down", "$0",        help="Seller carries 10% as subordinated note")
-        s2.metric("Seller Note",    _fmt(sf_note), help="6% / 5-year seller note")
-        s3.metric("Note Payment",   (_fmt(sf_monthly) + "/mo") if sf_monthly else "—", help="Kicks in after 24-month standby")
+        s1.metric("Your Cash Down",  "$0")
+        s2.metric("Seller Note",     _fmt(row.get("seller_note_amount")))
+        s3.metric("Note Payment",    (_fmt(row.get("seller_note_monthly")) + "/mo") if row.get("seller_note_monthly") else "—")
         s4, s5, s6 = st.columns(3)
-        s4.metric("CF Yr 1–2",  _fmt(sf_standby), help="CF after SBA only (seller note on standby)")
-        s5.metric("CF Yr 3+",   _fmt(sf_after),   help="CF after SBA + seller note")
-        s6.metric("DSCR Yr 3+", _fmt(sf_dscr, "x") if sf_dscr else "—", help="≥1.25 required for SBA")
-        st.caption("⚠️ SBA requires seller note on full standby for 24 months. Seller must agree.")
+        s4.metric("CF Yr 1–2",  _fmt(row.get("cf_during_standby")))
+        s5.metric("CF Yr 3+",   _fmt(row.get("cf_after_seller_financing")))
+        s6.metric("DSCR Yr 3+", _fmt(row.get("dscr_seller_financed"), "x") if row.get("dscr_seller_financed") else "—")
+        st.caption("⚠️ SBA requires seller note on full standby for 24 months.")
 
     # Business details
-    st.markdown('<div class="ds-section">Business Details</div>', unsafe_allow_html=True)
+    st.markdown('<div class="dp-section">Business Details</div>', unsafe_allow_html=True)
     d1, d2, d3 = st.columns(3)
-    d1.metric("Industry",       row.get("industry", "—") or "—")
-    d2.metric("Years Operating",row.get("years_in_business", "—") or "—")
-    d3.metric("Franchise?",     row.get("is_franchise", "—") or "—")
+    d1.metric("Industry",        row.get("industry", "—") or "—")
+    d2.metric("Years Operating", row.get("years_in_business", "—") or "—")
+    d3.metric("Franchise?",      row.get("is_franchise", "—") or "—")
     d4, d5 = st.columns(2)
     d4.metric("SBA Pre-Approved?", row.get("sba_available", "—") or "—")
     d5.metric("Real Estate",       row.get("real_estate", "—") or "—")
 
     reason = row.get("reason_for_selling", "") or ""
     if reason and str(reason) != "nan":
-        st.markdown(f'<div style="font-size:12px;color:#475569;margin-top:6px;"><b>Reason for selling:</b> {reason}</div>', unsafe_allow_html=True)
+        st.markdown(f'<div style="font-size:12px;color:#475569;margin-top:8px"><b>Reason for selling:</b> {reason}</div>',
+                    unsafe_allow_html=True)
 
     # Tags
     tags = []
     if absentee in ("Likely", "Possible"):
-        tags.append('<span class="tag tag-absentee">🏠 Absentee</span>')
+        tags.append('<span class="cat-tag" style="background:#EEF2FF;color:#4F46E5">🏠 Absentee</span>')
     for cat_name, cfg in cats:
-        tags.append(f'<span class="tag" style="background:{cfg["bg"]};color:{cfg["color"]}">{cfg["emoji"]} {cat_name}</span>')
+        tags.append(f'<span class="cat-tag" style="background:{cfg["bg"]};color:{cfg["color"]}">{cfg["emoji"]} {cat_name}</span>')
     if tags:
-        st.markdown(f'<div class="card-tags">{"".join(tags)}</div>', unsafe_allow_html=True)
+        st.markdown(f'<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">{"".join(tags)}</div>',
+                    unsafe_allow_html=True)
 
     # Narrative
     narrative = row.get("narrative", "")
     if narrative and str(narrative) != "nan":
-        st.markdown('<div class="ds-section">Deal Summary</div>', unsafe_allow_html=True)
+        st.markdown('<div class="dp-section">Deal Summary</div>', unsafe_allow_html=True)
 
         def _ns(text, prefix, icon, bg, border, lc):
             if prefix not in text: return ""
@@ -897,114 +784,104 @@ def render_detail_panel(row):
                     body = body.split(stop)[0]
             items = [s.strip().rstrip(".") for s in body.strip().split(";") if s.strip()]
             bullets = "".join(f'<li style="margin-bottom:3px">{i}.</li>' for i in items)
-            return f'<div style="background:{bg};border:1px solid {border};border-radius:8px;padding:12px 16px;margin-bottom:8px"><div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.6px;color:{lc};margin-bottom:6px">{icon} {prefix.rstrip(":")}</div><ul style="margin:0;padding-left:16px;font-size:12px;line-height:1.7;color:#1E293B">{bullets}</ul></div>'
+            return (f'<div class="nar-block" style="background:{bg};border:1px solid {border}">'
+                    f'<div class="nar-label" style="color:{lc}">{icon} {prefix.rstrip(":")}</div>'
+                    f'<ul class="nar-list">{bullets}</ul></div>')
 
         intro = narrative.split("What's attractive:")[0].strip() if "What's attractive:" in narrative else ""
         html = ""
         if intro:
-            html += f'<div style="font-size:12px;color:#475569;margin-bottom:8px;line-height:1.6">{intro}</div>'
+            html += f'<div style="font-size:12px;color:#475569;margin-bottom:10px;line-height:1.65">{intro}</div>'
         html += _ns(narrative, "What's attractive:", "✅", "#F0FDF4", "#86EFAC", "#15803D")
         html += _ns(narrative, "Watch-outs:", "⚠️", "#FFFBEB", "#FCD34D", "#B45309")
         if "Bottom line:" in narrative:
             bl = narrative.split("Bottom line:", 1)[1].strip()
-            html += f'<div style="background:#1E3A5F;border-radius:8px;padding:12px 16px;margin-bottom:8px"><div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.6px;color:#93C5FD;margin-bottom:4px">⚖️ Bottom Line</div><div style="font-size:13px;font-weight:600;color:white;line-height:1.5">{bl}</div></div>'
+            html += (f'<div class="nar-bottom">'
+                     f'<div class="nar-bottom-label">⚖️ Bottom Line</div>'
+                     f'<div class="nar-bottom-text">{bl}</div></div>')
         st.markdown(html, unsafe_allow_html=True)
 
     # Scoring signals
     reasons = row.get("reasons", "")
     if reasons and str(reasons) != "nan":
-        st.markdown('<div class="ds-section">Scoring Signals</div>', unsafe_allow_html=True)
+        st.markdown('<div class="dp-section">Scoring Signals</div>', unsafe_allow_html=True)
         st.info(str(reasons))
 
     # Description
     desc = row.get("description", "")
     if desc and str(desc) != "nan":
         with st.expander("📄 Full Listing Description"):
-            st.markdown(f'<div style="font-size:13px;line-height:1.65;color:#334155">{desc}</div>', unsafe_allow_html=True)
+            st.markdown(f'<div style="font-size:13px;line-height:1.65;color:#334155">{desc}</div>',
+                        unsafe_allow_html=True)
 
 
-# ── Card renderer ──────────────────────────────────────────────────────────────
-def render_cards(rows, ncols=3):
-    watchlist = st.session_state.watchlist
-    cols = st.columns(ncols)
-    for i, (_, row) in enumerate(rows.iterrows()):
+# ── Deal list renderer ─────────────────────────────────────────────────────────
+def render_deal_list(rows):
+    watchlist   = st.session_state.watchlist
+    selected_id = st.session_state.selected_id
+
+    for _, row in rows.iterrows():
+        lid      = str(row.get("id", ""))
         bucket   = str(row.get("bucket", "SKIP"))
         score    = int(row.get("score", 0))
         title    = row.get("title", "Untitled")
-        location = row.get("location", "")
-        industry = row.get("industry", "")
+        location = row.get("location", "") or ""
+        industry = row.get("industry", "") or ""
         asking   = row.get("asking_price")
         cf       = row.get("annual_cash_flow")
         coc      = row.get("coc_return_20pct")
-        dscr     = row.get("dscr_20pct")
         absentee = row.get("absentee", "No")
-        lid      = str(row.get("id", i))
+        is_saved = lid in watchlist
+        is_sel   = str(selected_id) == lid
 
-        border_color = BUCKET_BORDER.get(bucket, "#94A3B8")
-        score_bar_color = _score_color(score)
-        badge_cls = _badge_cls(bucket)
+        sc          = _score_color(score)
+        bclass      = _bucket_cls(bucket)
+        sel_class   = "selected" if is_sel else ""
         cat_name, cat_cfg = _primary_category(row)
-        cat_emoji = cat_cfg["emoji"]
-
-        dscr_color = _val_color(dscr, 1.5, 1.25)
-        coc_color  = _val_color(coc, 0.30, 0.15)
 
         meta_parts = []
-        if location and str(location) != "nan": meta_parts.append(f"📍 {location}")
-        if industry and str(industry) != "nan": meta_parts.append(f"🏷 {industry}")
-        meta_html = f'<div class="card-meta">' + " &nbsp;·&nbsp; ".join(meta_parts) + '</div>' if meta_parts else ""
+        if location and location != "nan": meta_parts.append(f"📍 {location}")
+        if industry and industry != "nan": meta_parts.append(f"· {industry}")
+        meta_str = "  ".join(meta_parts)
 
-        tags_html = ""
-        if absentee in ("Likely", "Possible"):
-            tags_html += '<span class="tag tag-absentee">🏠 Absentee</span>'
-        for c_name, c_cfg in _row_categories(row):
-            tags_html += f'<span class="tag" style="background:{c_cfg["bg"]};color:{c_cfg["color"]}">{c_cfg["emoji"]} {c_name}</span>'
+        coc_str = f"CoC {_fmt(coc, '%')}" if coc and not (isinstance(coc, float) and pd.isna(coc)) else ""
+        coc_html  = f'<span style="font-size:10px;color:#64748B">{coc_str}</span>' if coc_str else ""
+        star_html = '<span style="font-size:10px;color:#4F46E5;font-weight:700">⭐</span>' if is_saved else ""
 
-        is_saved = lid in watchlist
-
-        saved_icon = '<span style="font-size:16px">⭐</span>' if is_saved else ""
-        tags_block = f'<div class="card-tags">{tags_html}</div>' if tags_html else ""
-        card_html = (
-            f'<div class="biz-card">'
-            f'<div class="card-border-bar" style="background:{border_color}"></div>'
-            f'<div class="card-header">'
-            f'<span class="badge {badge_cls}">{bucket}</span>'
-            f'<span style="font-size:20px;margin-left:auto">{cat_emoji}</span>'
-            f'{saved_icon}'
+        html = (
+            f'<div class="deal-row {sel_class}">'
+            f'<div class="dr-top">'
+            f'<div class="dr-title">{cat_cfg["emoji"]} {title}</div>'
+            f'<div class="dr-price">{_fmt(asking, "$M")}</div>'
             f'</div>'
-            f'<div class="card-title">{title}</div>'
-            f'{meta_html}'
-            f'<div class="score-bar-wrap">'
-            f'<div class="score-bar-label"><span>Score</span><span>{score}/100</span></div>'
-            f'<div class="score-bar-bg"><div class="score-bar-fill" style="width:{score}%;background:{score_bar_color}"></div></div>'
+            f'<div class="dr-meta">{meta_str}</div>'
+            f'<div class="dr-bottom">'
+            f'<span class="bucket-badge {bclass}">{bucket}</span>'
+            f'<span class="score-chip">'
+            f'<span class="score-dot" style="background:{sc};opacity:{max(0.3, score/100):.2f}"></span>'
+            f'{score}</span>'
+            f'{coc_html}'
+            f'{star_html}'
             f'</div>'
-            f'<div class="card-metrics">'
-            f'<div class="card-metric"><div class="cm-label">Price</div><div class="cm-value">{_fmt(asking, "$M")}</div></div>'
-            f'<div class="card-metric"><div class="cm-label">Cash Flow</div><div class="cm-value">{_fmt(cf)}</div></div>'
-            f'<div class="card-metric"><div class="cm-label">CoC (20%)</div><div class="cm-value" style="color:{coc_color}">{_fmt(coc, "%")}</div></div>'
-            f'<div class="card-metric"><div class="cm-label">DSCR (20%)</div><div class="cm-value" style="color:{dscr_color}">{_fmt(dscr, "x")}</div></div>'
-            f'</div>'
-            f'{tags_block}'
             f'</div>'
         )
+        st.markdown(html, unsafe_allow_html=True)
 
-        with cols[i % ncols]:
-            st.markdown(card_html, unsafe_allow_html=True)
-            btn_col, star_col = st.columns([4, 1])
-            with btn_col:
-                if st.button("View Deal →", key=f"view_{lid}", use_container_width=True, type="primary"):
-                    st.session_state.selected_id = lid
-                    st.rerun()
-            with star_col:
-                star_label = "⭐" if is_saved else "☆"
-                if st.button(star_label, key=f"wl_{lid}", use_container_width=True):
-                    new_wl = set(st.session_state.watchlist)
-                    if is_saved:
-                        new_wl.discard(lid)
-                    else:
-                        new_wl.add(lid)
-                    st.session_state.watchlist = new_wl
-                    st.rerun()
+        btn_a, btn_b = st.columns([4, 1])
+        with btn_a:
+            btn_label = "📂 Selected" if is_sel else "View Deal →"
+            btn_type  = "primary" if is_sel else "secondary"
+            if st.button(btn_label, key=f"view_{lid}", use_container_width=True, type=btn_type):
+                st.session_state.selected_id = None if is_sel else lid
+                st.rerun()
+        with btn_b:
+            star_label = "⭐" if is_saved else "☆"
+            if st.button(star_label, key=f"wl_{lid}", use_container_width=True):
+                new_wl = set(st.session_state.watchlist)
+                if is_saved: new_wl.discard(lid)
+                else:        new_wl.add(lid)
+                st.session_state.watchlist = new_wl
+                st.rerun()
 
 
 # ── Table renderer ─────────────────────────────────────────────────────────────
@@ -1015,7 +892,7 @@ def render_table(rows):
         "dscr_20pct", "revenue_multiple", "sde_margin",
         "absentee", "location", "url",
     ]
-    available = [c for c in display_cols if c in rows.columns]
+    available  = [c for c in display_cols if c in rows.columns]
     display_df = rows[available].copy()
     for col in ["coc_return_20pct", "sde_margin"]:
         if col in display_df.columns:
@@ -1024,26 +901,23 @@ def render_table(rows):
     event = st.dataframe(
         display_df,
         column_config={
-            "score":               st.column_config.NumberColumn("Score",          width="small"),
-            "bucket":              st.column_config.TextColumn("Bucket",           width="small"),
-            "title":               st.column_config.TextColumn("Business",         width="large"),
-            "industry":            st.column_config.TextColumn("Industry",         width="medium"),
-            "asking_price":        st.column_config.NumberColumn("Price ($)",       format="%.0f", width="small"),
-            "annual_cash_flow":    st.column_config.NumberColumn("Cash Flow ($)",   format="%.0f", width="small"),
+            "score":               st.column_config.NumberColumn("Score",           width="small"),
+            "bucket":              st.column_config.TextColumn("Bucket",            width="small"),
+            "title":               st.column_config.TextColumn("Business",          width="large"),
+            "industry":            st.column_config.TextColumn("Industry",          width="medium"),
+            "asking_price":        st.column_config.NumberColumn("Price ($)",        format="%.0f", width="small"),
+            "annual_cash_flow":    st.column_config.NumberColumn("Cash Flow ($)",    format="%.0f", width="small"),
             "cf_after_debt_20pct": st.column_config.NumberColumn("CF After Debt ($)",format="%.0f",width="small"),
-            "coc_return_20pct":    st.column_config.NumberColumn("CoC (%)",         format="%.0f", width="small"),
-            "dscr_20pct":          st.column_config.NumberColumn("DSCR",            format="%.2f", width="small"),
-            "revenue_multiple":    st.column_config.NumberColumn("Rev Multiple",    format="%.2f", width="small"),
-            "sde_margin":          st.column_config.NumberColumn("SDE Margin (%)",  format="%.0f", width="small"),
-            "absentee":            st.column_config.TextColumn("Absentee",          width="small"),
-            "location":            st.column_config.TextColumn("Location",          width="small"),
-            "url":                 st.column_config.LinkColumn("Link",              width="small"),
+            "coc_return_20pct":    st.column_config.NumberColumn("CoC (%)",          format="%.0f", width="small"),
+            "dscr_20pct":          st.column_config.NumberColumn("DSCR",             format="%.2f", width="small"),
+            "revenue_multiple":    st.column_config.NumberColumn("Rev Multiple",     format="%.2f", width="small"),
+            "sde_margin":          st.column_config.NumberColumn("SDE Margin (%)",   format="%.0f", width="small"),
+            "absentee":            st.column_config.TextColumn("Absentee",           width="small"),
+            "location":            st.column_config.TextColumn("Location",           width="small"),
+            "url":                 st.column_config.LinkColumn("Link",               width="small"),
         },
-        hide_index=True,
-        height=680,
-        use_container_width=True,
-        selection_mode="single-row",
-        on_select="rerun",
+        hide_index=True, height=680, use_container_width=True,
+        selection_mode="single-row", on_select="rerun",
     )
     if event.selection.rows:
         selected_row = rows.iloc[event.selection.rows[0]]
@@ -1052,55 +926,64 @@ def render_table(rows):
 
 
 # ── Main layout ────────────────────────────────────────────────────────────────
+view_mode = st.radio("View", ["List", "Table"], horizontal=True, label_visibility="collapsed")
+
 if len(filtered) == 0:
     st.info("No listings match the current filters.")
-else:
-    selected_id  = st.session_state.selected_id
-    selected_row = None
-    if selected_id is not None:
-        match = filtered[filtered["id"].astype(str) == str(selected_id)]
-        if len(match) > 0:
-            selected_row = match.iloc[0]
+    st.stop()
 
-    if selected_row is not None:
-        card_col, detail_col = st.columns([3, 2], gap="large")
-        with card_col:
-            if view_mode == "Cards":
-                render_cards(filtered, ncols=1)
-            else:
-                render_table(filtered)
-        with detail_col:
-            with st.container(border=True):
-                render_detail_panel(selected_row)
+selected_id  = st.session_state.selected_id
+selected_row = None
+if selected_id is not None:
+    match = filtered[filtered["id"].astype(str) == str(selected_id)]
+    if len(match) > 0:
+        selected_row = match.iloc[0]
+
+# Always show split layout — detail panel shows empty state when nothing selected
+list_col, detail_col = st.columns([5, 4], gap="large")
+
+with list_col:
+    count_label = f"{len(filtered)} listing{'s' if len(filtered) != 1 else ''}"
+    st.caption(count_label)
+
+    if view_mode == "List":
+        render_deal_list(filtered)
     else:
-        if view_mode == "Cards":
-            render_cards(filtered, ncols=2)
-        else:
-            render_table(filtered)
+        render_table(filtered)
 
-        # Analytics expander at bottom (only in full-width mode)
-        with st.expander("💰 SBA Financing Comparison"):
-            sba_cols = ["title", "asking_price", "down_10", "sba_monthly_10pct", "cf_after_debt_10pct",
-                        "coc_return_10pct", "down_20", "sba_monthly_20pct", "cf_after_debt_20pct", "coc_return_20pct"]
-            sba_available = [c for c in sba_cols if c in filtered.columns]
-            sba_df = filtered[sba_available].head(20).copy()
-            for col in ["coc_return_10pct", "coc_return_20pct"]:
-                if col in sba_df.columns:
-                    sba_df[col] = sba_df[col] * 100
-            st.dataframe(
-                sba_df,
-                column_config={
-                    "title":               st.column_config.TextColumn("Business",               width="large"),
-                    "asking_price":        st.column_config.NumberColumn("Price ($)",             format="%.0f"),
-                    "down_10":             st.column_config.NumberColumn("Down 10% ($)",          format="%.0f"),
-                    "sba_monthly_10pct":   st.column_config.NumberColumn("Monthly 10% ($)",       format="%.0f"),
-                    "cf_after_debt_10pct": st.column_config.NumberColumn("CF After Debt 10% ($)", format="%.0f"),
-                    "coc_return_10pct":    st.column_config.NumberColumn("CoC 10% (%)",           format="%.0f"),
-                    "down_20":             st.column_config.NumberColumn("Down 20% ($)",          format="%.0f"),
-                    "sba_monthly_20pct":   st.column_config.NumberColumn("Monthly 20% ($)",       format="%.0f"),
-                    "cf_after_debt_20pct": st.column_config.NumberColumn("CF After Debt 20% ($)", format="%.0f"),
-                    "coc_return_20pct":    st.column_config.NumberColumn("CoC 20% (%)",           format="%.0f"),
-                },
-                hide_index=True,
-                use_container_width=True,
-            )
+with detail_col:
+    if selected_row is not None:
+        with st.container(border=True):
+            render_detail_panel(selected_row)
+    else:
+        st.markdown("""
+<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;
+            height:300px;color:#94A3B8;text-align:center;padding:40px">
+  <div style="font-size:40px;margin-bottom:12px">👈</div>
+  <div style="font-size:15px;font-weight:700;color:#475569;margin-bottom:6px">Select a deal to view details</div>
+  <div style="font-size:13px">Click "View Deal" on any listing to open the full deal sheet here</div>
+</div>
+""", unsafe_allow_html=True)
+
+        # Pipeline analytics in empty state
+        with st.expander("📈 Pipeline Analytics"):
+            chart_df = filtered[filtered["asking_price"].notna() & filtered["annual_cash_flow"].notna()].copy()
+            chart_df["bucket_display"] = chart_df["bucket"].fillna("SKIP")
+            if len(chart_df) > 0:
+                color_map = {"SHORTLIST": "#10B981", "REVIEW": "#F59E0B", "AUTO-REJECT": "#EF4444", "SKIP": "#94A3B8"}
+                fig = px.scatter(chart_df, x="asking_price", y="annual_cash_flow",
+                    color="bucket_display", color_discrete_map=color_map,
+                    hover_data={"title": True, "location": True, "score": True, "bucket_display": False},
+                    labels={"asking_price": "Asking Price ($)", "annual_cash_flow": "Cash Flow ($)", "bucket_display": "Bucket"},
+                    title="Price vs. Cash Flow")
+                fig.update_traces(marker=dict(size=8, opacity=0.8))
+                fig.update_layout(
+                    plot_bgcolor="white", paper_bgcolor="white",
+                    font=dict(family="Inter", size=12),
+                    margin=dict(l=40, r=20, t=40, b=40),
+                    legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+                    height=300,
+                )
+                fig.update_xaxes(tickprefix="$", tickformat=",.0f", gridcolor="#F1F5F9")
+                fig.update_yaxes(tickprefix="$", tickformat=",.0f", gridcolor="#F1F5F9")
+                st.plotly_chart(fig, use_container_width=True)
