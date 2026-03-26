@@ -139,10 +139,10 @@ CATEGORY_CONFIG = {
 }
 
 BUCKET_COLOR = {
-    "SHORTLIST":   "#10B981",
-    "REVIEW":      "#F59E0B",
-    "SKIP":        "#94A3B8",
-    "AUTO-REJECT": "#EF4444",
+    "SHORTLIST":   "#008A05",
+    "REVIEW":      "#C45C00",
+    "SKIP":        "#B0B0B0",
+    "AUTO-REJECT": "#C13515",
 }
 
 CSV_PATH = Path(__file__).resolve().parents[1] / "output" / "candidates.csv"
@@ -155,209 +155,258 @@ st.markdown("""
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
 
-/* ── Top header bar ── */
+/* ── Page background ── */
+.stApp { background: #F7F7F7; }
+section[data-testid="stSidebar"] + div .main { background: #F7F7F7; }
+.main .block-container { background: #F7F7F7; }
+
+/* ── Top header ── */
 .top-bar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 14px 0 16px;
-    border-bottom: 2px solid #E2E8F0;
-    margin-bottom: 20px;
+    padding: 0 0 18px;
+    margin-bottom: 4px;
 }
 .top-bar-title {
-    font-size: 20px;
+    font-size: 24px;
     font-weight: 800;
-    color: #0F172A;
+    color: #222222;
     letter-spacing: -0.5px;
 }
-.top-bar-title span { color: #2563EB; }
-.top-bar-sub { font-size: 12px; color: #94A3B8; margin-top: 1px; }
+.top-bar-title span { color: #FF385C; }
+.top-bar-sub { font-size: 13px; color: #717171; margin-top: 3px; }
 
 /* ── Stat pills ── */
-.stats-row { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+.stats-row { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
 .stat-pill {
     background: white;
-    border: 1px solid #E2E8F0;
-    border-radius: 10px;
-    padding: 10px 16px;
-    min-width: 100px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    border-radius: 14px;
+    padding: 12px 18px;
+    min-width: 90px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    border: 1px solid #EBEBEB;
 }
-.stat-pill .sp-label { font-size: 10px; font-weight: 700; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.5px; }
-.stat-pill .sp-value { font-size: 22px; font-weight: 800; color: #0F172A; line-height: 1.2; margin-top: 2px; }
-.stat-pill .sp-value.green  { color: #10B981; }
-.stat-pill .sp-value.amber  { color: #F59E0B; }
-.stat-pill .sp-value.red    { color: #EF4444; }
-.stat-pill .sp-value.blue   { color: #2563EB; }
+.stat-pill .sp-label { font-size: 11px; font-weight: 600; color: #717171; text-transform: uppercase; letter-spacing: 0.4px; }
+.stat-pill .sp-value { font-size: 24px; font-weight: 800; color: #222222; line-height: 1.2; margin-top: 2px; }
+.stat-pill .sp-value.green  { color: #008A05; }
+.stat-pill .sp-value.amber  { color: #C45C00; }
+.stat-pill .sp-value.red    { color: #C13515; }
+.stat-pill .sp-value.blue   { color: #FF385C; }
 
-/* ── Deal list rows ── */
-.deal-row {
+/* ── Deal cards ── */
+.deal-card {
     background: white;
-    border: 1px solid #E2E8F0;
-    border-radius: 10px;
-    padding: 12px 14px;
-    margin-bottom: 6px;
-    cursor: pointer;
-    transition: box-shadow 0.15s, border-color 0.15s;
-    border-left: 4px solid transparent;
+    border-radius: 16px;
+    padding: 16px 16px 10px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    border: 1px solid #EBEBEB;
+    border-left: 4px solid #EBEBEB;
+    transition: box-shadow 0.2s;
 }
-.deal-row:hover {
-    box-shadow: 0 3px 12px rgba(37,99,235,0.1);
-    border-color: #BFDBFE;
+.deal-card.bucket-shortlist { border-left-color: #008A05; }
+.deal-card.bucket-review    { border-left-color: #C45C00; }
+.deal-card.bucket-reject    { border-left-color: #C13515; opacity: 0.75; }
+.deal-card.selected {
+    border-left-color: #FF385C !important;
+    box-shadow: 0 4px 16px rgba(255,56,92,0.15);
+    background: #FFF8F9;
 }
-.deal-row.selected {
-    border-left-color: #2563EB;
-    background: #EFF6FF;
-    border-color: #BFDBFE;
+
+.dc-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 4px; }
+.dc-title { font-size: 14px; font-weight: 700; color: #222222; line-height: 1.35; flex: 1; margin-right: 10px; }
+.dc-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.dc-price { font-size: 15px; font-weight: 800; color: #222222; white-space: nowrap; }
+.score-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    font-size: 11px;
+    font-weight: 800;
+    color: white;
+    flex-shrink: 0;
 }
-.dr-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 5px; }
-.dr-title { font-size: 14px; font-weight: 700; color: #0F172A; line-height: 1.35; }
-.dr-price { font-size: 13px; font-weight: 700; color: #0F172A; white-space: nowrap; }
-.dr-meta { font-size: 11px; color: #64748B; margin-bottom: 6px; }
-.dr-bottom { display: flex; align-items: center; gap: 8px; }
+.dc-meta { font-size: 12px; color: #717171; margin-bottom: 10px; }
+.dc-footer { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; padding-top: 8px; border-top: 1px solid #F5F5F5; }
 
 /* ── Bucket badge ── */
 .bucket-badge {
     display: inline-block;
-    font-size: 9px;
-    font-weight: 800;
-    padding: 2px 7px;
-    border-radius: 20px;
-    letter-spacing: 0.3px;
-    text-transform: uppercase;
-}
-.bb-shortlist { background: #D1FAE5; color: #065F46; }
-.bb-review    { background: #FEF3C7; color: #92400E; }
-.bb-skip      { background: #F1F5F9; color: #475569; }
-.bb-reject    { background: #FEE2E2; color: #991B1B; }
-
-/* ── Score chip ── */
-.score-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
     font-size: 10px;
     font-weight: 700;
-    color: #475569;
+    padding: 3px 9px;
+    border-radius: 20px;
+    letter-spacing: 0.2px;
+    text-transform: uppercase;
 }
-.score-dot {
-    width: 28px;
-    height: 6px;
-    border-radius: 3px;
-}
+.bb-shortlist { background: #D4EDDA; color: #155724; }
+.bb-review    { background: #FFF3CD; color: #856404; }
+.bb-skip      { background: #F1F5F9; color: #6C757D; }
+.bb-reject    { background: #FDECEA; color: #C13515; }
 
 /* ── Category tag ── */
 .cat-tag {
     font-size: 10px;
     font-weight: 600;
-    padding: 2px 7px;
+    padding: 3px 8px;
+    border-radius: 20px;
+}
+
+/* ── CoC / CF badges ── */
+.coc-badge {
+    font-size: 11px;
+    font-weight: 700;
+    color: #008A05;
+    background: #D4EDDA;
+    padding: 3px 8px;
+    border-radius: 20px;
+}
+.cf-badge {
+    font-size: 11px;
+    font-weight: 600;
+    color: #717171;
+    background: #F7F7F7;
+    padding: 3px 8px;
     border-radius: 20px;
 }
 
 /* ── Detail panel ── */
-.dp-header { padding-bottom: 16px; border-bottom: 1px solid #F1F5F9; margin-bottom: 16px; }
-.dp-title { font-size: 18px; font-weight: 800; color: #0F172A; line-height: 1.35; margin-bottom: 6px; }
+.dp-header { padding-bottom: 16px; border-bottom: 1px solid #EBEBEB; margin-bottom: 16px; }
+.dp-title { font-size: 20px; font-weight: 800; color: #222222; line-height: 1.3; margin-bottom: 8px; }
 .dp-section {
-    font-size: 10px;
-    font-weight: 800;
-    color: #94A3B8;
+    font-size: 11px;
+    font-weight: 700;
+    color: #717171;
     text-transform: uppercase;
     letter-spacing: 0.8px;
-    margin: 18px 0 10px;
-    padding-top: 14px;
-    border-top: 1px solid #F1F5F9;
+    margin: 20px 0 10px;
+    padding-top: 16px;
+    border-top: 1px solid #EBEBEB;
 }
 
 /* ── Score bar ── */
 .score-bar-wrap { margin: 10px 0; }
-.score-bar-label { display: flex; justify-content: space-between; font-size: 10px; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 4px; }
-.score-bar-track { background: #F1F5F9; border-radius: 4px; height: 6px; overflow: hidden; }
-.score-bar-fill { height: 6px; border-radius: 4px; }
+.score-bar-label { display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; color: #717171; margin-bottom: 5px; }
+.score-bar-track { background: #EBEBEB; border-radius: 6px; height: 8px; overflow: hidden; }
+.score-bar-fill { height: 8px; border-radius: 6px; }
 
 /* ── Finance grid ── */
-.fin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+.fin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
 .fin-cell {
-    background: #F8FAFC;
-    border: 1px solid #E2E8F0;
-    border-radius: 8px;
-    padding: 10px 12px;
+    background: #F7F7F7;
+    border: 1px solid #EBEBEB;
+    border-radius: 12px;
+    padding: 12px 14px;
 }
-.fin-label { font-size: 10px; font-weight: 700; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.4px; }
-.fin-value { font-size: 17px; font-weight: 800; color: #0F172A; margin-top: 2px; }
-.fin-value.green { color: #10B981; }
-.fin-value.red   { color: #EF4444; }
-.fin-value.amber { color: #F59E0B; }
+.fin-label { font-size: 11px; font-weight: 600; color: #717171; text-transform: uppercase; letter-spacing: 0.3px; }
+.fin-value { font-size: 18px; font-weight: 800; color: #222222; margin-top: 2px; }
+.fin-value.green { color: #008A05; }
+.fin-value.red   { color: #C13515; }
+.fin-value.amber { color: #C45C00; }
 
 /* ── Narrative blocks ── */
-.nar-block { border-radius: 8px; padding: 12px 14px; margin-bottom: 8px; }
-.nar-label { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 6px; }
-.nar-list { margin: 0; padding-left: 16px; font-size: 12px; line-height: 1.7; color: #1E293B; }
-.nar-bottom { background: #1E3A5F; border-radius: 8px; padding: 12px 14px; margin-bottom: 8px; }
-.nar-bottom-label { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px; color: #93C5FD; margin-bottom: 4px; }
-.nar-bottom-text { font-size: 13px; font-weight: 600; color: white; line-height: 1.5; }
+.nar-block { border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; }
+.nar-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+.nar-list { margin: 0; padding-left: 16px; font-size: 13px; line-height: 1.75; color: #222222; }
+.nar-bottom { background: #FF385C; border-radius: 12px; padding: 14px 16px; margin-bottom: 10px; }
+.nar-bottom-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: rgba(255,255,255,0.8); margin-bottom: 4px; }
+.nar-bottom-text { font-size: 14px; font-weight: 600; color: white; line-height: 1.5; }
 
 /* ── Sidebar ── */
 [data-testid="stSidebar"] {
     background: white !important;
-    border-right: 1px solid #E2E8F0 !important;
+    border-right: 1px solid #EBEBEB !important;
 }
 [data-testid="stSidebar"] label { font-size: 13px !important; color: #374151 !important; }
 [data-testid="stSidebar"] .stMarkdown h3 {
     font-size: 11px !important;
-    font-weight: 800 !important;
+    font-weight: 700 !important;
     text-transform: uppercase !important;
     letter-spacing: 0.6px !important;
-    color: #94A3B8 !important;
+    color: #717171 !important;
 }
 
 /* ── Expander ── */
-[data-testid="stExpander"] { background: white !important; border: 1px solid #E2E8F0 !important; border-radius: 10px !important; }
+[data-testid="stExpander"] { background: white !important; border: 1px solid #EBEBEB !important; border-radius: 12px !important; }
 
 /* ── Buttons ── */
 .stButton > button {
-    border-radius: 7px;
-    font-size: 12px;
-    font-weight: 700;
-    padding: 5px 0;
-    transition: all 0.12s;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 6px 0;
+    transition: all 0.15s;
 }
 [data-testid="stBaseButton-primary"] {
-    background: #2563EB !important;
+    background: #FF385C !important;
     color: white !important;
     border: none !important;
 }
-[data-testid="stBaseButton-primary"]:hover { background: #1D4ED8 !important; }
+[data-testid="stBaseButton-primary"]:hover { background: #E0314F !important; }
 [data-testid="stBaseButton-secondary"] {
     background: white !important;
-    color: #374151 !important;
-    border: 1.5px solid #D1D5DB !important;
+    color: #222222 !important;
+    border: 1.5px solid #DDDDDD !important;
 }
 [data-testid="stBaseButton-secondary"]:hover {
-    background: #F9FAFB !important;
-    border-color: #9CA3AF !important;
+    background: #F7F7F7 !important;
+    border-color: #B0B0B0 !important;
 }
 
 /* ── Metrics ── */
 [data-testid="metric-container"] {
-    background: #F8FAFC !important;
-    border: 1px solid #E2E8F0 !important;
-    border-radius: 8px !important;
-    padding: 10px 12px !important;
+    background: #F7F7F7 !important;
+    border: 1px solid #EBEBEB !important;
+    border-radius: 12px !important;
+    padding: 12px 14px !important;
 }
 [data-testid="metric-container"] label {
-    font-size: 10px !important;
-    font-weight: 700 !important;
-    color: #64748B !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    color: #717171 !important;
     text-transform: uppercase !important;
-    letter-spacing: 0.4px !important;
+    letter-spacing: 0.3px !important;
 }
-[data-testid="stMetricValue"] { font-size: 15px !important; font-weight: 800 !important; }
+[data-testid="stMetricValue"] { font-size: 16px !important; font-weight: 800 !important; color: #222222 !important; }
 
 /* ── Tabs ── */
-[data-testid="stTabs"] [data-baseweb="tab"] { font-size: 13px; font-weight: 600; }
+[data-baseweb="tab-list"] {
+    background: #EBEBEB !important;
+    border-radius: 10px !important;
+    padding: 3px !important;
+    gap: 2px !important;
+}
+[data-baseweb="tab"] {
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    border-radius: 8px !important;
+    color: #717171 !important;
+}
+[aria-selected="true"][data-baseweb="tab"] {
+    background: white !important;
+    color: #222222 !important;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.1) !important;
+}
+
+/* ── Search input ── */
+[data-testid="stTextInput"] input {
+    border-radius: 50px !important;
+    border: 1.5px solid #DDDDDD !important;
+    padding: 10px 16px !important;
+    font-size: 14px !important;
+    background: white !important;
+}
+[data-testid="stTextInput"] input:focus {
+    border-color: #222222 !important;
+    box-shadow: none !important;
+}
 
 /* ── Divider ── */
-hr { border-color: #F1F5F9 !important; margin: 12px 0 !important; }
+hr { border-color: #EBEBEB !important; margin: 16px 0 !important; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -440,9 +489,9 @@ def _val_color(val, good, ok):
     return "green" if val >= good else ("amber" if val >= ok else "red")
 
 def _score_color(score):
-    if score >= 65: return "#10B981"
-    if score >= 35: return "#F59E0B"
-    return "#94A3B8"
+    if score >= 65: return "#008A05"
+    if score >= 35: return "#C45C00"
+    return "#B0B0B0"
 
 def _bucket_cls(bucket):
     return {"SHORTLIST": "bb-shortlist", "REVIEW": "bb-review", "AUTO-REJECT": "bb-reject"}.get(bucket, "bb-skip")
@@ -529,8 +578,8 @@ n_watchlist = len(st.session_state.watchlist)
 st.markdown(f"""
 <div class="top-bar">
   <div>
-    <div class="top-bar-title">🏢 Sunbelt <span>Scout</span></div>
-    <div class="top-bar-sub">Minnesota business acquisition pipeline · updated daily</div>
+    <div class="top-bar-title">Sunbelt <span>Scout</span></div>
+    <div class="top-bar-sub">Minnesota business acquisition pipeline &middot; updated daily</div>
   </div>
 </div>
 """, unsafe_allow_html=True)
@@ -541,8 +590,8 @@ st.markdown(f"""
   <div class="stat-pill"><div class="sp-label">Showing</div><div class="sp-value">{n_filtered}</div></div>
   <div class="stat-pill"><div class="sp-label">Shortlisted</div><div class="sp-value green">{n_shortlist}</div></div>
   <div class="stat-pill"><div class="sp-label">Review</div><div class="sp-value amber">{n_review}</div></div>
-  <div class="stat-pill"><div class="sp-label">Auto-Rejected</div><div class="sp-value red">{n_rejected}</div></div>
-  <div class="stat-pill"><div class="sp-label">Saved ⭐</div><div class="sp-value">{n_watchlist}</div></div>
+  <div class="stat-pill"><div class="sp-label">Rejected</div><div class="sp-value red">{n_rejected}</div></div>
+  <div class="stat-pill"><div class="sp-label">Saved</div><div class="sp-value">{n_watchlist}</div></div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -558,6 +607,17 @@ with search_col:
 p1, p2, p3, p4, p5, p6, p7 = st.columns(7)
 active = st.session_state.active_preset
 
+# Compute preset counts
+tc_pat_pre = "|".join(["minneapolis","saint paul","st\\.paul","bloomington","plymouth",
+                        "eden prairie","burnsville","minnetonka","eagan","edina",
+                        "maple grove","woodbury","coon rapids","brooklyn park","twin cities","metro"])
+_n_tc       = len(base_filtered[base_filtered["location"].str.contains(tc_pat_pre, case=False, na=False)])
+_n_coc      = len(base_filtered[base_filtered["coc_return_20pct"].notna() & (base_filtered["coc_return_20pct"] >= 0.20)])
+_n_500k     = len(base_filtered[base_filtered["asking_price"].notna() & (base_filtered["asking_price"] <= 500000)])
+_n_absentee = len(base_filtered[base_filtered["absentee"].isin(["Likely", "Possible"])])
+_n_wl       = len(st.session_state.watchlist)
+_n_rejected = len(df[df["bucket"] == "AUTO-REJECT"])
+
 def _preset(col, label, key):
     with col:
         is_active = active == key
@@ -567,13 +627,13 @@ def _preset(col, label, key):
             st.session_state.active_preset = None if is_active else key
             st.rerun()
 
-_preset(p1, "All",           "all")
-_preset(p2, "🏆 Best CoC",  "best_returns")
-_preset(p3, "📍 Twin Cities","twin_cities")
-_preset(p4, "💰 Under $500K","under_500k")
-_preset(p5, "🏠 Absentee",  "absentee")
-_preset(p6, "⭐ Watchlist",  "watchlist")
-_preset(p7, "🔴 Rejected",   "rejected")
+_preset(p1, f"All ({len(base_filtered)})",        "all")
+_preset(p2, f"Best CoC ({_n_coc})",               "best_returns")
+_preset(p3, f"Twin Cities ({_n_tc})",              "twin_cities")
+_preset(p4, f"Under $500K ({_n_500k})",            "under_500k")
+_preset(p5, f"Absentee ({_n_absentee})",           "absentee")
+_preset(p6, f"Saved ({_n_wl})",                    "watchlist")
+_preset(p7, f"Rejected ({_n_rejected})",           "rejected")
 
 # Category filter
 selected_categories = st.multiselect(
@@ -839,28 +899,39 @@ def render_deal_list(rows):
         sel_class   = "selected" if is_sel else ""
         cat_name, cat_cfg = _primary_category(row)
 
+        bucket_card_cls = {
+            "SHORTLIST": "bucket-shortlist",
+            "REVIEW":    "bucket-review",
+            "AUTO-REJECT": "bucket-reject",
+        }.get(bucket, "")
+
         meta_parts = []
         if location and location != "nan": meta_parts.append(f"📍 {location}")
-        if industry and industry != "nan": meta_parts.append(f"· {industry}")
-        meta_str = "  ".join(meta_parts)
+        if industry and industry != "nan": meta_parts.append(industry)
+        meta_str = "  ·  ".join(meta_parts)
 
-        coc_str = f"CoC {_fmt(coc, '%')}" if coc and not (isinstance(coc, float) and pd.isna(coc)) else ""
-        coc_html  = f'<span style="font-size:10px;color:#64748B">{coc_str}</span>' if coc_str else ""
-        star_html = '<span style="font-size:10px;color:#4F46E5;font-weight:700">⭐</span>' if is_saved else ""
+        coc_html = (f'<span class="coc-badge">CoC {_fmt(coc, "%")}</span>'
+                    if coc and not (isinstance(coc, float) and pd.isna(coc)) else "")
+        cf_html  = (f'<span class="cf-badge">CF {_fmt(cf, "$M")}</span>'
+                    if cf and not (isinstance(cf, float) and pd.isna(cf)) else "")
+        star_html = '<span style="font-size:14px;margin-left:auto">⭐</span>' if is_saved else ""
 
         html = (
-            f'<div class="deal-row {sel_class}">'
-            f'<div class="dr-top">'
-            f'<div class="dr-title">{cat_cfg["emoji"]} {title}</div>'
-            f'<div class="dr-price">{_fmt(asking, "$M")}</div>'
+            f'<div class="deal-card {bucket_card_cls} {sel_class}">'
+            f'<div class="dc-top">'
+            f'<div class="dc-title">{cat_cfg["emoji"]} {title}</div>'
+            f'<div class="dc-right">'
+            f'<div class="dc-price">{_fmt(asking, "$M")}</div>'
+            f'<div class="score-badge" style="background:{sc}">{score}</div>'
             f'</div>'
-            f'<div class="dr-meta">{meta_str}</div>'
-            f'<div class="dr-bottom">'
+            f'</div>'
+            f'<div class="dc-meta">{meta_str}</div>'
+            f'<div class="dc-footer">'
             f'<span class="bucket-badge {bclass}">{bucket}</span>'
-            f'<span class="score-chip">'
-            f'<span class="score-dot" style="background:{sc};opacity:{max(0.3, score/100):.2f}"></span>'
-            f'{score}</span>'
             f'{coc_html}'
+            f'{cf_html}'
+            f'<span class="cat-tag" style="background:{cat_cfg["bg"]};color:{cat_cfg["color"]}">'
+            f'{cat_name}</span>'
             f'{star_html}'
             f'</div>'
             f'</div>'
@@ -869,13 +940,13 @@ def render_deal_list(rows):
 
         btn_a, btn_b = st.columns([4, 1])
         with btn_a:
-            btn_label = "📂 Selected" if is_sel else "View Deal →"
+            btn_label = "Selected" if is_sel else "View details"
             btn_type  = "primary" if is_sel else "secondary"
             if st.button(btn_label, key=f"view_{lid}", use_container_width=True, type=btn_type):
                 st.session_state.selected_id = None if is_sel else lid
                 st.rerun()
         with btn_b:
-            star_label = "⭐" if is_saved else "☆"
+            star_label = "⭐" if is_saved else "Save"
             if st.button(star_label, key=f"wl_{lid}", use_container_width=True):
                 new_wl = set(st.session_state.watchlist)
                 if is_saved: new_wl.discard(lid)
@@ -958,32 +1029,32 @@ with detail_col:
     else:
         st.markdown("""
 <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;
-            height:300px;color:#94A3B8;text-align:center;padding:40px">
-  <div style="font-size:40px;margin-bottom:12px">👈</div>
-  <div style="font-size:15px;font-weight:700;color:#475569;margin-bottom:6px">Select a deal to view details</div>
-  <div style="font-size:13px">Click "View Deal" on any listing to open the full deal sheet here</div>
+            height:200px;text-align:center;padding:40px">
+  <div style="font-size:36px;margin-bottom:10px">👈</div>
+  <div style="font-size:16px;font-weight:700;color:#222222;margin-bottom:6px">Select a listing</div>
+  <div style="font-size:13px;color:#717171">Click "View details" on any card to open the full deal sheet</div>
 </div>
 """, unsafe_allow_html=True)
 
         # Pipeline analytics in empty state
-        with st.expander("📈 Pipeline Analytics"):
-            chart_df = filtered[filtered["asking_price"].notna() & filtered["annual_cash_flow"].notna()].copy()
-            chart_df["bucket_display"] = chart_df["bucket"].fillna("SKIP")
-            if len(chart_df) > 0:
-                color_map = {"SHORTLIST": "#10B981", "REVIEW": "#F59E0B", "AUTO-REJECT": "#EF4444", "SKIP": "#94A3B8"}
-                fig = px.scatter(chart_df, x="asking_price", y="annual_cash_flow",
-                    color="bucket_display", color_discrete_map=color_map,
-                    hover_data={"title": True, "location": True, "score": True, "bucket_display": False},
-                    labels={"asking_price": "Asking Price ($)", "annual_cash_flow": "Cash Flow ($)", "bucket_display": "Bucket"},
-                    title="Price vs. Cash Flow")
-                fig.update_traces(marker=dict(size=8, opacity=0.8))
-                fig.update_layout(
-                    plot_bgcolor="white", paper_bgcolor="white",
-                    font=dict(family="Inter", size=12),
-                    margin=dict(l=40, r=20, t=40, b=40),
-                    legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
-                    height=300,
-                )
-                fig.update_xaxes(tickprefix="$", tickformat=",.0f", gridcolor="#F1F5F9")
-                fig.update_yaxes(tickprefix="$", tickformat=",.0f", gridcolor="#F1F5F9")
-                st.plotly_chart(fig, use_container_width=True)
+        st.markdown('<div style="font-size:13px;font-weight:700;color:#222222;margin-bottom:8px">Pipeline Overview</div>', unsafe_allow_html=True)
+        chart_df = filtered[filtered["asking_price"].notna() & filtered["annual_cash_flow"].notna()].copy()
+        chart_df["bucket_display"] = chart_df["bucket"].fillna("SKIP")
+        if len(chart_df) > 0:
+            color_map = {"SHORTLIST": "#008A05", "REVIEW": "#C45C00", "AUTO-REJECT": "#C13515", "SKIP": "#B0B0B0"}
+            fig = px.scatter(chart_df, x="asking_price", y="annual_cash_flow",
+                color="bucket_display", color_discrete_map=color_map,
+                hover_data={"title": True, "location": True, "score": True, "bucket_display": False},
+                labels={"asking_price": "Asking Price ($)", "annual_cash_flow": "Cash Flow ($)", "bucket_display": "Bucket"},
+                title="")
+            fig.update_traces(marker=dict(size=9, opacity=0.85))
+            fig.update_layout(
+                plot_bgcolor="white", paper_bgcolor="white",
+                font=dict(family="Inter", size=12),
+                margin=dict(l=40, r=20, t=10, b=40),
+                legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+                height=280,
+            )
+            fig.update_xaxes(tickprefix="$", tickformat=",.0f", gridcolor="#F5F5F5", linecolor="#EBEBEB")
+            fig.update_yaxes(tickprefix="$", tickformat=",.0f", gridcolor="#F5F5F5", linecolor="#EBEBEB")
+            st.plotly_chart(fig, use_container_width=True)
