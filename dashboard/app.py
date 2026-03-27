@@ -651,12 +651,13 @@ with search_col:
         label_visibility="collapsed",
     )
 
-p1, p2, p3, p4 = st.columns(4)
+p1, p2, p3, p4, p5 = st.columns(5)
 active = st.session_state.active_preset
 
-_n_coc  = len(base_filtered[base_filtered["coc_return_20pct"].notna() & (base_filtered["coc_return_20pct"] >= 0.20)])
-_n_500k = len(base_filtered[base_filtered["asking_price"].notna() & (base_filtered["asking_price"] <= 500000)])
-_n_wl   = len(st.session_state.watchlist)
+_n_coc      = len(base_filtered[base_filtered["coc_return_20pct"].notna() & (base_filtered["coc_return_20pct"] >= 0.20)])
+_n_500k     = len(base_filtered[base_filtered["asking_price"].notna() & (base_filtered["asking_price"] <= 500000)])
+_n_wl       = len(st.session_state.watchlist)
+_n_rejected = len(df[df["bucket"] == "AUTO-REJECT"])
 
 def _preset(col, label, key):
     with col:
@@ -667,10 +668,11 @@ def _preset(col, label, key):
             st.session_state.active_preset = None if is_active else key
             st.rerun()
 
-_preset(p1, f"All  ({len(base_filtered)})",   "all")
-_preset(p2, f"Top Picks  ({_n_coc})",         "best_returns")
-_preset(p3, f"Under $500K  ({_n_500k})",      "under_500k")
-_preset(p4, f"Saved  ({_n_wl})",              "watchlist")
+_preset(p1, f"All  ({len(base_filtered)})",      "all")
+_preset(p2, f"Top Picks  ({_n_coc})",            "best_returns")
+_preset(p3, f"Under $500K  ({_n_500k})",         "under_500k")
+_preset(p4, f"Saved  ({_n_wl})",                 "watchlist")
+_preset(p5, f"Rejected  ({_n_rejected})",        "rejected")
 
 # Category filter
 selected_categories = st.multiselect(
@@ -709,6 +711,8 @@ elif ap == "under_500k":
 elif ap == "watchlist":
     wl = st.session_state.watchlist
     filtered = filtered[filtered["id"].astype(str).isin(wl)]
+elif ap == "rejected":
+    filtered = df[df["bucket"] == "AUTO-REJECT"].copy()
 
 if ap != "best_returns":
     filtered = filtered.sort_values("score", ascending=False)
