@@ -1,15 +1,9 @@
-# Sunbelt Scout — 2026-03-26
+# Sunbelt Scout — 2026-03-27
 
-New listings processed: **79**
-Shortlisted: **18** | Review: **47** | Auto-Rejected: **11**
+New listings processed: **78**
+Shortlisted: **17** | Review: **47** | Auto-Rejected: **11**
 
 ## SHORTLIST
-- **Complete material handling installation company located in Twin Cities metro area.** (score 75)
-  Price: $1,075,000 | CF: $306,026 | CF After Debt: $169,646
-  CoC: 79% | DSCR: 2.24x | Absentee: No
-  https://www.sunbeltmidwest.com/complete-search-listing/?id_number=58037
-  _Why_: strong CF $306,026, DSCR 2.24, CoC 79%, 4 employees, no heavy inventory, operationally simple, durable industry, Twin Cities area
-
 - **Medicare-Certified Home Health & Personal Care Agency** (score 73)
   Price: $2,200,000 | CF: $691,911 | CF After Debt: $412,809
   CoC: 94% | DSCR: 2.48x | Absentee: No
