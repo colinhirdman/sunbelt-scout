@@ -170,6 +170,13 @@ BUCKET_COLOR = {
     "AUTO-REJECT": "#C13515",
 }
 
+BUCKET_DISPLAY = {
+    "SHORTLIST":   "Strong Match",
+    "REVIEW":      "Worth a Look",
+    "SKIP":        "Skip",
+    "AUTO-REJECT": "Skip",
+}
+
 CSV_PATH = Path(__file__).resolve().parents[1] / "output" / "candidates.csv"
 
 st.set_page_config(page_title="Sunbelt Scout", layout="wide", page_icon="🏢")
@@ -222,11 +229,12 @@ section[data-testid="stSidebar"] + div .main { background: #F7F7F7; }
 /* ── Deal cards ── */
 .deal-card {
     background: white;
-    border-radius: 16px;
-    padding: 16px 16px 10px;
-    margin-bottom: 12px;
+    border-radius: 16px 16px 0 0;
+    padding: 16px 16px 12px;
+    margin-bottom: 0;
     box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     border: 1px solid #EBEBEB;
+    border-bottom: none;
     border-left: 4px solid #EBEBEB;
     transition: box-shadow 0.2s;
 }
@@ -235,38 +243,32 @@ section[data-testid="stSidebar"] + div .main { background: #F7F7F7; }
 .deal-card.bucket-reject    { border-left-color: #C13515; opacity: 0.75; }
 .deal-card.selected {
     border-left-color: #FF385C !important;
-    box-shadow: 0 4px 16px rgba(255,56,92,0.15);
+    box-shadow: 0 4px 16px rgba(255,56,92,0.12);
     background: #FFF8F9;
 }
 
 .dc-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 4px; }
-.dc-title { font-size: 14px; font-weight: 700; color: #222222; line-height: 1.35; flex: 1; margin-right: 10px; }
-.dc-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-.dc-price { font-size: 15px; font-weight: 800; color: #222222; white-space: nowrap; }
-.score-badge {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
-    font-size: 11px;
-    font-weight: 800;
-    color: white;
-    flex-shrink: 0;
-}
+.dc-title { font-size: 14px; font-weight: 600; color: #222222; line-height: 1.35; flex: 1; margin-right: 12px; }
+.dc-price { font-size: 18px; font-weight: 800; color: #222222; white-space: nowrap; }
 .dc-meta { font-size: 12px; color: #717171; margin-bottom: 10px; }
 .dc-footer { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; padding-top: 8px; border-top: 1px solid #F5F5F5; }
+
+/* ── Score pill (footer) ── */
+.score-pill {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 20px;
+    margin-left: auto;
+}
 
 /* ── Bucket badge ── */
 .bucket-badge {
     display: inline-block;
-    font-size: 10px;
-    font-weight: 700;
-    padding: 3px 9px;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
     border-radius: 20px;
-    letter-spacing: 0.2px;
-    text-transform: uppercase;
 }
 .bb-shortlist { background: #D4EDDA; color: #155724; }
 .bb-review    { background: #FFF3CD; color: #856404; }
@@ -297,6 +299,39 @@ section[data-testid="stSidebar"] + div .main { background: #F7F7F7; }
     background: #F7F7F7;
     padding: 3px 8px;
     border-radius: 20px;
+}
+
+/* ── Card action row (fused below card) ── */
+.card-actions {
+    display: flex;
+    border: 1px solid #EBEBEB;
+    border-top: none;
+    border-radius: 0 0 16px 16px;
+    margin-bottom: 16px;
+    overflow: hidden;
+    background: white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.card-actions .stButton button {
+    border-radius: 0 !important;
+    border: none !important;
+    background: white !important;
+    color: #717171 !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    padding: 8px 0 !important;
+    transition: background 0.15s !important;
+}
+.card-actions .stButton button:hover {
+    background: #F7F7F7 !important;
+    color: #222222 !important;
+}
+.card-actions .stButton:first-child button {
+    border-right: 1px solid #EBEBEB !important;
+}
+.card-actions .stButton button[kind="primary"] {
+    background: #FFF8F9 !important;
+    color: #FF385C !important;
 }
 
 /* ── Detail panel ── */
@@ -530,44 +565,32 @@ def _primary_category(row):
 
 
 # ── Sidebar ────────────────────────────────────────────────────────────────────
-st.sidebar.markdown("### Filters")
+st.sidebar.markdown("### Price Range")
+min_price = st.sidebar.number_input("Min ($)", value=50000,   step=50000)
+max_price = st.sidebar.number_input("Max ($)", value=5000000, step=100000)
 
-st.sidebar.markdown("### Scoring")
-apply_scoring = st.sidebar.checkbox("Apply scoring filters", value=False,
-    help="When off, all listings are shown regardless of score.")
-if apply_scoring:
-    all_buckets = sorted(df["bucket"].dropna().unique().tolist())
-    buckets = st.sidebar.multiselect("Bucket", options=all_buckets,
-        default=[b for b in ["SHORTLIST", "REVIEW"] if b in all_buckets])
-    min_score = st.sidebar.slider("Min Score", 0, 100, 35)
-else:
+st.sidebar.markdown("### Cash Flow")
+min_cf = st.sidebar.number_input("Min Cash Flow ($)", value=0, step=25000)
+
+with st.sidebar.expander("More filters"):
+    min_coc   = st.sidebar.slider("Min CoC Return (20% down)", 0, 200, 0, format="%d%%")
+    twin_cities_only = st.sidebar.checkbox("Twin Cities Only")
+    absentee_only    = st.sidebar.checkbox("Absentee / Semi-Absentee Only")
+    st.markdown("---")
+    apply_scoring = st.sidebar.checkbox("Filter by score", value=False)
+    if apply_scoring:
+        all_buckets = sorted(df["bucket"].dropna().unique().tolist())
+        buckets   = st.sidebar.multiselect("Match quality", options=all_buckets,
+            default=[b for b in ["SHORTLIST", "REVIEW"] if b in all_buckets])
+        min_score = st.sidebar.slider("Min score", 0, 100, 35)
+    else:
+        buckets   = None
+        min_score = 0
+
+min_coc_decimal = min_coc / 100.0
+if not apply_scoring:
     buckets   = None
     min_score = 0
-
-st.sidebar.markdown("---")
-st.sidebar.markdown("### Financial")
-max_price = st.sidebar.number_input("Max Asking Price ($)", value=5000000, step=100000)
-min_price = st.sidebar.number_input("Min Asking Price ($)", value=50000,   step=50000)
-min_cf    = st.sidebar.number_input("Min Cash Flow ($)",    value=0,       step=25000)
-min_coc   = st.sidebar.slider("Min CoC Return (20% down)", 0, 200, 0, format="%d%%")
-min_coc_decimal = min_coc / 100.0
-
-st.sidebar.markdown("---")
-st.sidebar.markdown("### Location & Operator")
-twin_cities_only = st.sidebar.checkbox("Twin Cities Only")
-absentee_only    = st.sidebar.checkbox("Absentee / Semi-Absentee Only")
-
-st.sidebar.markdown("---")
-with st.sidebar.expander("📊 How scores work"):
-    st.markdown("""
-**Buckets:** 🟢 SHORTLIST 65+ · 🟡 REVIEW 35–64 · ⚪ SKIP <35 · 🔴 AUTO-REJECT 0
-
-**Auto-Reject triggers:**
-Price outside $50K–$5M · No cash flow · DSCR<1.25 · Not MN · Franchise/cannabis/gambling/digital-only
-
-**Scoring (100 pts):**
-💰 Financial 40 · ⚙️ Operations 15 · 💻 Tech gap 15 · 🔁 Recurring 10 · 🏗️ Industry 10 · 📍 Geography 10
-""")
 
 
 # ── Base filters ───────────────────────────────────────────────────────────────
@@ -613,9 +636,8 @@ st.markdown(f"""
 <div class="stats-row">
   <div class="stat-pill"><div class="sp-label">Total</div><div class="sp-value blue">{n_total}</div></div>
   <div class="stat-pill"><div class="sp-label">Showing</div><div class="sp-value">{n_filtered}</div></div>
-  <div class="stat-pill"><div class="sp-label">Shortlisted</div><div class="sp-value green">{n_shortlist}</div></div>
-  <div class="stat-pill"><div class="sp-label">Review</div><div class="sp-value amber">{n_review}</div></div>
-  <div class="stat-pill"><div class="sp-label">Rejected</div><div class="sp-value red">{n_rejected}</div></div>
+  <div class="stat-pill"><div class="sp-label">Strong Match</div><div class="sp-value green">{n_shortlist}</div></div>
+  <div class="stat-pill"><div class="sp-label">Worth a Look</div><div class="sp-value amber">{n_review}</div></div>
   <div class="stat-pill"><div class="sp-label">Saved</div><div class="sp-value">{n_watchlist}</div></div>
 </div>
 """, unsafe_allow_html=True)
@@ -629,19 +651,12 @@ with search_col:
         label_visibility="collapsed",
     )
 
-p1, p2, p3, p4, p5, p6, p7 = st.columns(7)
+p1, p2, p3, p4 = st.columns(4)
 active = st.session_state.active_preset
 
-# Compute preset counts
-tc_pat_pre = "|".join(["minneapolis","saint paul","st\\.paul","bloomington","plymouth",
-                        "eden prairie","burnsville","minnetonka","eagan","edina",
-                        "maple grove","woodbury","coon rapids","brooklyn park","twin cities","metro"])
-_n_tc       = len(base_filtered[base_filtered["location"].str.contains(tc_pat_pre, case=False, na=False)])
-_n_coc      = len(base_filtered[base_filtered["coc_return_20pct"].notna() & (base_filtered["coc_return_20pct"] >= 0.20)])
-_n_500k     = len(base_filtered[base_filtered["asking_price"].notna() & (base_filtered["asking_price"] <= 500000)])
-_n_absentee = len(base_filtered[base_filtered["absentee"].isin(["Likely", "Possible"])])
-_n_wl       = len(st.session_state.watchlist)
-_n_rejected = len(df[df["bucket"] == "AUTO-REJECT"])
+_n_coc  = len(base_filtered[base_filtered["coc_return_20pct"].notna() & (base_filtered["coc_return_20pct"] >= 0.20)])
+_n_500k = len(base_filtered[base_filtered["asking_price"].notna() & (base_filtered["asking_price"] <= 500000)])
+_n_wl   = len(st.session_state.watchlist)
 
 def _preset(col, label, key):
     with col:
@@ -652,13 +667,10 @@ def _preset(col, label, key):
             st.session_state.active_preset = None if is_active else key
             st.rerun()
 
-_preset(p1, f"All ({len(base_filtered)})",        "all")
-_preset(p2, f"Best CoC ({_n_coc})",               "best_returns")
-_preset(p3, f"Twin Cities ({_n_tc})",              "twin_cities")
-_preset(p4, f"Under $500K ({_n_500k})",            "under_500k")
-_preset(p5, f"Absentee ({_n_absentee})",           "absentee")
-_preset(p6, f"Saved ({_n_wl})",                    "watchlist")
-_preset(p7, f"Rejected ({_n_rejected})",           "rejected")
+_preset(p1, f"All  ({len(base_filtered)})",   "all")
+_preset(p2, f"Top Picks  ({_n_coc})",         "best_returns")
+_preset(p3, f"Under $500K  ({_n_500k})",      "under_500k")
+_preset(p4, f"Saved  ({_n_wl})",              "watchlist")
 
 # Category filter
 selected_categories = st.multiselect(
@@ -692,20 +704,11 @@ ap = st.session_state.active_preset
 if ap == "best_returns":
     filtered = filtered[filtered["coc_return_20pct"].notna() & (filtered["coc_return_20pct"] >= 0.20)]
     filtered = filtered.sort_values("coc_return_20pct", ascending=False)
-elif ap == "twin_cities":
-    tc_pat = "|".join(["minneapolis","saint paul","st\\.paul","bloomington","plymouth",
-                        "eden prairie","burnsville","minnetonka","eagan","edina",
-                        "maple grove","woodbury","coon rapids","brooklyn park","twin cities","metro"])
-    filtered = filtered[filtered["location"].str.contains(tc_pat, case=False, na=False)]
 elif ap == "under_500k":
     filtered = filtered[filtered["asking_price"].notna() & (filtered["asking_price"] <= 500000)]
-elif ap == "absentee":
-    filtered = filtered[filtered["absentee"].isin(["Likely", "Possible"])]
 elif ap == "watchlist":
     wl = st.session_state.watchlist
     filtered = filtered[filtered["id"].astype(str).isin(wl)]
-elif ap == "rejected":
-    filtered = df[df["bucket"] == "AUTO-REJECT"].copy()
 
 if ap != "best_returns":
     filtered = filtered.sort_values("score", ascending=False)
@@ -737,14 +740,15 @@ def render_detail_panel(row):
         if url and str(url) != "nan":
             st.link_button("View on Sunbelt →", url, use_container_width=True)
 
-    sc = _score_color(score)
-    bclass = _bucket_cls(bucket)
+    sc            = _score_color(score)
+    bclass        = _bucket_cls(bucket)
+    bucket_label  = BUCKET_DISPLAY.get(bucket, bucket)
     st.markdown(f"""
 <div class="dp-header">
   <div class="dp-title">{title}</div>
   <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
-    <span class="bucket-badge {bclass}">{bucket}</span>
-    <span style="font-size:12px;color:#64748B;font-weight:700">Score {score}/100</span>
+    <span class="bucket-badge {bclass}">{bucket_label}</span>
+    <span style="font-size:12px;color:#717171;font-weight:600">Score {score}/100</span>
   </div>
   <div class="score-bar-wrap">
     <div class="score-bar-track"><div class="score-bar-fill" style="width:{score}%;background:{sc}"></div></div>
@@ -752,7 +756,36 @@ def render_detail_panel(row):
 </div>
 """, unsafe_allow_html=True)
 
-    # KPIs
+    # ── Deal Summary FIRST ──────────────────────────────────────────────────────
+    narrative = row.get("narrative", "")
+    if narrative and str(narrative) != "nan":
+        def _ns(text, prefix, icon, bg, border, lc):
+            if prefix not in text: return ""
+            body = text.split(prefix, 1)[1]
+            for stop in ["What's attractive:", "Watch-outs:", "Bottom line:"]:
+                if stop != prefix and stop in body:
+                    body = body.split(stop)[0]
+            items = [s.strip().rstrip(".") for s in body.strip().split(";") if s.strip()]
+            bullets = "".join(f'<li style="margin-bottom:3px">{i}.</li>' for i in items)
+            return (f'<div class="nar-block" style="background:{bg};border:1px solid {border}">'
+                    f'<div class="nar-label" style="color:{lc}">{icon} {prefix.rstrip(":")}</div>'
+                    f'<ul class="nar-list">{bullets}</ul></div>')
+
+        intro = narrative.split("What's attractive:")[0].strip() if "What's attractive:" in narrative else ""
+        html = ""
+        if intro:
+            html += f'<div style="font-size:13px;color:#717171;margin-bottom:10px;line-height:1.65">{intro}</div>'
+        html += _ns(narrative, "What's attractive:", "✅", "#F0FDF4", "#86EFAC", "#15803D")
+        html += _ns(narrative, "Watch-outs:", "⚠️", "#FFFBEB", "#FCD34D", "#B45309")
+        if "Bottom line:" in narrative:
+            bl = narrative.split("Bottom line:", 1)[1].strip()
+            html += (f'<div class="nar-bottom">'
+                     f'<div class="nar-bottom-label">⚖️ Bottom Line</div>'
+                     f'<div class="nar-bottom-text">{bl}</div></div>')
+        st.markdown(html, unsafe_allow_html=True)
+
+    # ── KPIs ───────────────────────────────────────────────────────────────────
+    st.markdown('<div class="dp-section">Financials</div>', unsafe_allow_html=True)
     k1, k2, k3 = st.columns(3)
     k1.metric("Asking Price",    _fmt(asking))
     k2.metric("Cash Flow (SDE)", _fmt(cf))
@@ -856,35 +889,7 @@ def render_detail_panel(row):
         st.markdown(f'<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">{"".join(tags)}</div>',
                     unsafe_allow_html=True)
 
-    # Narrative
-    narrative = row.get("narrative", "")
-    if narrative and str(narrative) != "nan":
-        st.markdown('<div class="dp-section">Deal Summary</div>', unsafe_allow_html=True)
-
-        def _ns(text, prefix, icon, bg, border, lc):
-            if prefix not in text: return ""
-            body = text.split(prefix, 1)[1]
-            for stop in ["What's attractive:", "Watch-outs:", "Bottom line:"]:
-                if stop != prefix and stop in body:
-                    body = body.split(stop)[0]
-            items = [s.strip().rstrip(".") for s in body.strip().split(";") if s.strip()]
-            bullets = "".join(f'<li style="margin-bottom:3px">{i}.</li>' for i in items)
-            return (f'<div class="nar-block" style="background:{bg};border:1px solid {border}">'
-                    f'<div class="nar-label" style="color:{lc}">{icon} {prefix.rstrip(":")}</div>'
-                    f'<ul class="nar-list">{bullets}</ul></div>')
-
-        intro = narrative.split("What's attractive:")[0].strip() if "What's attractive:" in narrative else ""
-        html = ""
-        if intro:
-            html += f'<div style="font-size:12px;color:#475569;margin-bottom:10px;line-height:1.65">{intro}</div>'
-        html += _ns(narrative, "What's attractive:", "✅", "#F0FDF4", "#86EFAC", "#15803D")
-        html += _ns(narrative, "Watch-outs:", "⚠️", "#FFFBEB", "#FCD34D", "#B45309")
-        if "Bottom line:" in narrative:
-            bl = narrative.split("Bottom line:", 1)[1].strip()
-            html += (f'<div class="nar-bottom">'
-                     f'<div class="nar-bottom-label">⚖️ Bottom Line</div>'
-                     f'<div class="nar-bottom-text">{bl}</div></div>')
-        st.markdown(html, unsafe_allow_html=True)
+    # Narrative rendered at top — skip here
 
     # Scoring signals
     reasons = row.get("reasons", "")
@@ -919,14 +924,15 @@ def render_deal_list(rows):
         is_saved = lid in watchlist
         is_sel   = str(selected_id) == lid
 
-        sc          = _score_color(score)
-        bclass      = _bucket_cls(bucket)
-        sel_class   = "selected" if is_sel else ""
+        sc            = _score_color(score)
+        bclass        = _bucket_cls(bucket)
+        bucket_label  = BUCKET_DISPLAY.get(bucket, bucket)
+        sel_class     = "selected" if is_sel else ""
         cat_name, cat_cfg = _primary_category(row)
 
         bucket_card_cls = {
-            "SHORTLIST": "bucket-shortlist",
-            "REVIEW":    "bucket-review",
+            "SHORTLIST":   "bucket-shortlist",
+            "REVIEW":      "bucket-review",
             "AUTO-REJECT": "bucket-reject",
         }.get(bucket, "")
 
@@ -939,40 +945,39 @@ def render_deal_list(rows):
                     if coc and not (isinstance(coc, float) and pd.isna(coc)) else "")
         cf_html  = (f'<span class="cf-badge">CF {_fmt(cf, "$M")}</span>'
                     if cf and not (isinstance(cf, float) and pd.isna(cf)) else "")
-        star_html = '<span style="font-size:14px;margin-left:auto">⭐</span>' if is_saved else ""
+        score_pill_html = (f'<span class="score-pill" style="background:{sc}22;color:{sc}">'
+                           f'{score}</span>')
 
         html = (
             f'<div class="deal-card {bucket_card_cls} {sel_class}">'
             f'<div class="dc-top">'
             f'<div class="dc-title">{cat_cfg["emoji"]} {title}</div>'
-            f'<div class="dc-right">'
             f'<div class="dc-price">{_fmt(asking, "$M")}</div>'
-            f'<div class="score-badge" style="background:{sc}">{score}</div>'
-            f'</div>'
             f'</div>'
             f'<div class="dc-meta">{meta_str}</div>'
             f'<div class="dc-footer">'
-            f'<span class="bucket-badge {bclass}">{bucket}</span>'
+            f'<span class="bucket-badge {bclass}">{bucket_label}</span>'
             f'{coc_html}'
             f'{cf_html}'
             f'<span class="cat-tag" style="background:{cat_cfg["bg"]};color:{cat_cfg["color"]}">'
             f'{cat_name}</span>'
-            f'{star_html}'
+            f'{score_pill_html}'
             f'</div>'
             f'</div>'
         )
         st.markdown(html, unsafe_allow_html=True)
 
-        btn_a, btn_b = st.columns([4, 1])
+        st.markdown('<div class="card-actions">', unsafe_allow_html=True)
+        btn_a, btn_b = st.columns([5, 1])
         with btn_a:
-            btn_label = "Selected" if is_sel else "View details"
-            btn_type  = "primary" if is_sel else "secondary"
-            if st.button(btn_label, key=f"view_{lid}", use_container_width=True, type=btn_type):
+            view_label = "Selected" if is_sel else "View details →"
+            view_type  = "primary" if is_sel else "secondary"
+            if st.button(view_label, key=f"view_{lid}", use_container_width=True, type=view_type):
                 st.session_state.selected_id = None if is_sel else lid
                 st.rerun()
         with btn_b:
-            star_label = "⭐" if is_saved else "Save"
-            if st.button(star_label, key=f"wl_{lid}", use_container_width=True):
+            bookmark = "🔖" if is_saved else "♡"
+            if st.button(bookmark, key=f"wl_{lid}", use_container_width=True):
                 new_wl = set(st.session_state.watchlist)
                 if is_saved:
                     new_wl.discard(lid)
@@ -982,6 +987,7 @@ def render_deal_list(rows):
                     _save_watchlist(new_wl, added=lid)
                 st.session_state.watchlist = new_wl
                 st.rerun()
+        st.markdown('</div>', unsafe_allow_html=True)
 
 
 # ── Table renderer ─────────────────────────────────────────────────────────────
@@ -1025,6 +1031,29 @@ def render_table(rows):
         st.rerun()
 
 
+# ── Pipeline chart (always visible, above list) ─────────────────────────────────
+with st.expander("Pipeline Overview", expanded=False):
+    chart_df = filtered[filtered["asking_price"].notna() & filtered["annual_cash_flow"].notna()].copy()
+    chart_df["bucket_display"] = chart_df["bucket"].fillna("SKIP")
+    if len(chart_df) > 0:
+        color_map = {"SHORTLIST": "#008A05", "REVIEW": "#C45C00", "AUTO-REJECT": "#C13515", "SKIP": "#B0B0B0"}
+        fig = px.scatter(chart_df, x="asking_price", y="annual_cash_flow",
+            color="bucket_display", color_discrete_map=color_map,
+            hover_data={"title": True, "location": True, "score": True, "bucket_display": False},
+            labels={"asking_price": "Asking Price ($)", "annual_cash_flow": "Cash Flow ($)", "bucket_display": "Match"},
+            title="")
+        fig.update_traces(marker=dict(size=9, opacity=0.85))
+        fig.update_layout(
+            plot_bgcolor="white", paper_bgcolor="white",
+            font=dict(family="Inter", size=12),
+            margin=dict(l=40, r=20, t=10, b=40),
+            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+            height=260,
+        )
+        fig.update_xaxes(tickprefix="$", tickformat=",.0f", gridcolor="#F5F5F5", linecolor="#EBEBEB")
+        fig.update_yaxes(tickprefix="$", tickformat=",.0f", gridcolor="#F5F5F5", linecolor="#EBEBEB")
+        st.plotly_chart(fig, use_container_width=True)
+
 # ── Main layout ────────────────────────────────────────────────────────────────
 view_mode = st.radio("View", ["List", "Table"], horizontal=True, label_visibility="collapsed")
 
@@ -1039,7 +1068,7 @@ if selected_id is not None:
     if len(match) > 0:
         selected_row = match.iloc[0]
 
-# Always show split layout — detail panel shows empty state when nothing selected
+# Split layout
 list_col, detail_col = st.columns([5, 4], gap="large")
 
 with list_col:
@@ -1058,32 +1087,7 @@ with detail_col:
     else:
         st.markdown("""
 <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;
-            height:200px;text-align:center;padding:40px">
-  <div style="font-size:36px;margin-bottom:10px">👈</div>
-  <div style="font-size:16px;font-weight:700;color:#222222;margin-bottom:6px">Select a listing</div>
-  <div style="font-size:13px;color:#717171">Click "View details" on any card to open the full deal sheet</div>
+            height:260px;text-align:center;padding:40px">
+  <div style="font-size:13px;color:#717171;margin-top:16px">Select a listing to view the full deal sheet</div>
 </div>
 """, unsafe_allow_html=True)
-
-        # Pipeline analytics in empty state
-        st.markdown('<div style="font-size:13px;font-weight:700;color:#222222;margin-bottom:8px">Pipeline Overview</div>', unsafe_allow_html=True)
-        chart_df = filtered[filtered["asking_price"].notna() & filtered["annual_cash_flow"].notna()].copy()
-        chart_df["bucket_display"] = chart_df["bucket"].fillna("SKIP")
-        if len(chart_df) > 0:
-            color_map = {"SHORTLIST": "#008A05", "REVIEW": "#C45C00", "AUTO-REJECT": "#C13515", "SKIP": "#B0B0B0"}
-            fig = px.scatter(chart_df, x="asking_price", y="annual_cash_flow",
-                color="bucket_display", color_discrete_map=color_map,
-                hover_data={"title": True, "location": True, "score": True, "bucket_display": False},
-                labels={"asking_price": "Asking Price ($)", "annual_cash_flow": "Cash Flow ($)", "bucket_display": "Bucket"},
-                title="")
-            fig.update_traces(marker=dict(size=9, opacity=0.85))
-            fig.update_layout(
-                plot_bgcolor="white", paper_bgcolor="white",
-                font=dict(family="Inter", size=12),
-                margin=dict(l=40, r=20, t=10, b=40),
-                legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
-                height=280,
-            )
-            fig.update_xaxes(tickprefix="$", tickformat=",.0f", gridcolor="#F5F5F5", linecolor="#EBEBEB")
-            fig.update_yaxes(tickprefix="$", tickformat=",.0f", gridcolor="#F5F5F5", linecolor="#EBEBEB")
-            st.plotly_chart(fig, use_container_width=True)
