@@ -1,24 +1,30 @@
-import json
 import streamlit as st
 import pandas as pd
 import plotly.express as px
 from pathlib import Path
+from supabase import create_client, Client
 
-# ── Watchlist persistence ───────────────────────────────────────────────────────
-_STATE_PATH = Path(__file__).parent.parent / "data" / "state.json"
+# ── Supabase client ─────────────────────────────────────────────────────────────
+@st.cache_resource
+def _get_supabase() -> Client:
+    url = st.secrets["SUPABASE_URL"]
+    key = st.secrets["SUPABASE_KEY"]
+    return create_client(url, key)
 
 def _load_watchlist() -> set:
     try:
-        data = json.loads(_STATE_PATH.read_text())
-        return set(data.get("watchlist", []))
+        res = _get_supabase().table("watchlist").select("listing_id").execute()
+        return {r["listing_id"] for r in res.data}
     except Exception:
         return set()
 
-def _save_watchlist(wl: set) -> None:
+def _save_watchlist(wl: set, added: str | None = None, removed: str | None = None) -> None:
     try:
-        data = json.loads(_STATE_PATH.read_text()) if _STATE_PATH.exists() else {}
-        data["watchlist"] = list(wl)
-        _STATE_PATH.write_text(json.dumps(data, indent=2))
+        sb = _get_supabase()
+        if added:
+            sb.table("watchlist").upsert({"listing_id": added}).execute()
+        if removed:
+            sb.table("watchlist").delete().eq("listing_id", removed).execute()
     except Exception:
         pass
 
@@ -968,10 +974,13 @@ def render_deal_list(rows):
             star_label = "⭐" if is_saved else "Save"
             if st.button(star_label, key=f"wl_{lid}", use_container_width=True):
                 new_wl = set(st.session_state.watchlist)
-                if is_saved: new_wl.discard(lid)
-                else:        new_wl.add(lid)
+                if is_saved:
+                    new_wl.discard(lid)
+                    _save_watchlist(new_wl, removed=lid)
+                else:
+                    new_wl.add(lid)
+                    _save_watchlist(new_wl, added=lid)
                 st.session_state.watchlist = new_wl
-                _save_watchlist(new_wl)
                 st.rerun()
 
 
