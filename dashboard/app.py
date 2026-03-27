@@ -1,7 +1,26 @@
+import json
 import streamlit as st
 import pandas as pd
 import plotly.express as px
 from pathlib import Path
+
+# ── Watchlist persistence ───────────────────────────────────────────────────────
+_STATE_PATH = Path(__file__).parent.parent / "data" / "state.json"
+
+def _load_watchlist() -> set:
+    try:
+        data = json.loads(_STATE_PATH.read_text())
+        return set(data.get("watchlist", []))
+    except Exception:
+        return set()
+
+def _save_watchlist(wl: set) -> None:
+    try:
+        data = json.loads(_STATE_PATH.read_text()) if _STATE_PATH.exists() else {}
+        data["watchlist"] = list(wl)
+        _STATE_PATH.write_text(json.dumps(data, indent=2))
+    except Exception:
+        pass
 
 # ── Category config ────────────────────────────────────────────────────────────
 
@@ -467,7 +486,7 @@ if df.empty:
 
 # ── Session state ──────────────────────────────────────────────────────────────
 if "selected_id"   not in st.session_state: st.session_state.selected_id   = None
-if "watchlist"     not in st.session_state: st.session_state.watchlist     = set()
+if "watchlist"     not in st.session_state: st.session_state.watchlist     = _load_watchlist()
 if "active_preset" not in st.session_state: st.session_state.active_preset = None
 
 
@@ -952,6 +971,7 @@ def render_deal_list(rows):
                 if is_saved: new_wl.discard(lid)
                 else:        new_wl.add(lid)
                 st.session_state.watchlist = new_wl
+                _save_watchlist(new_wl)
                 st.rerun()
 
 
