@@ -45,60 +45,49 @@ def _extract_ids_from_html(html):
     return set(re.findall(r'id_number=([A-Za-z0-9]{4,})', html))
 
 
+def _has_next_page(html):
+    """Return True if a NEXT pagination link exists in the HTML."""
+    return bool(re.search(r'class="[^"]*next[^"]*"', html, re.IGNORECASE)
+                or re.search(r'>NEXT<', html, re.IGNORECASE)
+                or re.search(r'>Next<', html, re.IGNORECASE))
+
+
 def _discover_listing_ids(cfg):
     """
-    Discover Minnesota listing IDs by hitting the search page with
-    many different filter combinations. The server only returns 10
-    listings per page in static HTML, so we vary filters to surface
-    different subsets.
+    Paginate through all Minnesota search result pages collecting listing IDs.
+    Uses results= for page number and shownum= for page size.
     """
     base_url = cfg["base_url"]
-    delay = cfg.get("rate_limit_delay", 3.0)
-    all_ids = set()
+    delay    = cfg.get("rate_limit_delay", 3.0)
+    all_ids  = set()
+    page     = 1
 
-    def _fetch_search(extra_params=None):
-        params = {"geography[]": "Minnesota"}
-        if extra_params:
-            params.update(extra_params)
+    print("  Paginating through search results...")
+    while True:
+        params = {
+            "geography[0]": "Minnesota",
+            "shownum":      100,
+            "results":      page,
+        }
         time.sleep(delay)
         html = _get_with_retry(base_url, params=params, cfg=cfg)
-        if html:
-            ids = _extract_ids_from_html(html)
-            all_ids.update(ids)
-            return len(ids)
-        return 0
+        if not html:
+            print(f"  Page {page}: request failed, stopping.")
+            break
 
-    # 1. Default (no extra filters)
-    _fetch_search()
+        ids = _extract_ids_from_html(html)
+        if not ids:
+            print(f"  Page {page}: no listings found, stopping.")
+            break
 
-    # 2. By industry
-    industries = [
-        "Accounting", "Automotive", "Construction", "Distribution",
-        "Franchise", "Home Health Care", "Hotels/Motels", "Manufacturing",
-        "Medical/Optometry/Dental/Veterinary", "Real Estate",
-        "Restaurant & Bar", "Retail", "Service", "Technology",
-    ]
-    for ind in industries:
-        _fetch_search({"industry[]": ind})
+        new = ids - all_ids
+        all_ids.update(ids)
+        print(f"  Page {page}: {len(ids)} listings ({len(new)} new) — {len(all_ids)} total")
 
-    # 3. Cash flow ranges
-    for cf_min in [25000, 50000, 75000, 100000, 150000, 200000, 300000, 500000, 750000, 1000000]:
-        _fetch_search({"cash_flow_min": cf_min})
-    for cf_max in [25000, 50000, 75000, 100000, 150000, 200000, 300000, 500000]:
-        _fetch_search({"cash_flow_max": cf_max})
+        if not _has_next_page(html):
+            break
 
-    # 4. Down payment ranges
-    for dp_min in [25000, 50000, 100000, 200000, 500000, 1000000]:
-        _fetch_search({"down_payment_min": dp_min})
-    for dp_max in [25000, 50000, 100000, 200000, 500000]:
-        _fetch_search({"down_payment_max": dp_max})
-
-    # 5. Cross filters for large categories
-    for ind in ["Service", "Retail", "Franchise", "Construction"]:
-        for cf_min in [50000, 100000, 200000]:
-            _fetch_search({"industry[]": ind, "cash_flow_min": cf_min})
-        for cf_max in [50000, 100000, 200000]:
-            _fetch_search({"industry[]": ind, "cash_flow_max": cf_max})
+        page += 1
 
     print(f"  Discovered {len(all_ids)} unique listing IDs")
     return all_ids
