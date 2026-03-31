@@ -46,7 +46,7 @@ def _num(val):
     return str(val)
 
 
-def upsert_rows(rows: list[dict], active_ids: set | None = None):
+def upsert_rows(rows: list[dict], active_ids=None):
     out = _base() / "output"
     out.mkdir(parents=True, exist_ok=True)
     p = out / "candidates.csv"
