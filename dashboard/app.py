@@ -630,7 +630,6 @@ with st.sidebar.expander("More filters"):
     min_coc   = st.sidebar.slider("Min CoC Return (20% down)", 0, 200, 0, format="%d%%")
     twin_cities_only = st.sidebar.checkbox("Twin Cities Only")
     absentee_only    = st.sidebar.checkbox("Absentee / Semi-Absentee Only")
-    show_archived    = st.sidebar.checkbox("Show archived (delisted)", value=False)
     st.markdown("---")
     apply_scoring = st.sidebar.checkbox("Filter by score", value=False)
     if apply_scoring:
@@ -650,9 +649,8 @@ if not apply_scoring:
 
 # ── Base filters ───────────────────────────────────────────────────────────────
 mask = pd.Series([True] * len(df))
-if not show_archived:
-    if "is_active" in df.columns:
-        mask &= df["is_active"].fillna("True").astype(str).str.lower() != "false"
+if "is_active" in df.columns:
+    mask &= df["is_active"].fillna("True").astype(str).str.lower() != "false"
 if apply_scoring and buckets:
     mask &= df["bucket"].isin(buckets)
 if apply_scoring:
@@ -709,13 +707,14 @@ with search_col:
         label_visibility="collapsed",
     )
 
-p1, p2, p3, p4, p5 = st.columns(5)
+p1, p2, p3, p4, p5, p6 = st.columns(6)
 active = st.session_state.active_preset
 
 _n_coc      = len(base_filtered[base_filtered["coc_return_20pct"].notna() & (base_filtered["coc_return_20pct"] >= 0.20)])
 _n_500k     = len(base_filtered[base_filtered["asking_price"].notna() & (base_filtered["asking_price"] <= 500000)])
 _n_wl       = len(st.session_state.watchlist)
 _n_rejected = len(df[df["bucket"] == "AUTO-REJECT"])
+_n_archived = len(df[df["is_active"].fillna("True").astype(str).str.lower() == "false"]) if "is_active" in df.columns else 0
 
 def _preset(col, label, key):
     with col:
@@ -731,6 +730,7 @@ _preset(p2, f"Top Picks  ({_n_coc})",            "best_returns")
 _preset(p3, f"Under $500K  ({_n_500k})",         "under_500k")
 _preset(p4, f"Saved  ({_n_wl})",                 "watchlist")
 _preset(p5, f"Rejected  ({_n_rejected})",        "rejected")
+_preset(p6, f"Archived  ({_n_archived})",        "archived")
 
 # Category filter
 selected_categories = st.multiselect(
@@ -771,6 +771,11 @@ elif ap == "watchlist":
     filtered = filtered[filtered["id"].astype(str).isin(wl)]
 elif ap == "rejected":
     filtered = df[df["bucket"] == "AUTO-REJECT"].copy()
+elif ap == "archived":
+    if "is_active" in df.columns:
+        filtered = df[df["is_active"].fillna("True").astype(str).str.lower() == "false"].copy()
+    else:
+        filtered = df.iloc[0:0].copy()  # empty
 
 if ap != "best_returns":
     filtered = filtered.sort_values("score", ascending=False)
