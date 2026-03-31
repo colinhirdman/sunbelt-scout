@@ -52,42 +52,53 @@ def _has_next_page(html):
                 or re.search(r'>Next<', html, re.IGNORECASE))
 
 
-def _discover_listing_ids(cfg):
-    """
-    Paginate through all Minnesota search result pages collecting listing IDs.
-    Uses results= for page number and shownum= for page size.
-    """
-    base_url = cfg["base_url"]
-    delay    = cfg.get("rate_limit_delay", 3.0)
-    all_ids  = set()
-    page     = 1
+def _paginate_geography(base_url, geography, cfg):
+    """Paginate through all search result pages for a given geography, return all IDs found."""
+    delay   = cfg.get("rate_limit_delay", 3.0)
+    all_ids = set()
+    page    = 1
 
-    print("  Paginating through search results...")
     while True:
         params = {
-            "geography[0]": "Minnesota",
+            "geography[0]": geography,
             "shownum":      100,
             "results":      page,
         }
         time.sleep(delay)
         html = _get_with_retry(base_url, params=params, cfg=cfg)
         if not html:
-            print(f"  Page {page}: request failed, stopping.")
+            print(f"    [{geography}] Page {page}: request failed, stopping.")
             break
 
         ids = _extract_ids_from_html(html)
         if not ids:
-            print(f"  Page {page}: no listings found, stopping.")
+            print(f"    [{geography}] Page {page}: no listings found, stopping.")
             break
 
         new = ids - all_ids
         all_ids.update(ids)
-        print(f"  Page {page}: {len(ids)} listings ({len(new)} new) — {len(all_ids)} total")
+        print(f"    [{geography}] Page {page}: {len(ids)} listings ({len(new)} new) — {len(all_ids)} total")
 
         if not _has_next_page(html):
             break
 
         page += 1
+
+    return all_ids
+
+
+def _discover_listing_ids(cfg):
+    """
+    Paginate through Minnesota AND Undisclosed location listings to capture
+    all relevant IDs, including those where sellers hide their location.
+    """
+    base_url = cfg["base_url"]
+    all_ids  = set()
+
+    print("  Paginating through search results...")
+    for geography in ["Minnesota", "Undisclosed"]:
+        ids = _paginate_geography(base_url, geography, cfg)
+        all_ids.update(ids)
 
     print(f"  Discovered {len(all_ids)} unique listing IDs")
     return all_ids
