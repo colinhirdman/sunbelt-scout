@@ -28,6 +28,27 @@ def _save_watchlist(wl: set, added: str | None = None, removed: str | None = Non
     except Exception:
         pass
 
+def _load_overrides() -> dict:
+    """Returns {listing_id: {dimension: value}} from Supabase."""
+    try:
+        res = _get_supabase().table("profile_overrides").select("listing_id,dimension,value").execute()
+        out = {}
+        for r in res.data:
+            out.setdefault(r["listing_id"], {})[r["dimension"]] = r["value"]
+        return out
+    except Exception:
+        return {}
+
+def _save_override(listing_id: str, dimension: str, value: int) -> None:
+    try:
+        _get_supabase().table("profile_overrides").upsert({
+            "listing_id": listing_id,
+            "dimension":  dimension,
+            "value":      value,
+        }).execute()
+    except Exception:
+        pass
+
 # ── Category config ────────────────────────────────────────────────────────────
 
 TRADES_KEYWORDS = [
@@ -161,6 +182,17 @@ CATEGORY_CONFIG = {
     "Technology / IT":       {"keywords": TECHNOLOGY_KEYWORDS,   "emoji": "💻", "col": "is_technology",   "color": "#1E40AF", "bg": "#EFF6FF"},
     "Education & Childcare": {"keywords": EDUCATION_KEYWORDS,    "emoji": "🎓", "col": "is_education",    "color": "#9F1239", "bg": "#FFF1F2"},
     "Beauty & Wellness":     {"keywords": BEAUTY_KEYWORDS,       "emoji": "💇", "col": "is_beauty",       "color": "#86198F", "bg": "#FDF4FF"},
+}
+
+DIMENSIONS = {
+    "dim_ai_proof":      {"label": "AI-Proof",        "icon": "🤖"},
+    "dim_fun":           {"label": "Fun to Own",       "icon": "⭐"},
+    "dim_weather":       {"label": "Year-Round",       "icon": "☀️"},
+    "dim_labor":         {"label": "Manual Labor",     "icon": "🔧"},
+    "dim_recurring":     {"label": "Recurring Rev",    "icon": "🔁"},
+    "dim_absentee":      {"label": "Absentee",         "icon": "🏠"},
+    "dim_capital_light": {"label": "Capital Light",    "icon": "💡"},
+    "dim_scalable":      {"label": "Scalable",         "icon": "📈"},
 }
 
 BUCKET_COLOR = {
@@ -489,6 +521,8 @@ def load_data():
         "payoff_years_10pct", "payoff_years_20pct",
         "seller_note_amount", "seller_note_monthly", "seller_note_annual",
         "cf_during_standby", "cf_after_seller_financing", "dscr_seller_financed",
+        "dim_ai_proof", "dim_fun", "dim_weather", "dim_labor",
+        "dim_recurring", "dim_absentee", "dim_capital_light", "dim_scalable",
     ]
     for col in numeric_cols:
         if col in df.columns:
@@ -529,6 +563,7 @@ if df.empty:
 if "selected_id"   not in st.session_state: st.session_state.selected_id   = None
 if "watchlist"     not in st.session_state: st.session_state.watchlist     = _load_watchlist()
 if "active_preset" not in st.session_state: st.session_state.active_preset = None
+if "overrides"     not in st.session_state: st.session_state.overrides     = _load_overrides()
 
 
 # ── Helpers ────────────────────────────────────────────────────────────────────
@@ -555,6 +590,25 @@ def _score_color(score):
 
 def _bucket_cls(bucket):
     return {"SHORTLIST": "bb-shortlist", "REVIEW": "bb-review", "AUTO-REJECT": "bb-reject"}.get(bucket, "bb-skip")
+
+def _dim_score_color(v):
+    if v >= 3: return "#008A05"
+    if v >= 2: return "#C45C00"
+    return "#B0B0B0"
+
+def _effective_profile(row) -> dict:
+    """Return dimension scores with any manual overrides applied."""
+    lid = str(row.get("id", ""))
+    overrides = st.session_state.overrides.get(lid, {})
+    result = {}
+    for dim in DIMENSIONS:
+        raw = row.get(dim)
+        try:
+            raw = int(float(raw)) if raw not in (None, "", "nan") else 2
+        except (ValueError, TypeError):
+            raw = 2
+        result[dim] = overrides.get(dim, raw)
+    return result
 
 def _row_categories(row):
     return [(name, cfg) for name, cfg in CATEGORY_CONFIG.items() if row.get(cfg["col"])]
@@ -901,6 +955,42 @@ def render_detail_panel(row):
         st.markdown('<div class="dp-section">Scoring Signals</div>', unsafe_allow_html=True)
         st.info(str(reasons))
 
+    # ── Operator Profile ───────────────────────────────────────────────────────
+    st.markdown('<div class="dp-section">Operator Profile</div>', unsafe_allow_html=True)
+    lid     = str(row.get("id", ""))
+    profile = _effective_profile(row)
+
+    for dim, cfg in DIMENSIONS.items():
+        v  = profile[dim]
+        c  = _dim_score_color(v)
+        c1, c2 = st.columns([3, 2])
+        with c1:
+            st.markdown(
+                f'<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">'
+                f'<span style="font-size:13px">{cfg["icon"]}</span>'
+                f'<span style="font-size:12px;font-weight:600;color:#222222">{cfg["label"]}</span>'
+                f'</div>'
+                f'<div style="background:#EBEBEB;border-radius:4px;height:6px;margin-bottom:10px">'
+                f'<div style="width:{v/3*100:.0f}%;background:{c};height:6px;border-radius:4px"></div>'
+                f'</div>',
+                unsafe_allow_html=True,
+            )
+        with c2:
+            new_val = st.radio(
+                f"_{dim}",
+                options=[1, 2, 3],
+                index=v - 1,
+                horizontal=True,
+                label_visibility="collapsed",
+                key=f"prof_{lid}_{dim}",
+            )
+            if new_val != v:
+                overrides = dict(st.session_state.overrides)
+                overrides.setdefault(lid, {})[dim] = new_val
+                st.session_state.overrides = overrides
+                _save_override(lid, dim, new_val)
+                st.rerun()
+
     # Description
     desc = row.get("description", "")
     if desc and str(desc) != "nan":
@@ -1035,6 +1125,63 @@ def render_table(rows):
         st.rerun()
 
 
+# ── Profile column view renderer ───────────────────────────────────────────────
+def render_profile_view(rows):
+    selected_id = st.session_state.selected_id
+
+    dim_keys   = list(DIMENSIONS.keys())
+    dim_labels = [f"{DIMENSIONS[d]['icon']} {DIMENSIONS[d]['label']}" for d in dim_keys]
+
+    # Header
+    header_html = (
+        '<div style="display:grid;grid-template-columns:2fr 1fr ' + ' '.join(['80px'] * 8) + ';'
+        'gap:8px;padding:8px 12px;background:#F7F7F7;border-radius:12px 12px 0 0;'
+        'font-size:11px;font-weight:700;color:#717171;text-transform:uppercase;letter-spacing:0.3px;'
+        'border:1px solid #EBEBEB;border-bottom:none;margin-bottom:0">'
+        '<div>Business</div><div>Price</div>'
+        + "".join(f'<div style="text-align:center">{lbl}</div>' for lbl in dim_labels)
+        + '</div>'
+    )
+    st.markdown(header_html, unsafe_allow_html=True)
+
+    for _, row in rows.iterrows():
+        lid      = str(row.get("id", ""))
+        title    = row.get("title", "Untitled")
+        asking   = row.get("asking_price")
+        is_sel   = str(selected_id) == lid
+        profile  = _effective_profile(row)
+
+        def _dot(v):
+            c = _dim_score_color(v)
+            return (f'<div style="display:flex;align-items:center;justify-content:center">'
+                    f'<div style="width:28px;height:28px;border-radius:50%;background:{c}22;'
+                    f'color:{c};font-size:11px;font-weight:800;display:flex;align-items:center;'
+                    f'justify-content:center">{v}</div></div>')
+
+        dots = "".join(_dot(profile[d]) for d in dim_keys)
+        bg   = "#FFF8F9" if is_sel else "white"
+        bl   = "#FF385C" if is_sel else "#EBEBEB"
+
+        row_html = (
+            f'<div style="display:grid;grid-template-columns:2fr 1fr ' + ' '.join(['80px'] * 8) + ';'
+            f'gap:8px;padding:10px 12px;background:{bg};'
+            f'border:1px solid #EBEBEB;border-left:4px solid {bl};border-bottom:none;'
+            f'align-items:center">'
+            f'<div style="font-size:13px;font-weight:600;color:#222222">{title}</div>'
+            f'<div style="font-size:13px;font-weight:700;color:#222222">{_fmt(asking, "$M")}</div>'
+            f'{dots}'
+            f'</div>'
+        )
+        st.markdown(row_html, unsafe_allow_html=True)
+
+        if st.button("View →", key=f"pv_{lid}", use_container_width=True):
+            st.session_state.selected_id = None if is_sel else lid
+            st.rerun()
+
+    # Close border
+    st.markdown('<div style="height:4px;background:#F7F7F7;border:1px solid #EBEBEB;border-top:none;border-radius:0 0 12px 12px"></div>', unsafe_allow_html=True)
+
+
 # ── Pipeline chart (always visible, above list) ─────────────────────────────────
 with st.expander("Pipeline Overview", expanded=False):
     chart_df = filtered[filtered["asking_price"].notna() & filtered["annual_cash_flow"].notna()].copy()
@@ -1059,7 +1206,7 @@ with st.expander("Pipeline Overview", expanded=False):
         st.plotly_chart(fig, use_container_width=True)
 
 # ── Main layout ────────────────────────────────────────────────────────────────
-view_mode = st.radio("View", ["List", "Table"], horizontal=True, label_visibility="collapsed")
+view_mode = st.radio("View", ["List", "Table", "Profile"], horizontal=True, label_visibility="collapsed")
 
 if len(filtered) == 0:
     st.info("No listings match the current filters.")
@@ -1081,6 +1228,8 @@ with list_col:
 
     if view_mode == "List":
         render_deal_list(filtered)
+    elif view_mode == "Profile":
+        render_profile_view(filtered)
     else:
         render_table(filtered)
 
