@@ -630,6 +630,7 @@ with st.sidebar.expander("More filters"):
     min_coc   = st.sidebar.slider("Min CoC Return (20% down)", 0, 200, 0, format="%d%%")
     twin_cities_only = st.sidebar.checkbox("Twin Cities Only")
     absentee_only    = st.sidebar.checkbox("Absentee / Semi-Absentee Only")
+    show_archived    = st.sidebar.checkbox("Show archived (delisted)", value=False)
     st.markdown("---")
     apply_scoring = st.sidebar.checkbox("Filter by score", value=False)
     if apply_scoring:
@@ -649,6 +650,9 @@ if not apply_scoring:
 
 # ── Base filters ───────────────────────────────────────────────────────────────
 mask = pd.Series([True] * len(df))
+if not show_archived:
+    # Treat missing is_active (pre-archive rows) as active
+    mask &= df["is_active"].fillna("True").astype(str).str.lower() != "false"
 if apply_scoring and buckets:
     mask &= df["bucket"].isin(buckets)
 if apply_scoring:
@@ -788,6 +792,11 @@ def render_detail_panel(row):
     rev      = row.get("annual_revenue")
     emps     = row.get("employees")
     absentee = row.get("absentee", "No")
+
+    is_active = str(row.get("is_active", "True")).lower() != "false"
+    if not is_active:
+        last_seen = row.get("last_seen", "")
+        st.warning(f"This listing is no longer active on Sunbelt. Last seen: {str(last_seen)[:10] if last_seen else 'unknown'}")
 
     col_close, col_link = st.columns([1, 1])
     with col_close:

@@ -23,7 +23,8 @@ def main():
         l["narrative"] = generate_narrative(l)
         scored.append(l)
 
-    upsert_rows(scored)
+    active_ids = {l["id"] for l in listings}
+    upsert_rows(scored, active_ids=active_ids)
 
     for l in new_listings:
         seen.add(l["id"])

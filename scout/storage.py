@@ -18,7 +18,7 @@ FIELDNAMES = [
     "sba_available", "listing_agent", "narrative",
     "dim_ai_proof", "dim_fun", "dim_weather", "dim_labor",
     "dim_recurring", "dim_absentee", "dim_capital_light", "dim_scalable",
-    "last_seen",
+    "last_seen", "is_active",
 ]
 
 
@@ -46,7 +46,7 @@ def _num(val):
     return str(val)
 
 
-def upsert_rows(rows: list[dict]):
+def upsert_rows(rows: list[dict], active_ids: set | None = None):
     out = _base() / "output"
     out.mkdir(parents=True, exist_ok=True)
     p = out / "candidates.csv"
@@ -109,7 +109,14 @@ def upsert_rows(rows: list[dict]):
             "dim_capital_light": _num(r.get("dim_capital_light")),
             "dim_scalable":      _num(r.get("dim_scalable")),
             "last_seen": datetime.utcnow().isoformat(),
+            "is_active": "True",
         }
+
+    # Mark rows no longer in the current scrape as inactive
+    if active_ids is not None:
+        for rid, row in existing.items():
+            if rid not in active_ids:
+                row["is_active"] = "False"
 
     with p.open("w", newline="", encoding="utf-8") as f:
         w = csv.DictWriter(f, fieldnames=FIELDNAMES)
