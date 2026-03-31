@@ -651,8 +651,8 @@ if not apply_scoring:
 # ── Base filters ───────────────────────────────────────────────────────────────
 mask = pd.Series([True] * len(df))
 if not show_archived:
-    # Treat missing is_active (pre-archive rows) as active
-    mask &= df["is_active"].fillna("True").astype(str).str.lower() != "false"
+    if "is_active" in df.columns:
+        mask &= df["is_active"].fillna("True").astype(str).str.lower() != "false"
 if apply_scoring and buckets:
     mask &= df["bucket"].isin(buckets)
 if apply_scoring:
