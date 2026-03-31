@@ -1,6 +1,6 @@
 from scout.fetch import fetch_all_listings
 from scout.parse import parse_listings
-from scout.score import score_listing
+from scout.score import score_listing, profile_score
 from scout.narrative import generate_narrative
 from scout.storage import load_state, save_state, upsert_rows
 from scout.report import write_report
@@ -19,6 +19,7 @@ def main():
     for l in new_listings:
         s = score_listing(l)
         l.update(s)
+        l.update(profile_score(l))
         l["narrative"] = generate_narrative(l)
         scored.append(l)
 

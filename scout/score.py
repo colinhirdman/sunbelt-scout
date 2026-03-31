@@ -206,3 +206,201 @@ def score_listing(l: dict) -> dict:
         bucket = "SKIP"
 
     return {"score": score, "bucket": bucket, "reasons": reasons, "absentee": absentee}
+
+
+# ── Profile scoring (8 operator-fit dimensions, 1–3 scale) ─────────────────────
+
+def profile_score(l: dict) -> dict:
+    """
+    Score a listing on 8 operator-fit dimensions, each 1–3.
+    1 = low / unfavorable, 2 = moderate, 3 = high / favorable.
+    """
+    title    = (l.get("title")       or "").lower()
+    desc     = (l.get("description") or "").lower()
+    industry = (l.get("industry")    or "").lower()
+    ctx = f"{title} {desc} {industry}"
+
+    absentee = l.get("absentee", "No")
+
+    # ── AI-Proof ───────────────────────────────────────────────────────────────
+    # 3 = physical/hands-on (very hard to automate)
+    # 2 = mixed
+    # 1 = knowledge/digital (automatable)
+    _ai_proof_high = [
+        "plumb", "electrical", "electrician", "hvac", "heating", "cooling",
+        "roofing", "roofer", "concrete", "masonry", "welding", "welder",
+        "auto repair", "auto body", "collision", "mechanic", "tire",
+        "landscaping", "lawn care", "snow removal", "excavat",
+        "pest control", "restoration", "physical therapy", "chiropractic",
+        "dental", "veterinar", "home health", "senior care", "elder care",
+        "construction", "flooring", "painting contractor", "insulation",
+        "septic", "drain", "refrigeration", "towing",
+    ]
+    _ai_proof_low = [
+        "accounting", "bookkeeping", "tax preparation", "financial planning",
+        "insurance agency", "staffing", "consulting", "digital", "software",
+        "it service", "managed service", "web design", "marketing agency",
+        "payroll", "mortgage", "lending",
+    ]
+    if any(kw in ctx for kw in _ai_proof_high):
+        dim_ai_proof = 3
+    elif any(kw in ctx for kw in _ai_proof_low):
+        dim_ai_proof = 1
+    else:
+        dim_ai_proof = 2
+
+    # ── Fun ────────────────────────────────────────────────────────────────────
+    # 3 = consumer-facing, entertaining, hospitality, retail
+    # 2 = some customer interaction
+    # 1 = back-office, industrial, B2B only
+    _fun_high = [
+        "restaurant", "bar ", "brewery", "brewpub", "cafe", "coffee",
+        "retail", "boutique", "gift shop", "clothing", "pet store",
+        "salon", "spa", "fitness", "gym", "yoga", "crossfit",
+        "hotel", "motel", "resort", "lodge", "bed and breakfast",
+        "entertainment", "recreation", "arcade", "bowling",
+        "bakery", "donut", "food truck", "catering",
+        "florist", "flower", "toy store", "book store",
+        "childcare", "daycare", "dance studio", "martial arts",
+        "veterinar", "animal hospital",
+    ]
+    _fun_low = [
+        "manufacturing", "fabrication", "machining", "industrial",
+        "distribution", "warehouse", "trucking", "freight", "wholesale",
+        "staffing", "payroll", "accounting", "bookkeeping", "tax",
+        "b2b", "commercial only", "government contract",
+    ]
+    if any(kw in ctx for kw in _fun_high):
+        dim_fun = 3
+    elif any(kw in ctx for kw in _fun_low):
+        dim_fun = 1
+    else:
+        dim_fun = 2
+
+    # ── Weather Dependent ──────────────────────────────────────────────────────
+    # 3 = year-round (good), 2 = some seasonality, 1 = highly seasonal (risky)
+    _weather_high = [
+        "lawn care", "lawn service", "landscaping", "landscape",
+        "snow removal", "snow plow", "irrigation", "sprinkler",
+        "outdoor construction", "excavat", "outdoor",
+        "tree service", "tree removal", "leaf removal",
+        "pressure wash", "deck", "fence install",
+        "swimming pool", "seasonal",
+    ]
+    _weather_low = [
+        "hvac", "plumbing", "electrical", "healthcare", "medical",
+        "dental", "retail", "restaurant", "cleaning", "janitorial",
+        "accounting", "manufacturing", "distribution", "trucking",
+        "auto repair", "home health", "senior care",
+    ]
+    if any(kw in ctx for kw in _weather_high):
+        dim_weather = 1
+    elif any(kw in ctx for kw in _weather_low):
+        dim_weather = 3
+    else:
+        dim_weather = 2
+
+    # ── Manual Labor ───────────────────────────────────────────────────────────
+    # 3 = heavy physical workforce, 2 = mixed, 1 = knowledge/light
+    _labor_high = [
+        "plumb", "electrical", "hvac", "roofing", "concrete", "masonry",
+        "landscaping", "excavat", "construction", "manufacturing",
+        "fabrication", "welding", "moving", "trucking", "distribution",
+        "warehouse", "janitorial", "cleaning service", "pest control",
+        "auto repair", "auto body", "towing", "insulation", "painting contractor",
+    ]
+    _labor_low = [
+        "accounting", "bookkeeping", "financial", "insurance", "consulting",
+        "staffing", "software", "it service", "managed service",
+        "real estate", "mortgage", "tax preparation",
+    ]
+    if any(kw in ctx for kw in _labor_high):
+        dim_labor = 3
+    elif any(kw in ctx for kw in _labor_low):
+        dim_labor = 1
+    else:
+        dim_labor = 2
+
+    # ── Recurring Revenue ──────────────────────────────────────────────────────
+    # 3 = strong recurring, 2 = some, 1 = transactional
+    _recurring_strong = [
+        "service contract", "maintenance agreement", "recurring revenue",
+        "annual contract", "subscription", "retainer", "route based",
+        "route-based", "service route", "maintenance plan",
+        "managed service", "membership",
+    ]
+    _recurring_some = [
+        "repeat customer", "loyal customer", "repeat business",
+        "established clientele", "long-term client", "regular customer",
+    ]
+    count_strong = sum(1 for kw in _recurring_strong if kw in ctx)
+    count_some   = sum(1 for kw in _recurring_some   if kw in ctx)
+    if count_strong >= 1:
+        dim_recurring = 3
+    elif count_some >= 1:
+        dim_recurring = 2
+    else:
+        dim_recurring = 1
+
+    # ── Absentee-Friendly ──────────────────────────────────────────────────────
+    # 3 = likely absentee, 2 = possible, 1 = owner-operated
+    if absentee == "Likely":
+        dim_absentee = 3
+    elif absentee == "Possible":
+        dim_absentee = 2
+    else:
+        dim_absentee = 1
+
+    # ── Capital Light ──────────────────────────────────────────────────────────
+    # 3 = minimal assets/inventory, 2 = moderate, 1 = heavy assets
+    _capital_heavy = [
+        "manufacturing", "fabrication", "machining", "equipment intensive",
+        "heavy equipment", "fleet", "trucking", "warehouse", "distribution",
+        "real estate included", "building included", "inventory",
+        "restaurant", "food service",  # high equipment + leasehold
+    ]
+    _capital_light = [
+        "service-based", "no inventory", "home-based", "home based",
+        "cleaning", "janitorial", "staffing", "consulting", "accounting",
+        "bookkeeping", "lawn care", "pest control", "home health",
+        "elder care", "senior care", "tutoring", "coaching",
+    ]
+    if any(kw in ctx for kw in _capital_light):
+        dim_capital_light = 3
+    elif any(kw in ctx for kw in _capital_heavy):
+        dim_capital_light = 1
+    else:
+        dim_capital_light = 2
+
+    # ── Scalable ───────────────────────────────────────────────────────────────
+    # 3 = easy to add locations/routes/units, 2 = some potential, 1 = owner-capped
+    _scalable_high = [
+        "multiple location", "multi-location", "additional location",
+        "scalable", "franchise", "route", "territory",
+        "cleaning", "janitorial", "lawn care", "pest control",
+        "staffing", "home health", "elder care", "tutoring",
+        "systems in place", "process driven", "documented process",
+        "turnkey", "replicable",
+    ]
+    _scalable_low = [
+        "owner operator", "sole proprietor", "owner-operated",
+        "boutique", "bespoke", "custom", "artisan",
+        "single location", "one location",
+    ]
+    if any(kw in ctx for kw in _scalable_high):
+        dim_scalable = 3
+    elif any(kw in ctx for kw in _scalable_low):
+        dim_scalable = 1
+    else:
+        dim_scalable = 2
+
+    return {
+        "dim_ai_proof":      dim_ai_proof,
+        "dim_fun":           dim_fun,
+        "dim_weather":       dim_weather,
+        "dim_labor":         dim_labor,
+        "dim_recurring":     dim_recurring,
+        "dim_absentee":      dim_absentee,
+        "dim_capital_light": dim_capital_light,
+        "dim_scalable":      dim_scalable,
+    }

@@ -16,6 +16,8 @@ FIELDNAMES = [
     "score", "bucket", "absentee", "reasons", "is_trades",
     "years_in_business", "is_franchise", "reason_for_selling",
     "sba_available", "listing_agent", "narrative",
+    "dim_ai_proof", "dim_fun", "dim_weather", "dim_labor",
+    "dim_recurring", "dim_absentee", "dim_capital_light", "dim_scalable",
     "last_seen",
 ]
 
@@ -98,6 +100,14 @@ def upsert_rows(rows: list[dict]):
             "sba_available": r.get("sba_available", ""),
             "listing_agent": r.get("listing_agent", ""),
             "narrative": r.get("narrative", ""),
+            "dim_ai_proof":      _num(r.get("dim_ai_proof")),
+            "dim_fun":           _num(r.get("dim_fun")),
+            "dim_weather":       _num(r.get("dim_weather")),
+            "dim_labor":         _num(r.get("dim_labor")),
+            "dim_recurring":     _num(r.get("dim_recurring")),
+            "dim_absentee":      _num(r.get("dim_absentee")),
+            "dim_capital_light": _num(r.get("dim_capital_light")),
+            "dim_scalable":      _num(r.get("dim_scalable")),
             "last_seen": datetime.utcnow().isoformat(),
         }
 
