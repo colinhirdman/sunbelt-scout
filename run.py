@@ -10,7 +10,7 @@ def main():
     state = load_state()
     seen = set(state.get("seen_ids", []))
 
-    raw = fetch_all_listings()
+    raw, discovered_ids = fetch_all_listings()
     listings = parse_listings(raw)
 
     new_listings = [l for l in listings if l["id"] not in seen]
@@ -23,8 +23,8 @@ def main():
         l["narrative"] = generate_narrative(l)
         scored.append(l)
 
-    active_ids = {l["id"] for l in listings}
-    upsert_rows(scored, active_ids=active_ids)
+    # Use full discovered ID set so non-MN listings don't get incorrectly archived
+    upsert_rows(scored, active_ids=discovered_ids)
 
     for l in new_listings:
         seen.add(l["id"])

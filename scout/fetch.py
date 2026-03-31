@@ -226,4 +226,5 @@ def fetch_all_listings():
             print(f"  [{i+1}/{len(ids)}] fetched...")
 
     print(f"  Fetched {len(listings)} Minnesota listings")
-    return listings
+    # Return listings + full discovered ID set so caller can mark inactive correctly
+    return listings, ids
