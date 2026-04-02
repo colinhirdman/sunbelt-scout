@@ -1036,8 +1036,8 @@ def render_deal_list(rows):
         bucket   = str(row.get("bucket", "SKIP"))
         score    = int(row.get("score", 0))
         title    = row.get("title", "Untitled")
-        location = row.get("location", "") or ""
-        industry = row.get("industry", "") or ""
+        location = str(row.get("location") or "")
+        industry = str(row.get("industry") or "")
         asking   = row.get("asking_price")
         cf       = row.get("annual_cash_flow")
         coc      = row.get("coc_return_20pct")
