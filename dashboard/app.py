@@ -723,11 +723,11 @@ with search_col:
 p1, p2, p3, p4, p5, p6 = st.columns(6)
 active = st.session_state.active_preset
 
-_n_coc      = len(base_filtered[base_filtered["coc_return_20pct"].notna() & (base_filtered["coc_return_20pct"] >= 0.20)])
-_n_500k     = len(base_filtered[base_filtered["asking_price"].notna() & (base_filtered["asking_price"] <= 500000)])
-_n_wl       = len(st.session_state.watchlist)
-_n_rejected = len(df[df["bucket"] == "AUTO-REJECT"])
-_n_archived = len(df[df["is_active"].fillna("True").astype(str).str.lower() == "false"]) if "is_active" in df.columns else 0
+_n_coc          = len(base_filtered[base_filtered["coc_return_20pct"].notna() & (base_filtered["coc_return_20pct"] >= 0.20)])
+_n_opportunities = len(df[df["description"].fillna("").astype(str).str.strip() != ""])
+_n_wl           = len(st.session_state.watchlist)
+_n_rejected     = len(df[df["bucket"] == "AUTO-REJECT"])
+_n_archived     = len(df[df["is_active"].fillna("True").astype(str).str.lower() == "false"]) if "is_active" in df.columns else 0
 
 def _preset(col, label, key):
     with col:
@@ -738,11 +738,11 @@ def _preset(col, label, key):
             st.session_state.active_preset = None if is_active else key
             st.rerun()
 
-_preset(p1, f"All  ({len(base_filtered)})",      "all")
-_preset(p2, f"Top Picks  ({_n_coc})",            "best_returns")
-_preset(p3, f"Under $500K  ({_n_500k})",         "under_500k")
-_preset(p4, f"Saved  ({_n_wl})",                 "watchlist")
-_preset(p5, f"Rejected  ({_n_rejected})",        "rejected")
+_preset(p1, f"All  ({len(base_filtered)})",           "all")
+_preset(p2, f"Top Picks  ({_n_coc})",               "best_returns")
+_preset(p3, f"Opportunities  ({_n_opportunities})",  "opportunities")
+_preset(p4, f"Saved  ({_n_wl})",                    "watchlist")
+_preset(p5, f"Rejected  ({_n_rejected})",           "rejected")
 _preset(p6, f"Archived  ({_n_archived})",        "archived")
 
 # Category filter
@@ -781,8 +781,8 @@ ap = st.session_state.active_preset
 if ap == "best_returns":
     filtered = filtered[filtered["coc_return_20pct"].notna() & (filtered["coc_return_20pct"] >= 0.20)]
     filtered = filtered.sort_values("coc_return_20pct", ascending=False)
-elif ap == "under_500k":
-    filtered = filtered[filtered["asking_price"].notna() & (filtered["asking_price"] <= 500000)]
+elif ap == "opportunities":
+    filtered = df[df["description"].fillna("").astype(str).str.strip() != ""].copy()
 elif ap == "watchlist":
     wl = st.session_state.watchlist
     filtered = filtered[filtered["id"].astype(str).isin(wl)]
