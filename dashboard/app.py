@@ -823,7 +823,9 @@ def render_detail_panel(row):
             st.rerun()
     with col_link:
         if url and str(url) != "nan":
-            st.link_button("View on Sunbelt →", url, use_container_width=True)
+            source = str(row.get("source") or "sunbelt").lower()
+            site_label = "Calhoun" if source == "calhoun" else "Sunbelt"
+            st.link_button(f"View on {site_label} →", url, use_container_width=True)
 
     sc            = _score_color(score)
     bclass        = _bucket_cls(bucket)
