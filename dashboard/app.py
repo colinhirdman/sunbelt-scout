@@ -819,6 +819,11 @@ def render_detail_panel(row):
         last_seen = row.get("last_seen", "")
         st.warning(f"This listing is no longer active on Sunbelt. Last seen: {str(last_seen)[:10] if last_seen else 'unknown'}")
 
+    description  = str(row.get("description") or "")
+    has_pdf      = bool(description and description != "nan")
+    listing_agent = str(row.get("listing_agent") or "")
+    if listing_agent == "nan": listing_agent = ""
+
     col_close, col_link = st.columns([1, 1])
     with col_close:
         if st.button("✕ Close", key="close_panel", use_container_width=True):
@@ -845,6 +850,24 @@ def render_detail_panel(row):
   </div>
 </div>
 """, unsafe_allow_html=True)
+
+    # ── PDF badge + Business Overview ──────────────────────────────────────────
+    if has_pdf:
+        agent_str = f" · {listing_agent}" if listing_agent else ""
+        st.markdown(
+            f'<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;'
+            f'padding:8px 12px;background:#7C3AED0D;border-radius:10px;border:1px solid #7C3AED22">'
+            f'<span style="font-size:13px">📄</span>'
+            f'<span style="font-size:12px;font-weight:700;color:#7C3AED">PDF Reviewed</span>'
+            f'<span style="font-size:11px;color:#717171">{agent_str}</span>'
+            f'</div>',
+            unsafe_allow_html=True,
+        )
+        st.markdown('<div class="dp-section">Business Overview</div>', unsafe_allow_html=True)
+        st.markdown(
+            f'<div style="font-size:13px;line-height:1.7;color:#334155;padding:4px 0 12px">{description}</div>',
+            unsafe_allow_html=True,
+        )
 
     # ── Deal Summary FIRST ──────────────────────────────────────────────────────
     narrative = row.get("narrative", "")
@@ -960,9 +983,10 @@ def render_detail_panel(row):
     d1.metric("Industry",        row.get("industry", "—") or "—")
     d2.metric("Years Operating", row.get("years_in_business", "—") or "—")
     d3.metric("Franchise?",      row.get("is_franchise", "—") or "—")
-    d4, d5 = st.columns(2)
+    d4, d5, d6 = st.columns(3)
     d4.metric("SBA Pre-Approved?", row.get("sba_available", "—") or "—")
     d5.metric("Real Estate",       row.get("real_estate", "—") or "—")
+    d6.metric("Listing Agent",     listing_agent or "—")
 
     reason = row.get("reason_for_selling", "") or ""
     if reason and str(reason) != "nan":
@@ -1023,12 +1047,6 @@ def render_detail_panel(row):
                 _save_override(lid, dim, new_val)
                 st.rerun()
 
-    # Description
-    desc = row.get("description", "")
-    if desc and str(desc) != "nan":
-        with st.expander("📄 Full Listing Description"):
-            st.markdown(f'<div style="font-size:13px;line-height:1.65;color:#334155">{desc}</div>',
-                        unsafe_allow_html=True)
 
 
 # ── Deal list renderer ─────────────────────────────────────────────────────────
@@ -1074,6 +1092,10 @@ def render_deal_list(rows):
                        f'border-radius:6px;background:{source_color}18;color:{source_color}">'
                        f'{source_label}</span>')
 
+        has_pdf = bool(row.get("description") and str(row.get("description")) not in ("", "nan"))
+        pdf_html = ('<span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:6px;'
+                    'background:#7C3AED18;color:#7C3AED">📄 Reviewed</span>') if has_pdf else ""
+
         coc_html = (f'<span class="coc-badge">CoC {_fmt(coc, "%")}</span>'
                     if coc and not (isinstance(coc, float) and pd.isna(coc)) else "")
         cf_html  = (f'<span class="cf-badge">CF {_fmt(cf, "$M")}</span>'
@@ -1095,6 +1117,7 @@ def render_deal_list(rows):
             f'<span class="cat-tag" style="background:{cat_cfg["bg"]};color:{cat_cfg["color"]}">'
             f'{cat_name}</span>'
             f'{source_html}'
+            f'{pdf_html}'
             f'{score_pill_html}'
             f'</div>'
             f'</div>'
