@@ -758,11 +758,14 @@ filtered = base_filtered.copy()
 
 if search_query:
     q = search_query.lower()
+    def _search_col(df, col):
+        return df[col].fillna("").astype(str).str.lower().str.contains(q, na=False)
+
     smask = (
-        filtered["title"].str.lower().str.contains(q, na=False)
-        | filtered.get("industry", pd.Series(dtype=str)).str.lower().str.contains(q, na=False)
-        | filtered["location"].str.lower().str.contains(q, na=False)
-        | filtered.get("description", pd.Series(dtype=str)).str.lower().str.contains(q, na=False)
+        _search_col(filtered, "title")
+        | _search_col(filtered, "industry")
+        | _search_col(filtered, "location")
+        | _search_col(filtered, "description")
     )
     filtered = filtered[smask]
 
