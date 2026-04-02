@@ -762,7 +762,8 @@ if search_query:
         return df[col].fillna("").astype(str).str.lower().str.contains(q, na=False)
 
     smask = (
-        _search_col(filtered, "title")
+        _search_col(filtered, "id")
+        | _search_col(filtered, "title")
         | _search_col(filtered, "industry")
         | _search_col(filtered, "location")
         | _search_col(filtered, "description")
