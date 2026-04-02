@@ -3,6 +3,10 @@ import csv
 from pathlib import Path
 from datetime import datetime
 
+_BASE = Path(__file__).resolve().parents[1]
+SUNBELT_CSV = _BASE / "output" / "sunbelt.csv"
+CALHOUN_CSV = _BASE / "output" / "calhoun.csv"
+
 FIELDNAMES = [
     "id", "title", "url", "industry", "location",
     "asking_price", "asking_price_text",
@@ -18,12 +22,12 @@ FIELDNAMES = [
     "sba_available", "listing_agent", "narrative",
     "dim_ai_proof", "dim_fun", "dim_weather", "dim_labor",
     "dim_recurring", "dim_absentee", "dim_capital_light", "dim_scalable",
-    "last_seen", "is_active",
+    "last_seen", "is_active", "source",
 ]
 
 
 def _base():
-    return Path(__file__).resolve().parents[1]
+    return _BASE
 
 
 def load_state():
@@ -46,10 +50,11 @@ def _num(val):
     return str(val)
 
 
-def upsert_rows(rows: list[dict], active_ids=None):
-    out = _base() / "output"
-    out.mkdir(parents=True, exist_ok=True)
-    p = out / "candidates.csv"
+def upsert_rows(rows: list[dict], active_ids=None, csv_path=None):
+    if csv_path is None:
+        csv_path = SUNBELT_CSV
+    p = Path(csv_path)
+    p.parent.mkdir(parents=True, exist_ok=True)
 
     existing = {}
     if p.exists():
@@ -110,6 +115,7 @@ def upsert_rows(rows: list[dict], active_ids=None):
             "dim_scalable":      _num(r.get("dim_scalable")),
             "last_seen": datetime.utcnow().isoformat(),
             "is_active": "True",
+            "source":    r.get("source", ""),
         }
 
     # Mark rows no longer in the current scrape as inactive

@@ -8,7 +8,7 @@ from datetime import datetime
 from scout.score import profile_score
 from scout.storage import FIELDNAMES
 
-CSV_PATH = Path(__file__).parent / "output" / "candidates.csv"
+CSV_PATH = Path(__file__).parent / "output" / "sunbelt.csv"
 
 
 def main():

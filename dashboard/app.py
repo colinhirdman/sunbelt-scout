@@ -209,7 +209,9 @@ BUCKET_DISPLAY = {
     "AUTO-REJECT": "Skip",
 }
 
-CSV_PATH = Path(__file__).resolve().parents[1] / "output" / "candidates.csv"
+_OUTPUT = Path(__file__).resolve().parents[1] / "output"
+SUNBELT_CSV = _OUTPUT / "sunbelt.csv"
+CALHOUN_CSV = _OUTPUT / "calhoun.csv"
 
 st.set_page_config(page_title="Sunbelt Scout", layout="wide", page_icon="🏢")
 
@@ -506,9 +508,17 @@ hr { border-color: #EBEBEB !important; margin: 16px 0 !important; }
 # ── Data loading ───────────────────────────────────────────────────────────────
 @st.cache_data(ttl=300)
 def load_data():
-    if not CSV_PATH.exists():
+    frames = []
+    for source_name, path in [("sunbelt", SUNBELT_CSV), ("calhoun", CALHOUN_CSV)]:
+        if not path.exists():
+            continue
+        part = pd.read_csv(path)
+        if "source" not in part.columns or part["source"].isna().all():
+            part["source"] = source_name
+        frames.append(part)
+    if not frames:
         return pd.DataFrame()
-    df = pd.read_csv(CSV_PATH)
+    df = pd.concat(frames, ignore_index=True)
     df["score"] = pd.to_numeric(df["score"], errors="coerce").fillna(0).astype(int)
 
     numeric_cols = [
@@ -630,6 +640,7 @@ with st.sidebar.expander("More filters"):
     min_coc   = st.sidebar.slider("Min CoC Return (20% down)", 0, 200, 0, format="%d%%")
     twin_cities_only = st.sidebar.checkbox("Twin Cities Only")
     absentee_only    = st.sidebar.checkbox("Absentee / Semi-Absentee Only")
+    source_filter    = st.sidebar.radio("Source", ["All", "Sunbelt", "Calhoun"], horizontal=True)
     st.markdown("---")
     apply_scoring = st.sidebar.checkbox("Filter by score", value=False)
     if apply_scoring:
@@ -651,6 +662,8 @@ if not apply_scoring:
 mask = pd.Series([True] * len(df))
 if "is_active" in df.columns:
     mask &= df["is_active"].fillna("True").astype(str).str.lower() != "false"
+if source_filter != "All":
+    mask &= df["source"].fillna("").str.lower() == source_filter.lower()
 if apply_scoring and buckets:
     mask &= df["bucket"].isin(buckets)
 if apply_scoring:
@@ -1049,6 +1062,13 @@ def render_deal_list(rows):
         if industry and industry != "nan": meta_parts.append(industry)
         meta_str = "  ·  ".join(meta_parts)
 
+        source = str(row.get("source", "sunbelt") or "sunbelt").lower()
+        source_label = "Calhoun" if source == "calhoun" else "Sunbelt"
+        source_color = "#0066CC" if source == "calhoun" else "#FF385C"
+        source_html = (f'<span style="font-size:10px;font-weight:700;padding:2px 6px;'
+                       f'border-radius:6px;background:{source_color}18;color:{source_color}">'
+                       f'{source_label}</span>')
+
         coc_html = (f'<span class="coc-badge">CoC {_fmt(coc, "%")}</span>'
                     if coc and not (isinstance(coc, float) and pd.isna(coc)) else "")
         cf_html  = (f'<span class="cf-badge">CF {_fmt(cf, "$M")}</span>'
@@ -1069,6 +1089,7 @@ def render_deal_list(rows):
             f'{cf_html}'
             f'<span class="cat-tag" style="background:{cat_cfg["bg"]};color:{cat_cfg["color"]}">'
             f'{cat_name}</span>'
+            f'{source_html}'
             f'{score_pill_html}'
             f'</div>'
             f'</div>'
