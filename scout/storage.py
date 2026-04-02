@@ -22,7 +22,7 @@ FIELDNAMES = [
     "sba_available", "listing_agent", "narrative", "description",
     "dim_ai_proof", "dim_fun", "dim_weather", "dim_labor",
     "dim_recurring", "dim_absentee", "dim_capital_light", "dim_scalable",
-    "last_seen", "is_active", "source",
+    "last_seen", "is_active", "source", "has_pdf",
 ]
 
 
@@ -117,6 +117,7 @@ def upsert_rows(rows: list[dict], active_ids=None, csv_path=None):
             "last_seen": datetime.utcnow().isoformat(),
             "is_active": "True",
             "source":    r.get("source", ""),
+            "has_pdf":   existing.get(r.get("id", ""), {}).get("has_pdf", "False"),
         }
 
     # Mark rows no longer in the current scrape as inactive

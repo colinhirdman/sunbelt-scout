@@ -724,7 +724,7 @@ p1, p2, p3, p4, p5, p6 = st.columns(6)
 active = st.session_state.active_preset
 
 _n_coc          = len(base_filtered[base_filtered["coc_return_20pct"].notna() & (base_filtered["coc_return_20pct"] >= 0.20)])
-_n_opportunities = len(df[df["description"].fillna("").astype(str).str.strip() != ""])
+_n_opportunities = len(df[df["has_pdf"].fillna("False").astype(str).str.lower() == "true"]) if "has_pdf" in df.columns else 0
 _n_wl           = len(st.session_state.watchlist)
 _n_rejected     = len(df[df["bucket"] == "AUTO-REJECT"])
 _n_archived     = len(df[df["is_active"].fillna("True").astype(str).str.lower() == "false"]) if "is_active" in df.columns else 0
@@ -782,7 +782,10 @@ if ap == "best_returns":
     filtered = filtered[filtered["coc_return_20pct"].notna() & (filtered["coc_return_20pct"] >= 0.20)]
     filtered = filtered.sort_values("coc_return_20pct", ascending=False)
 elif ap == "opportunities":
-    filtered = df[df["description"].fillna("").astype(str).str.strip() != ""].copy()
+    if "has_pdf" in df.columns:
+        filtered = df[df["has_pdf"].fillna("False").astype(str).str.lower() == "true"].copy()
+    else:
+        filtered = df.iloc[0:0].copy()
 elif ap == "watchlist":
     wl = st.session_state.watchlist
     filtered = filtered[filtered["id"].astype(str).isin(wl)]
@@ -821,7 +824,7 @@ def render_detail_panel(row):
         st.warning(f"This listing is no longer active on Sunbelt. Last seen: {str(last_seen)[:10] if last_seen else 'unknown'}")
 
     description  = str(row.get("description") or "")
-    has_pdf      = bool(description and description != "nan")
+    has_pdf      = str(row.get("has_pdf", "False")).lower() == "true"
     listing_agent = str(row.get("listing_agent") or "")
     if listing_agent == "nan": listing_agent = ""
 
@@ -1093,7 +1096,7 @@ def render_deal_list(rows):
                        f'border-radius:6px;background:{source_color}18;color:{source_color}">'
                        f'{source_label}</span>')
 
-        has_pdf = bool(row.get("description") and str(row.get("description")) not in ("", "nan"))
+        has_pdf = str(row.get("has_pdf", "False")).lower() == "true"
         pdf_html = ('<span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:6px;'
                     'background:#7C3AED18;color:#7C3AED">📄 Reviewed</span>') if has_pdf else ""
 

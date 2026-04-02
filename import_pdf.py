@@ -178,6 +178,8 @@ def apply_updates(row: dict, updates: dict, csv_path: str):
             for field, change in updates.items():
                 if field in r:
                     r[field] = change["new"]
+            if "has_pdf" in r:
+                r["has_pdf"] = "True"
             break
 
     with path.open("w", newline="", encoding="utf-8") as f:
