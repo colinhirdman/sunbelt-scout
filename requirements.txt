@@ -8,3 +8,4 @@ lxml
 anthropic
 supabase
 pdfminer.six
+openpyxl

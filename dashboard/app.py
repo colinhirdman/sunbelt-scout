@@ -214,6 +214,27 @@ def _extract_pdf_text(file_bytes: bytes) -> str:
         return ""
 
 
+def _extract_excel_text(file_bytes: bytes) -> str:
+    try:
+        xl = pd.read_excel(io.BytesIO(file_bytes), sheet_name=None, header=None)
+        parts = []
+        for sheet_name, df in xl.items():
+            parts.append(f"── Sheet: {sheet_name} ──")
+            parts.append(df.fillna("").to_string(index=False, header=False))
+        return "\n\n".join(parts)[:15000]
+    except Exception:
+        return ""
+
+
+def _extract_file_text(file_bytes: bytes, filename: str) -> str:
+    name = filename.lower()
+    if name.endswith(".pdf"):
+        return _extract_pdf_text(file_bytes)
+    if name.endswith((".xlsx", ".xls")):
+        return _extract_excel_text(file_bytes)
+    return ""
+
+
 def _extract_pdf_fields(pdf_text: str) -> dict:
     try:
         key = st.secrets.get("ANTHROPIC_API_KEY", "")
@@ -1083,30 +1104,29 @@ def render_detail_panel(row):
 
     if not has_pdf_cloud:
         uploaded_files = st.file_uploader(
-            "Attach broker PDF" if not has_pdf_csv else "Upload PDF to enable download & full chat context",
-            type="pdf",
+            "Attach broker documents" if not has_pdf_csv else "Upload documents to enable download & full chat context",
+            type=["pdf", "xlsx", "xls"],
             accept_multiple_files=True,
             key=f"upload_{listing_id}",
-            help="You can upload multiple PDFs — they'll be combined into one document.",
+            help="Upload PDFs or Excel files — multiple files are combined into one document.",
         )
         if uploaded_files:
-            with st.spinner(f"Extracting and analyzing {len(uploaded_files)} PDF(s)…"):
+            with st.spinner(f"Extracting and analyzing {len(uploaded_files)} file(s)…"):
                 combined_text = ""
-                combined_bytes = b""
+                first_pdf_bytes = None
                 for uf in uploaded_files:
                     b = uf.read()
-                    combined_bytes += b
-                    part = _extract_pdf_text(b)
+                    part = _extract_file_text(b, uf.name)
                     combined_text += f"\n\n── {uf.name} ──\n\n{part}"
+                    if first_pdf_bytes is None and uf.name.lower().endswith(".pdf"):
+                        first_pdf_bytes = b
                 combined_text = combined_text.strip()[:20000]
                 fields = _extract_pdf_fields(combined_text)
                 _save_pdf_data(listing_id, fields, combined_text)
-                # Store first PDF as the downloadable file
-                first_bytes = uploaded_files[0].getvalue() if hasattr(uploaded_files[0], "getvalue") else b""
-                if first_bytes:
-                    _upload_pdf_storage(listing_id, first_bytes)
+                if first_pdf_bytes:
+                    _upload_pdf_storage(listing_id, first_pdf_bytes)
                 st.session_state.pdf_data[listing_id] = {"fields": fields, "pdf_text": combined_text}
-            st.success(f"{len(uploaded_files)} PDF(s) imported — listing enriched.")
+            st.success(f"{len(uploaded_files)} file(s) imported — listing enriched.")
             st.rerun()
         st.markdown('<div class="dp-section">Business Overview</div>', unsafe_allow_html=True)
         pdf_full_text = pdf_record.get("pdf_text", "") if pdf_record else ""
