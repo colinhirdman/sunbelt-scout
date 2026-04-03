@@ -3,6 +3,7 @@ import pandas as pd
 import plotly.express as px
 from pathlib import Path
 from supabase import create_client, Client
+import anthropic
 
 # ── Supabase client ─────────────────────────────────────────────────────────────
 @st.cache_resource
@@ -38,6 +39,86 @@ def _load_overrides() -> dict:
         return out
     except Exception:
         return {}
+
+def _chat_response(messages: list, listing_context: str) -> str:
+    """Call Claude Haiku with listing context and return assistant reply."""
+    try:
+        key = st.secrets.get("ANTHROPIC_API_KEY", "")
+        if not key:
+            return "ANTHROPIC_API_KEY not configured in Streamlit secrets."
+        client = anthropic.Anthropic(api_key=key)
+        system = (
+            "You are Scout, an AI assistant helping evaluate small business acquisition opportunities "
+            "for Monkey Island Ventures. You have deep expertise in SBA lending, business valuation, "
+            "owner-operator acquisitions, and SMB due diligence.\n\n"
+            "You are analyzing the following listing:\n\n"
+            + listing_context +
+            "\n\nBe concise and direct. Focus on what matters for an acquisition decision. "
+            "If asked to calculate something, show your work briefly."
+        )
+        response = client.messages.create(
+            model="claude-haiku-4-5-20251001",
+            max_tokens=1024,
+            system=system,
+            messages=messages,
+        )
+        return response.content[0].text
+    except Exception as e:
+        return f"Error: {e}"
+
+
+def _build_listing_context(row) -> str:
+    """Serialize a listing row into a readable context block for the system prompt."""
+    def v(key, fmt=None):
+        val = row.get(key)
+        if val is None or (isinstance(val, float) and pd.isna(val)) or str(val) in ("", "nan"):
+            return "N/A"
+        if fmt == "$":
+            return f"${float(val):,.0f}"
+        if fmt == "%":
+            return f"{float(val)*100:.1f}%"
+        if fmt == "x":
+            return f"{float(val):.2f}x"
+        return str(val)
+
+    lines = [
+        f"Title: {v('title')}",
+        f"ID: {v('id')}  |  Source: {v('source')}",
+        f"Location: {v('location')}  |  Industry: {v('industry')}",
+        f"Asking Price: {v('asking_price', '$')}",
+        f"Annual Cash Flow (SDE): {v('annual_cash_flow', '$')}",
+        f"Annual Revenue: {v('annual_revenue', '$')}",
+        f"Employees: {v('employees')}",
+        f"Years in Business: {v('years_in_business')}",
+        f"Absentee Owner: {v('absentee')}",
+        f"Franchise: {v('is_franchise')}  |  SBA Available: {v('sba_available')}",
+        f"Reason for Selling: {v('reason_for_selling')}",
+        f"Listing Agent: {v('listing_agent')}",
+        "",
+        "── SBA Financing (10% down) ──",
+        f"Down Payment: {v('down_10', '$')}  |  Monthly Payment: {v('sba_monthly_10pct', '$')}",
+        f"CF After Debt: {v('cf_after_debt_10pct', '$')}  |  CoC Return: {v('coc_return_10pct', '%')}",
+        f"DSCR: {v('dscr_10pct', 'x')}  |  Payoff: {v('payoff_years_10pct')} yrs",
+        "",
+        "── SBA Financing (20% down) ──",
+        f"Down Payment: {v('down_20', '$')}  |  Monthly Payment: {v('sba_monthly_20pct', '$')}",
+        f"CF After Debt: {v('cf_after_debt_20pct', '$')}  |  CoC Return: {v('coc_return_20pct', '%')}",
+        f"DSCR: {v('dscr_20pct', 'x')}  |  Payoff: {v('payoff_years_20pct')} yrs",
+        "",
+        f"Scout Score: {v('score')}  |  Bucket: {v('bucket')}",
+        f"Scoring Signals: {v('reasons')}",
+    ]
+
+    narrative = v("narrative")
+    if narrative != "N/A":
+        lines += ["", f"Scout Narrative: {narrative}"]
+
+    description = v("description")
+    if description != "N/A":
+        lines += ["", f"Broker Description: {description}"]
+
+    return "\n".join(lines)
+
 
 def _save_override(listing_id: str, dimension: str, value: int) -> None:
     try:
@@ -823,6 +904,7 @@ def render_detail_panel(row):
         last_seen = row.get("last_seen", "")
         st.warning(f"This listing is no longer active on Sunbelt. Last seen: {str(last_seen)[:10] if last_seen else 'unknown'}")
 
+    listing_id   = str(row.get("id", ""))
     description  = str(row.get("description") or "")
     has_pdf      = str(row.get("has_pdf", "False")).lower() == "true"
     listing_agent = str(row.get("listing_agent") or "")
@@ -858,15 +940,29 @@ def render_detail_panel(row):
     # ── PDF badge + Business Overview ──────────────────────────────────────────
     if has_pdf:
         agent_str = f" · {listing_agent}" if listing_agent else ""
-        st.markdown(
-            f'<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;'
-            f'padding:8px 12px;background:#7C3AED0D;border-radius:10px;border:1px solid #7C3AED22">'
-            f'<span style="font-size:13px">📄</span>'
-            f'<span style="font-size:12px;font-weight:700;color:#7C3AED">PDF Reviewed</span>'
-            f'<span style="font-size:11px;color:#717171">{agent_str}</span>'
-            f'</div>',
-            unsafe_allow_html=True,
-        )
+        badge_col, dl_col = st.columns([3, 1])
+        with badge_col:
+            st.markdown(
+                f'<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;'
+                f'padding:8px 12px;background:#7C3AED0D;border-radius:10px;border:1px solid #7C3AED22">'
+                f'<span style="font-size:13px">📄</span>'
+                f'<span style="font-size:12px;font-weight:700;color:#7C3AED">PDF Reviewed</span>'
+                f'<span style="font-size:11px;color:#717171">{agent_str}</span>'
+                f'</div>',
+                unsafe_allow_html=True,
+            )
+        with dl_col:
+            try:
+                pdf_bytes = _get_supabase().storage.from_("pdfs").download(f"{listing_id}.pdf")
+                st.download_button(
+                    label="Download PDF",
+                    data=pdf_bytes,
+                    file_name=f"{listing_id}.pdf",
+                    mime="application/pdf",
+                    use_container_width=True,
+                )
+            except Exception:
+                pass
         st.markdown('<div class="dp-section">Business Overview</div>', unsafe_allow_html=True)
         st.markdown(
             f'<div style="font-size:13px;line-height:1.7;color:#334155;padding:4px 0 12px">{description}</div>',
@@ -1006,6 +1102,28 @@ def render_detail_panel(row):
     if tags:
         st.markdown(f'<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">{"".join(tags)}</div>',
                     unsafe_allow_html=True)
+
+    # ── Ask Scout ──────────────────────────────────────────────────────────────
+    st.markdown('<div class="dp-section">Ask Scout</div>', unsafe_allow_html=True)
+    chat_key = f"chat_{listing_id}"
+    if chat_key not in st.session_state:
+        st.session_state[chat_key] = []
+
+    for msg in st.session_state[chat_key]:
+        with st.chat_message(msg["role"]):
+            st.write(msg["content"])
+
+    if prompt := st.chat_input("Ask about this opportunity…", key=f"ci_{listing_id}"):
+        st.session_state[chat_key].append({"role": "user", "content": prompt})
+        context = _build_listing_context(row)
+        reply = _chat_response(st.session_state[chat_key], context)
+        st.session_state[chat_key].append({"role": "assistant", "content": reply})
+        st.rerun()
+
+    if st.session_state[chat_key]:
+        if st.button("Clear chat", key=f"clearchat_{listing_id}", use_container_width=False):
+            st.session_state[chat_key] = []
+            st.rerun()
 
     # Narrative rendered at top — skip here
 

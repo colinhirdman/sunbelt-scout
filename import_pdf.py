@@ -8,6 +8,7 @@ Usage:
 
 Requires:
     ANTHROPIC_API_KEY environment variable
+    SUPABASE_URL + SUPABASE_KEY environment variables (for PDF storage)
 """
 import argparse
 import csv
@@ -27,6 +28,11 @@ try:
 except ImportError:
     print("Missing anthropic — run: pip install anthropic")
     sys.exit(1)
+
+try:
+    from supabase import create_client
+except ImportError:
+    create_client = None
 
 SUNBELT_CSV = Path(__file__).parent / "output" / "sunbelt.csv"
 CALHOUN_CSV = Path(__file__).parent / "output" / "calhoun.csv"
@@ -163,6 +169,33 @@ def build_updates(row: dict, extracted: dict) -> dict:
     return updates
 
 
+def upload_pdf_to_supabase(pdf_path: str, listing_id: str) -> bool:
+    """Upload PDF to Supabase Storage bucket 'pdfs' as {listing_id}.pdf. Returns True on success."""
+    if create_client is None:
+        print("  Skipping PDF upload — supabase-py not installed.")
+        return False
+    url = os.environ.get("SUPABASE_URL")
+    key = os.environ.get("SUPABASE_KEY")
+    if not url or not key:
+        print("  Skipping PDF upload — SUPABASE_URL / SUPABASE_KEY not set.")
+        return False
+    try:
+        sb = create_client(url, key)
+        filename = f"{listing_id}.pdf"
+        with open(pdf_path, "rb") as f:
+            data = f.read()
+        # upsert=True overwrites if already exists
+        sb.storage.from_("pdfs").upload(
+            filename, data,
+            file_options={"content-type": "application/pdf", "upsert": "true"},
+        )
+        print(f"  PDF uploaded to Supabase Storage: {filename}")
+        return True
+    except Exception as e:
+        print(f"  PDF upload failed: {e}")
+        return False
+
+
 def apply_updates(row: dict, updates: dict, csv_path: str):
     path = Path(csv_path)
     all_rows = []
@@ -249,6 +282,7 @@ def main():
 
     apply_updates(match, updates, match["_csv_path"])
     print(f"\nUpdated {match['id']} in {Path(match['_csv_path']).name}")
+    upload_pdf_to_supabase(str(pdf_path), match["id"])
 
 
 if __name__ == "__main__":
