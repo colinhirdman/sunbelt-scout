@@ -1082,21 +1082,31 @@ def render_detail_panel(row):
                     pass
 
     if not has_pdf_cloud:
-        uploaded = st.file_uploader(
+        uploaded_files = st.file_uploader(
             "Attach broker PDF" if not has_pdf_csv else "Upload PDF to enable download & full chat context",
             type="pdf",
+            accept_multiple_files=True,
             key=f"upload_{listing_id}",
-            help="Upload a broker PDF to enrich this listing and enable AI chat with full document context",
+            help="You can upload multiple PDFs — they'll be combined into one document.",
         )
-        if uploaded is not None:
-            with st.spinner("Extracting and analyzing PDF…"):
-                file_bytes = uploaded.read()
-                pdf_text   = _extract_pdf_text(file_bytes)
-                fields     = _extract_pdf_fields(pdf_text)
-                _save_pdf_data(listing_id, fields, pdf_text)
-                _upload_pdf_storage(listing_id, file_bytes)
-                st.session_state.pdf_data[listing_id] = {"fields": fields, "pdf_text": pdf_text}
-            st.success("PDF imported — listing enriched.")
+        if uploaded_files:
+            with st.spinner(f"Extracting and analyzing {len(uploaded_files)} PDF(s)…"):
+                combined_text = ""
+                combined_bytes = b""
+                for uf in uploaded_files:
+                    b = uf.read()
+                    combined_bytes += b
+                    part = _extract_pdf_text(b)
+                    combined_text += f"\n\n── {uf.name} ──\n\n{part}"
+                combined_text = combined_text.strip()[:20000]
+                fields = _extract_pdf_fields(combined_text)
+                _save_pdf_data(listing_id, fields, combined_text)
+                # Store first PDF as the downloadable file
+                first_bytes = uploaded_files[0].getvalue() if hasattr(uploaded_files[0], "getvalue") else b""
+                if first_bytes:
+                    _upload_pdf_storage(listing_id, first_bytes)
+                st.session_state.pdf_data[listing_id] = {"fields": fields, "pdf_text": combined_text}
+            st.success(f"{len(uploaded_files)} PDF(s) imported — listing enriched.")
             st.rerun()
         st.markdown('<div class="dp-section">Business Overview</div>', unsafe_allow_html=True)
         pdf_full_text = pdf_record.get("pdf_text", "") if pdf_record else ""
