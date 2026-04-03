@@ -1099,10 +1099,18 @@ def render_detail_panel(row):
             st.success("PDF imported — listing enriched.")
             st.rerun()
         st.markdown('<div class="dp-section">Business Overview</div>', unsafe_allow_html=True)
-        st.markdown(
-            f'<div style="font-size:13px;line-height:1.7;color:#334155;padding:4px 0 12px">{description}</div>',
-            unsafe_allow_html=True,
-        )
+        pdf_full_text = pdf_record.get("pdf_text", "") if pdf_record else ""
+        if pdf_full_text:
+            st.markdown(
+                f'<div style="font-size:13px;line-height:1.7;color:#334155;padding:4px 0 12px;'
+                f'white-space:pre-wrap">{pdf_full_text}</div>',
+                unsafe_allow_html=True,
+            )
+        elif description:
+            st.markdown(
+                f'<div style="font-size:13px;line-height:1.7;color:#334155;padding:4px 0 12px">{description}</div>',
+                unsafe_allow_html=True,
+            )
 
     # ── Deal Summary FIRST ──────────────────────────────────────────────────────
     narrative = row.get("narrative", "")
