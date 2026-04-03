@@ -1019,8 +1019,10 @@ def render_detail_panel(row):
         last_seen = row.get("last_seen", "")
         st.warning(f"This listing is no longer active on Sunbelt. Last seen: {str(last_seen)[:10] if last_seen else 'unknown'}")
 
-    description  = str(row.get("description") or "")
-    has_pdf      = (str(row.get("has_pdf", "False")).lower() == "true") or bool(pdf_record)
+    description   = str(row.get("description") or "")
+    has_pdf_csv   = str(row.get("has_pdf", "False")).lower() == "true"
+    has_pdf_cloud = bool(pdf_record)   # only True if uploaded via dashboard/Supabase
+    has_pdf       = has_pdf_csv or has_pdf_cloud
     listing_agent = str(row.get("listing_agent") or "")
     if listing_agent == "nan": listing_agent = ""
 
@@ -1061,27 +1063,29 @@ def render_detail_panel(row):
                 f'padding:8px 12px;background:#7C3AED0D;border-radius:10px;border:1px solid #7C3AED22">'
                 f'<span style="font-size:13px">📄</span>'
                 f'<span style="font-size:12px;font-weight:700;color:#7C3AED">PDF Reviewed</span>'
-                f'<span style="font-size:11px;color:#717171">{agent_str}</span>'
+                f'<span style="font-size:11px;color:#717181">{agent_str}</span>'
                 f'</div>',
                 unsafe_allow_html=True,
             )
         with dl_col:
-            try:
-                pdf_bytes = _get_supabase().storage.from_("pdfs").download(f"{listing_id}.pdf")
-                st.download_button(
-                    label="Download PDF",
-                    data=pdf_bytes,
-                    file_name=f"{listing_id}.pdf",
-                    mime="application/pdf",
-                    use_container_width=True,
-                )
-            except Exception:
-                pass
-    else:
+            if has_pdf_cloud:
+                try:
+                    pdf_bytes = _get_supabase().storage.from_("pdfs").download(f"{listing_id}.pdf")
+                    st.download_button(
+                        label="Download PDF",
+                        data=pdf_bytes,
+                        file_name=f"{listing_id}.pdf",
+                        mime="application/pdf",
+                        use_container_width=True,
+                    )
+                except Exception:
+                    pass
+
+    if not has_pdf_cloud:
         uploaded = st.file_uploader(
-            "Attach broker PDF", type="pdf",
+            "Attach broker PDF" if not has_pdf_csv else "Upload PDF to enable download & full chat context",
+            type="pdf",
             key=f"upload_{listing_id}",
-            label_visibility="collapsed",
             help="Upload a broker PDF to enrich this listing and enable AI chat with full document context",
         )
         if uploaded is not None:
