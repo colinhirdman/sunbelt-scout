@@ -4,6 +4,14 @@ import plotly.express as px
 from pathlib import Path
 from supabase import create_client, Client
 import anthropic
+import json
+import io
+
+try:
+    from pdfminer.high_level import extract_text as _pdfminer_extract
+    _PDFMINER_OK = True
+except ImportError:
+    _PDFMINER_OK = False
 
 # ── Supabase client ─────────────────────────────────────────────────────────────
 @st.cache_resource
@@ -117,6 +125,13 @@ def _build_listing_context(row) -> str:
     if description != "N/A":
         lines += ["", f"Broker Description: {description}"]
 
+    # Include full PDF text if available
+    lid = str(row.get("id", ""))
+    pdf_record = st.session_state.get("pdf_data", {}).get(lid, {})
+    pdf_text = pdf_record.get("pdf_text", "")
+    if pdf_text:
+        lines += ["", "── Full Broker Document ──", pdf_text[:8000]]
+
     return "\n".join(lines)
 
 
@@ -129,6 +144,91 @@ def _save_override(listing_id: str, dimension: str, value: int) -> None:
         }).execute()
     except Exception:
         pass
+
+
+# ── PDF data ────────────────────────────────────────────────────────────────────
+
+def _load_pdf_data() -> dict:
+    """Returns {listing_id: {fields: {}, pdf_text: ''}} from Supabase."""
+    try:
+        res = _get_supabase().table("pdf_data").select("listing_id,fields,pdf_text").execute()
+        return {r["listing_id"]: {"fields": r.get("fields") or {}, "pdf_text": r.get("pdf_text") or ""} for r in res.data}
+    except Exception:
+        return {}
+
+
+def _save_pdf_data(listing_id: str, fields: dict, pdf_text: str) -> None:
+    try:
+        _get_supabase().table("pdf_data").upsert({
+            "listing_id": listing_id,
+            "fields":     fields,
+            "pdf_text":   pdf_text,
+        }).execute()
+    except Exception as e:
+        st.error(f"Failed to save PDF data: {e}")
+
+
+def _upload_pdf_storage(listing_id: str, file_bytes: bytes) -> None:
+    try:
+        _get_supabase().storage.from_("pdfs").upload(
+            f"{listing_id}.pdf",
+            file_bytes,
+            file_options={"content-type": "application/pdf", "upsert": "true"},
+        )
+    except Exception as e:
+        st.warning(f"PDF storage upload failed: {e}")
+
+
+_PDF_EXTRACT_PROMPT = """You are extracting structured business listing data from a broker PDF.
+
+Return ONLY a valid JSON object with these fields (use null for anything not found):
+
+{
+  "title":             string or null,
+  "asking_price":      number or null,
+  "annual_cash_flow":  number or null,
+  "annual_revenue":    number or null,
+  "employees":         number or null,
+  "years_in_business": string or null,
+  "reason_for_selling":string or null,
+  "location":          string or null,
+  "industry":          string or null,
+  "listing_agent":     string or null,
+  "is_franchise":      string or null,
+  "sba_available":     string or null,
+  "description":       string or null
+}
+
+PDF text:
+"""
+
+
+def _extract_pdf_text(file_bytes: bytes) -> str:
+    if not _PDFMINER_OK:
+        return ""
+    try:
+        return _pdfminer_extract(io.BytesIO(file_bytes))[:15000]
+    except Exception:
+        return ""
+
+
+def _extract_pdf_fields(pdf_text: str) -> dict:
+    try:
+        key = st.secrets.get("ANTHROPIC_API_KEY", "")
+        if not key:
+            return {}
+        client = anthropic.Anthropic(api_key=key)
+        msg = client.messages.create(
+            model="claude-haiku-4-5-20251001",
+            max_tokens=1024,
+            messages=[{"role": "user", "content": _PDF_EXTRACT_PROMPT + pdf_text}],
+        )
+        raw = msg.content[0].text.strip()
+        if raw.startswith("```"):
+            raw = raw.split("\n", 1)[1].rsplit("```", 1)[0].strip()
+        return json.loads(raw)
+    except Exception:
+        return {}
 
 # ── Category config ────────────────────────────────────────────────────────────
 
@@ -655,6 +755,7 @@ if "selected_id"   not in st.session_state: st.session_state.selected_id   = Non
 if "watchlist"     not in st.session_state: st.session_state.watchlist     = _load_watchlist()
 if "active_preset" not in st.session_state: st.session_state.active_preset = None
 if "overrides"     not in st.session_state: st.session_state.overrides     = _load_overrides()
+if "pdf_data"      not in st.session_state: st.session_state.pdf_data      = _load_pdf_data()
 
 
 # ── Helpers ────────────────────────────────────────────────────────────────────
@@ -805,7 +906,12 @@ p1, p2, p3, p4, p5, p6 = st.columns(6)
 active = st.session_state.active_preset
 
 _n_coc          = len(base_filtered[base_filtered["coc_return_20pct"].notna() & (base_filtered["coc_return_20pct"] >= 0.20)])
-_n_opportunities = len(df[df["has_pdf"].fillna("False").astype(str).str.lower() == "true"]) if "has_pdf" in df.columns else 0
+_pdf_ids = set(st.session_state.get("pdf_data", {}).keys())
+if "has_pdf" in df.columns:
+    _csv_pdf = set(df[df["has_pdf"].fillna("False").astype(str).str.lower() == "true"]["id"].astype(str))
+else:
+    _csv_pdf = set()
+_n_opportunities = len(_csv_pdf | _pdf_ids)
 _n_wl           = len(st.session_state.watchlist)
 _n_rejected     = len(df[df["bucket"] == "AUTO-REJECT"])
 _n_archived     = len(df[df["is_active"].fillna("True").astype(str).str.lower() == "false"]) if "is_active" in df.columns else 0
@@ -863,10 +969,8 @@ if ap == "best_returns":
     filtered = filtered[filtered["coc_return_20pct"].notna() & (filtered["coc_return_20pct"] >= 0.20)]
     filtered = filtered.sort_values("coc_return_20pct", ascending=False)
 elif ap == "opportunities":
-    if "has_pdf" in df.columns:
-        filtered = df[df["has_pdf"].fillna("False").astype(str).str.lower() == "true"].copy()
-    else:
-        filtered = df.iloc[0:0].copy()
+    all_pdf_ids = _csv_pdf | _pdf_ids
+    filtered = df[df["id"].astype(str).isin(all_pdf_ids)].copy()
 elif ap == "watchlist":
     wl = st.session_state.watchlist
     filtered = filtered[filtered["id"].astype(str).isin(wl)]
@@ -889,6 +993,15 @@ if st.session_state.selected_id is not None:
 
 # ── Detail panel renderer ──────────────────────────────────────────────────────
 def render_detail_panel(row):
+    # Merge pdf_data fields (from Supabase) over CSV row values
+    row = dict(row)
+    listing_id  = str(row.get("id", ""))
+    pdf_record  = st.session_state.get("pdf_data", {}).get(listing_id, {})
+    pdf_fields  = pdf_record.get("fields", {})
+    for k, val in pdf_fields.items():
+        if val is not None and str(val) not in ("", "None", "null"):
+            row[k] = val
+
     title    = row.get("title", "Untitled")
     url      = row.get("url", "")
     bucket   = str(row.get("bucket", "SKIP"))
@@ -904,9 +1017,8 @@ def render_detail_panel(row):
         last_seen = row.get("last_seen", "")
         st.warning(f"This listing is no longer active on Sunbelt. Last seen: {str(last_seen)[:10] if last_seen else 'unknown'}")
 
-    listing_id   = str(row.get("id", ""))
     description  = str(row.get("description") or "")
-    has_pdf      = str(row.get("has_pdf", "False")).lower() == "true"
+    has_pdf      = (str(row.get("has_pdf", "False")).lower() == "true") or bool(pdf_record)
     listing_agent = str(row.get("listing_agent") or "")
     if listing_agent == "nan": listing_agent = ""
 
@@ -937,7 +1049,7 @@ def render_detail_panel(row):
 </div>
 """, unsafe_allow_html=True)
 
-    # ── PDF badge + Business Overview ──────────────────────────────────────────
+    # ── PDF badge + upload ──────────────────────────────────────────────────────
     if has_pdf:
         agent_str = f" · {listing_agent}" if listing_agent else ""
         badge_col, dl_col = st.columns([3, 1])
@@ -963,6 +1075,23 @@ def render_detail_panel(row):
                 )
             except Exception:
                 pass
+    else:
+        uploaded = st.file_uploader(
+            "Attach broker PDF", type="pdf",
+            key=f"upload_{listing_id}",
+            label_visibility="collapsed",
+            help="Upload a broker PDF to enrich this listing and enable AI chat with full document context",
+        )
+        if uploaded is not None:
+            with st.spinner("Extracting and analyzing PDF…"):
+                file_bytes = uploaded.read()
+                pdf_text   = _extract_pdf_text(file_bytes)
+                fields     = _extract_pdf_fields(pdf_text)
+                _save_pdf_data(listing_id, fields, pdf_text)
+                _upload_pdf_storage(listing_id, file_bytes)
+                st.session_state.pdf_data[listing_id] = {"fields": fields, "pdf_text": pdf_text}
+            st.success("PDF imported — listing enriched.")
+            st.rerun()
         st.markdown('<div class="dp-section">Business Overview</div>', unsafe_allow_html=True)
         st.markdown(
             f'<div style="font-size:13px;line-height:1.7;color:#334155;padding:4px 0 12px">{description}</div>',
