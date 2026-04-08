@@ -151,20 +151,25 @@ def _save_override(listing_id: str, dimension: str, value: int) -> None:
 # ── PDF data ────────────────────────────────────────────────────────────────────
 
 def _load_pdf_data() -> dict:
-    """Returns {listing_id: {fields: {}, pdf_text: ''}} from Supabase."""
+    """Returns {listing_id: {fields: {}, pdf_text: '', filenames: []}} from Supabase."""
     try:
-        res = _get_supabase().table("pdf_data").select("listing_id,fields,pdf_text").execute()
-        return {r["listing_id"]: {"fields": r.get("fields") or {}, "pdf_text": r.get("pdf_text") or ""} for r in res.data}
+        res = _get_supabase().table("pdf_data").select("listing_id,fields,pdf_text,filenames").execute()
+        return {r["listing_id"]: {
+            "fields":    r.get("fields") or {},
+            "pdf_text":  r.get("pdf_text") or "",
+            "filenames": r.get("filenames") or [],
+        } for r in res.data}
     except Exception:
         return {}
 
 
-def _save_pdf_data(listing_id: str, fields: dict, pdf_text: str) -> None:
+def _save_pdf_data(listing_id: str, fields: dict, pdf_text: str, filenames: list = None) -> None:
     try:
         _get_supabase().table("pdf_data").upsert({
             "listing_id": listing_id,
             "fields":     fields,
             "pdf_text":   pdf_text,
+            "filenames":  filenames or [],
         }).execute()
     except Exception as e:
         st.error(f"Failed to save PDF data: {e}")
@@ -1103,6 +1108,18 @@ def render_detail_panel(row):
                     pass
 
     if has_pdf_cloud:
+        filenames = pdf_record.get("filenames", [])
+        if filenames:
+            files_html = "".join(
+                f'<div style="font-size:11px;color:#475569;padding:2px 0">📄 {fn}</div>'
+                for fn in filenames
+            )
+            st.markdown(
+                f'<div style="padding:4px 0 8px">{files_html}</div>',
+                unsafe_allow_html=True,
+            )
+
+    if has_pdf_cloud:
         with st.expander("Replace / add documents"):
             uploaded_files = st.file_uploader(
                 "Upload PDFs or Excel files — replaces existing document context.",
@@ -1129,11 +1146,12 @@ def render_detail_panel(row):
                     if first_pdf_bytes is None and uf.name.lower().endswith(".pdf"):
                         first_pdf_bytes = b
                 combined_text = combined_text.strip()[:20000]
+                filenames = [uf.name for uf in uploaded_files]
                 fields = _extract_pdf_fields(combined_text)
-                _save_pdf_data(listing_id, fields, combined_text)
+                _save_pdf_data(listing_id, fields, combined_text, filenames)
                 if first_pdf_bytes:
                     _upload_pdf_storage(listing_id, first_pdf_bytes)
-                st.session_state.pdf_data[listing_id] = {"fields": fields, "pdf_text": combined_text}
+                st.session_state.pdf_data[listing_id] = {"fields": fields, "pdf_text": combined_text, "filenames": filenames}
             st.success(f"{len(uploaded_files)} file(s) imported — listing enriched.")
             st.rerun()
         st.markdown('<div class="dp-section">Business Overview</div>', unsafe_allow_html=True)
