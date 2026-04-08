@@ -1102,7 +1102,15 @@ def render_detail_panel(row):
                 except Exception:
                     pass
 
-    if not has_pdf_cloud:
+    if has_pdf_cloud:
+        with st.expander("Replace / add documents"):
+            uploaded_files = st.file_uploader(
+                "Upload PDFs or Excel files — replaces existing document context.",
+                type=["pdf", "xlsx", "xls"],
+                accept_multiple_files=True,
+                key=f"upload_{listing_id}",
+            )
+    else:
         uploaded_files = st.file_uploader(
             "Attach broker documents" if not has_pdf_csv else "Upload documents to enable download & full chat context",
             type=["pdf", "xlsx", "xls"],
